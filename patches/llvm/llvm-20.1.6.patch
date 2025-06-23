@@ -1,0 +1,6094 @@
+From bcea36d0337ac31b49ad5c02717c35b189b62316 Mon Sep 17 00:00:00 2001
+From: Peter Niekamp <pniekamp@gmail.com>
+Date: Mon, 23 Jun 2025 21:54:32 +1000
+Subject: [PATCH] a
+
+---
+ clang/lib/Basic/Targets.cpp                   |    2 +
+ clang/lib/Basic/Targets/OSTargets.h           |   28 +
+ clang/lib/Driver/CMakeLists.txt               |    1 +
+ clang/lib/Driver/Driver.cpp                   |    4 +
+ clang/lib/Driver/ToolChains/ZaOS.cpp          |   99 ++
+ clang/lib/Driver/ToolChains/ZaOS.h            |   76 +
+ compiler-rt/lib/builtins/CMakeLists.txt       |   16 +-
+ .../cmake/modules/LLVMLibCArchitectures.cmake |    2 +
+ libc/config/app.h                             |    2 +
+ libc/config/zaos/app.h                        |   97 ++
+ libc/config/zaos/x86_64/entrypoints.txt       | 1235 +++++++++++++++++
+ libc/config/zaos/x86_64/headers.txt           |   60 +
+ libc/include/llvm-libc-macros/time-macros.h   |    2 +
+ .../llvm-libc-macros/zaos/CMakeLists.txt      |    6 +
+ .../llvm-libc-macros/zaos/time-macros.h       |   20 +
+ libc/include/llvm-libc-types/__mutex_type.h   |    2 +
+ libc/include/llvm-libc-types/once_flag.h      |    2 +
+ libc/src/__support/File/zaos/CMakeLists.txt   |   63 +
+ libc/src/__support/File/zaos/file.cpp         |  124 ++
+ libc/src/__support/File/zaos/file.h           |   34 +
+ libc/src/__support/File/zaos/stderr.cpp       |   25 +
+ libc/src/__support/File/zaos/stdin.cpp        |   26 +
+ libc/src/__support/File/zaos/stdout.cpp       |   26 +
+ libc/src/__support/OSUtil/io.h                |    2 +
+ libc/src/__support/OSUtil/zaos/CMakeLists.txt |   27 +
+ libc/src/__support/OSUtil/zaos/exit.cpp       |   29 +
+ libc/src/__support/OSUtil/zaos/fcntl.cpp      |  120 ++
+ libc/src/__support/OSUtil/zaos/io.h           |   25 +
+ libc/src/__support/OSUtil/zaos/ioring.cpp     |  950 +++++++++++++
+ libc/src/__support/OSUtil/zaos/ioring.h       |  414 ++++++
+ libc/src/__support/OSUtil/zaos/vdso.cpp       |  139 ++
+ libc/src/__support/OSUtil/zaos/vdso.h         |  107 ++
+ .../OSUtil/zaos/x86_64/CMakeLists.txt         |    0
+ libc/src/__support/threads/mutex.h            |    2 +
+ libc/src/__support/threads/thread.h           |    3 +-
+ .../src/__support/threads/zaos/CMakeLists.txt |   33 +
+ libc/src/__support/threads/zaos/mutex.h       |  100 ++
+ libc/src/__support/threads/zaos/thread.cpp    |  316 +++++
+ libc/src/__support/time/zaos/CMakeLists.txt   |   13 +
+ .../src/__support/time/zaos/clock_gettime.cpp |   38 +
+ libc/src/stdlib/CMakeLists.txt                |    4 +-
+ libc/src/stdlib/zaos/CMakeLists.txt           |   71 +
+ libc/src/stdlib/zaos/abort.cpp                |   21 +
+ libc/src/stdlib/zaos/aligned_alloc.cpp        |   22 +
+ libc/src/stdlib/zaos/calloc.cpp               |   31 +
+ libc/src/stdlib/zaos/free.cpp                 |   22 +
+ libc/src/stdlib/zaos/heap.cpp                 |  152 ++
+ libc/src/stdlib/zaos/heap.h                   |   37 +
+ libc/src/stdlib/zaos/malloc.cpp               |   22 +
+ libc/src/stdlib/zaos/realloc.cpp              |   23 +
+ libc/src/time/zaos/CMakeLists.txt             |   68 +
+ libc/src/time/zaos/clock.cpp                  |   47 +
+ libc/src/time/zaos/clock_gettime.cpp          |   30 +
+ libc/src/time/zaos/gettimeofday.cpp           |   42 +
+ libc/src/time/zaos/nanosleep.cpp              |   48 +
+ libc/src/time/zaos/timespec_get.cpp           |   45 +
+ libc/startup/linux/do_start.cpp               |    5 -
+ libc/startup/zaos/CMakeLists.txt              |  139 ++
+ libc/startup/zaos/crti.cpp                    |    0
+ libc/startup/zaos/crtn.cpp                    |    0
+ libc/startup/zaos/do_start.cpp                |  204 +++
+ libc/startup/zaos/do_start.h                  |   15 +
+ libc/startup/zaos/x86_64/CMakeLists.txt       |   28 +
+ libc/startup/zaos/x86_64/start.cpp            |   33 +
+ libc/startup/zaos/x86_64/tls.cpp              |   71 +
+ lld/ELF/Writer.cpp                            |    2 +-
+ llvm/include/llvm/TargetParser/Triple.h       |    1 +
+ llvm/lib/TargetParser/Triple.cpp              |    2 +
+ 68 files changed, 5438 insertions(+), 17 deletions(-)
+ create mode 100644 clang/lib/Driver/ToolChains/ZaOS.cpp
+ create mode 100644 clang/lib/Driver/ToolChains/ZaOS.h
+ create mode 100644 libc/config/zaos/app.h
+ create mode 100644 libc/config/zaos/x86_64/entrypoints.txt
+ create mode 100644 libc/config/zaos/x86_64/headers.txt
+ create mode 100644 libc/include/llvm-libc-macros/zaos/CMakeLists.txt
+ create mode 100644 libc/include/llvm-libc-macros/zaos/time-macros.h
+ create mode 100644 libc/src/__support/File/zaos/CMakeLists.txt
+ create mode 100644 libc/src/__support/File/zaos/file.cpp
+ create mode 100644 libc/src/__support/File/zaos/file.h
+ create mode 100644 libc/src/__support/File/zaos/stderr.cpp
+ create mode 100644 libc/src/__support/File/zaos/stdin.cpp
+ create mode 100644 libc/src/__support/File/zaos/stdout.cpp
+ create mode 100644 libc/src/__support/OSUtil/zaos/CMakeLists.txt
+ create mode 100644 libc/src/__support/OSUtil/zaos/exit.cpp
+ create mode 100644 libc/src/__support/OSUtil/zaos/fcntl.cpp
+ create mode 100644 libc/src/__support/OSUtil/zaos/io.h
+ create mode 100644 libc/src/__support/OSUtil/zaos/ioring.cpp
+ create mode 100644 libc/src/__support/OSUtil/zaos/ioring.h
+ create mode 100644 libc/src/__support/OSUtil/zaos/vdso.cpp
+ create mode 100644 libc/src/__support/OSUtil/zaos/vdso.h
+ create mode 100644 libc/src/__support/OSUtil/zaos/x86_64/CMakeLists.txt
+ create mode 100644 libc/src/__support/threads/zaos/CMakeLists.txt
+ create mode 100644 libc/src/__support/threads/zaos/mutex.h
+ create mode 100755 libc/src/__support/threads/zaos/thread.cpp
+ create mode 100644 libc/src/__support/time/zaos/CMakeLists.txt
+ create mode 100644 libc/src/__support/time/zaos/clock_gettime.cpp
+ create mode 100644 libc/src/stdlib/zaos/CMakeLists.txt
+ create mode 100644 libc/src/stdlib/zaos/abort.cpp
+ create mode 100644 libc/src/stdlib/zaos/aligned_alloc.cpp
+ create mode 100644 libc/src/stdlib/zaos/calloc.cpp
+ create mode 100644 libc/src/stdlib/zaos/free.cpp
+ create mode 100644 libc/src/stdlib/zaos/heap.cpp
+ create mode 100644 libc/src/stdlib/zaos/heap.h
+ create mode 100644 libc/src/stdlib/zaos/malloc.cpp
+ create mode 100644 libc/src/stdlib/zaos/realloc.cpp
+ create mode 100644 libc/src/time/zaos/CMakeLists.txt
+ create mode 100644 libc/src/time/zaos/clock.cpp
+ create mode 100644 libc/src/time/zaos/clock_gettime.cpp
+ create mode 100644 libc/src/time/zaos/gettimeofday.cpp
+ create mode 100644 libc/src/time/zaos/nanosleep.cpp
+ create mode 100644 libc/src/time/zaos/timespec_get.cpp
+ create mode 100644 libc/startup/zaos/CMakeLists.txt
+ create mode 100644 libc/startup/zaos/crti.cpp
+ create mode 100644 libc/startup/zaos/crtn.cpp
+ create mode 100644 libc/startup/zaos/do_start.cpp
+ create mode 100644 libc/startup/zaos/do_start.h
+ create mode 100644 libc/startup/zaos/x86_64/CMakeLists.txt
+ create mode 100644 libc/startup/zaos/x86_64/start.cpp
+ create mode 100644 libc/startup/zaos/x86_64/tls.cpp
+
+diff --git a/clang/lib/Basic/Targets.cpp b/clang/lib/Basic/Targets.cpp
+index 281aebdb1..fa1bd5e67 100644
+--- a/clang/lib/Basic/Targets.cpp
++++ b/clang/lib/Basic/Targets.cpp
+@@ -654,6 +654,8 @@ std::unique_ptr<TargetInfo> AllocateTarget(const llvm::Triple &Triple,
+       return std::make_unique<PS5OSTargetInfo<X86_64TargetInfo>>(Triple, Opts);
+     case llvm::Triple::Hurd:
+       return std::make_unique<HurdTargetInfo<X86_64TargetInfo>>(Triple, Opts);
++    case llvm::Triple::ZaOS:
++      return std::make_unique<ZaOSTargetInfo<X86_64TargetInfo>>(Triple, Opts);
+     default:
+       return std::make_unique<X86_64TargetInfo>(Triple, Opts);
+     }
+diff --git a/clang/lib/Basic/Targets/OSTargets.h b/clang/lib/Basic/Targets/OSTargets.h
+index 4cf423027..25265fcca 100644
+--- a/clang/lib/Basic/Targets/OSTargets.h
++++ b/clang/lib/Basic/Targets/OSTargets.h
+@@ -1033,6 +1033,34 @@ public:
+   }
+ };
+ 
++// ZaOS Target
++template <typename Target>
++class LLVM_LIBRARY_VISIBILITY ZaOSTargetInfo : public OSTargetInfo<Target> {
++protected:
++  void getOSDefines(const LangOptions &Opts, const llvm::Triple &Triple,
++                    MacroBuilder &Builder) const override {
++    DefineStd(Builder, "unix", Opts);
++    Builder.defineMacro("__zaos__");
++    if (Opts.POSIXThreads)
++      Builder.defineMacro("_REENTRANT");
++    if (this->HasFloat128)
++      Builder.defineMacro("__FLOAT128__");
++  }
++
++public:
++  ZaOSTargetInfo(const llvm::Triple &Triple, const TargetOptions &Opts)
++      : OSTargetInfo<Target>(Triple, Opts) {
++    this->WIntType = TargetInfo::UnsignedInt;
++    switch (Triple.getArch()) {
++    default:
++      break;
++    case llvm::Triple::x86_64:
++      this->HasFloat128 = true;
++      break;
++    }
++  }
++};
++
+ } // namespace targets
+ } // namespace clang
+ #endif // LLVM_CLANG_LIB_BASIC_TARGETS_OSTARGETS_H
+diff --git a/clang/lib/Driver/CMakeLists.txt b/clang/lib/Driver/CMakeLists.txt
+index 5bdb66143..4c49c04b8 100644
+--- a/clang/lib/Driver/CMakeLists.txt
++++ b/clang/lib/Driver/CMakeLists.txt
+@@ -87,6 +87,7 @@ add_clang_library(clangDriver
+   ToolChains/PPCLinux.cpp
+   ToolChains/PPCFreeBSD.cpp
+   ToolChains/InterfaceStubs.cpp
++  ToolChains/ZaOS.cpp
+   ToolChains/ZOS.cpp
+   Types.cpp
+   XRayArgs.cpp
+diff --git a/clang/lib/Driver/Driver.cpp b/clang/lib/Driver/Driver.cpp
+index 87855fdb7..088a72736 100644
+--- a/clang/lib/Driver/Driver.cpp
++++ b/clang/lib/Driver/Driver.cpp
+@@ -51,6 +51,7 @@
+ #include "ToolChains/VEToolchain.h"
+ #include "ToolChains/WebAssembly.h"
+ #include "ToolChains/XCore.h"
++#include "ToolChains/ZaOS.h"
+ #include "ToolChains/ZOS.h"
+ #include "clang/Basic/DiagnosticDriver.h"
+ #include "clang/Basic/TargetID.h"
+@@ -6720,6 +6721,9 @@ const ToolChain &Driver::getToolChain(const ArgList &Args,
+     case llvm::Triple::LiteOS:
+       TC = std::make_unique<toolchains::OHOS>(*this, Target, Args);
+       break;
++    case llvm::Triple::ZaOS:
++      TC = std::make_unique<toolchains::ZaOS>(*this, Target, Args);
++      break;
+     case llvm::Triple::ZOS:
+       TC = std::make_unique<toolchains::ZOS>(*this, Target, Args);
+       break;
+diff --git a/clang/lib/Driver/ToolChains/ZaOS.cpp b/clang/lib/Driver/ToolChains/ZaOS.cpp
+new file mode 100644
+index 000000000..c322d7423
+--- /dev/null
++++ b/clang/lib/Driver/ToolChains/ZaOS.cpp
+@@ -0,0 +1,99 @@
++//===--- ZaOS.cpp - ZaOS ToolChain Implementations --------------*- C++ -*-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "ZaOS.h"
++#include "CommonArgs.h"
++#include "clang/Config/config.h"
++#include "clang/Driver/Compilation.h"
++#include "clang/Driver/Driver.h"
++#include "clang/Driver/Options.h"
++#include "clang/Driver/SanitizerArgs.h"
++#include "llvm/Support/Path.h"
++
++using namespace clang::driver;
++using namespace clang::driver::toolchains;
++using namespace clang::driver::tools;
++using namespace clang;
++using namespace llvm::opt;
++
++ZaOS::ZaOS(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
++    : Generic_ELF(D, Triple, Args) {
++  GCCInstallation.init(Triple, Args);
++
++  getFilePaths().push_back(concat(getDriver().SysRoot, "/usr/lib"));
++  getFilePaths().push_back(concat(getDriver().SysRoot, "/usr/lib/x86_64-unknown-zaos-llvm"));
++}
++
++Tool *ZaOS::buildLinker() const {
++  return new tools::gnutools::Linker(*this);
++}
++
++Tool *ZaOS::buildAssembler() const {
++  return new tools::gnutools::Assembler(*this);
++}
++
++Tool *ZaOS::buildStaticLibTool() const {
++  return new tools::gnutools::StaticLibTool(*this);
++}
++
++void ZaOS::addExtraOpts(llvm::opt::ArgStringList &CmdArgs) const {
++  CmdArgs.push_back("-z");
++  CmdArgs.push_back("now");
++  CmdArgs.push_back("-z");
++  CmdArgs.push_back("relro");
++}
++
++void ZaOS::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
++                                        ArgStringList &CC1Args) const {
++  const Driver &D = getDriver();
++
++  if (DriverArgs.hasArg(options::OPT_nostdinc))
++    return;
++
++  if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
++    SmallString<128> ResourceDirInclude(D.ResourceDir);
++    llvm::sys::path::append(ResourceDirInclude, "include");
++    addSystemInclude(DriverArgs, CC1Args, ResourceDirInclude);
++  }
++
++  if (DriverArgs.hasArg(options::OPT_nostdlibinc))
++    return;
++
++  // Check for configure-time C include directories.
++  StringRef CIncludeDirs(C_INCLUDE_DIRS);
++  if (CIncludeDirs != "") {
++    SmallVector<StringRef, 5> dirs;
++    CIncludeDirs.split(dirs, ":");
++    for (StringRef dir : dirs) {
++      StringRef Prefix =
++          llvm::sys::path::is_absolute(dir) ? "" : StringRef(D.SysRoot);
++      addExternCSystemInclude(DriverArgs, CC1Args, Prefix + dir);
++    }
++    return;
++  }
++
++  addExternCSystemInclude(DriverArgs, CC1Args, concat(D.SysRoot, "/usr/include"));
++}
++
++SanitizerMask ZaOS::getSupportedSanitizers() const {
++  SanitizerMask Res = ToolChain::getSupportedSanitizers();
++  Res |= SanitizerKind::SafeStack;
++  return Res;
++}
++
++SanitizerMask ZaOS::getDefaultSanitizers() const {
++  SanitizerMask Res;
++  switch (getTriple().getArch()) {
++  case llvm::Triple::x86_64:
++    //Res |= SanitizerKind::SafeStack;
++    break;
++  default:
++    break;
++  }
++  return Res;
++}
+diff --git a/clang/lib/Driver/ToolChains/ZaOS.h b/clang/lib/Driver/ToolChains/ZaOS.h
+new file mode 100644
+index 000000000..bfa45f2e1
+--- /dev/null
++++ b/clang/lib/Driver/ToolChains/ZaOS.h
+@@ -0,0 +1,76 @@
++//===--- ZAOS.h - ZaOS ToolChain Implementations ----------------*- C++ -*-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_ZAOS_H
++#define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_ZAOS_H
++
++#include "Gnu.h"
++#include "clang/Basic/LangOptions.h"
++#include "clang/Driver/Tool.h"
++#include "clang/Driver/ToolChain.h"
++
++namespace clang {
++namespace driver {
++
++namespace toolchains {
++
++class LLVM_LIBRARY_VISIBILITY ZaOS : public Generic_ELF {
++public:
++  ZaOS(const Driver &D, const llvm::Triple &Triple,
++          const llvm::opt::ArgList &Args);
++
++  bool HasNativeLLVMSupport() const override { return true; }
++
++  bool IsMathErrnoDefault() const override { return false; }
++  bool isPICDefault() const override { return false; }
++
++  bool isPIEDefault(const llvm::opt::ArgList &Args) const override {
++    return true;
++  }
++
++  LangOptions::StackProtectorMode
++  GetDefaultStackProtectorLevel(bool KernelOrKext) const override {
++    return LangOptions::SSPStrong;
++  }
++
++  SanitizerMask getSupportedSanitizers() const override;
++  SanitizerMask getDefaultSanitizers() const override;
++
++  void AddClangSystemIncludeArgs(
++      const llvm::opt::ArgList &DriverArgs,
++      llvm::opt::ArgStringList &CC1Args) const override;
++
++  void addExtraOpts(llvm::opt::ArgStringList &CmdArgs) const override;
++
++  RuntimeLibType GetDefaultRuntimeLibType() const override {
++    return ToolChain::RLT_CompilerRT;
++  }
++
++  CXXStdlibType GetDefaultCXXStdlibType() const override {
++    return ToolChain::CST_Libcxx;
++  }
++
++  unsigned GetDefaultDwarfVersion() const override { return 4; }
++
++  bool GetDefaultStandaloneDebug() const override { return true; }
++
++  const char *getDefaultLinker() const override { return "ld.lld"; }
++
++  std::string getDynamicLinker(const llvm::opt::ArgList &Args) const override { return "/zaos/lib/loader"; };
++
++protected:
++  Tool *buildLinker() const override;
++  Tool *buildAssembler() const override;
++  Tool *buildStaticLibTool() const override;
++};
++
++} // end namespace toolchains
++} // end namespace driver
++} // end namespace clang
++
++#endif // LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_ZAOS_H
+diff --git a/compiler-rt/lib/builtins/CMakeLists.txt b/compiler-rt/lib/builtins/CMakeLists.txt
+index 19316c52d..20b4d4760 100644
+--- a/compiler-rt/lib/builtins/CMakeLists.txt
++++ b/compiler-rt/lib/builtins/CMakeLists.txt
+@@ -230,14 +230,14 @@ option(COMPILER_RT_EXCLUDE_ATOMIC_BUILTIN
+   "Skip the atomic builtin (these should normally be provided by a shared library)"
+   On)
+ 
+-if(NOT FUCHSIA AND NOT COMPILER_RT_BAREMETAL_BUILD AND NOT COMPILER_RT_GPU_BUILD)
+-  set(GENERIC_SOURCES
+-    ${GENERIC_SOURCES}
+-    emutls.c
+-    enable_execute_stack.c
+-    eprintf.c
+-  )
+-endif()
++#if(NOT FUCHSIA AND NOT COMPILER_RT_BAREMETAL_BUILD AND NOT COMPILER_RT_GPU_BUILD)
++#  set(GENERIC_SOURCES
++#    ${GENERIC_SOURCES}
++#    emutls.c
++#    enable_execute_stack.c
++#    eprintf.c
++#  )
++#endif()
+ 
+ option(COMPILER_RT_LIBATOMIC_USE_PTHREAD
+   "Whether libatomic should use pthreads if available."
+diff --git a/libc/cmake/modules/LLVMLibCArchitectures.cmake b/libc/cmake/modules/LLVMLibCArchitectures.cmake
+index fbb1091dd..0142a8595 100644
+--- a/libc/cmake/modules/LLVMLibCArchitectures.cmake
++++ b/libc/cmake/modules/LLVMLibCArchitectures.cmake
+@@ -187,6 +187,8 @@ elseif(LIBC_TARGET_OS STREQUAL "windows")
+   set(LIBC_TARGET_OS_IS_WINDOWS TRUE)
+ elseif(LIBC_TARGET_OS STREQUAL "gpu")
+   set(LIBC_TARGET_OS_IS_GPU TRUE)
++elseif(LIBC_TARGET_OS STREQUAL "zaos")
++  set(LIBC_TARGET_OS_IS_ZAOS TRUE)
+ else()
+   message(FATAL_ERROR
+           "Unsupported libc target operating system ${LIBC_TARGET_OS}")
+diff --git a/libc/config/app.h b/libc/config/app.h
+index 27f4141d8..af06e17d4 100644
+--- a/libc/config/app.h
++++ b/libc/config/app.h
+@@ -15,6 +15,8 @@
+ #include "gpu/app.h"
+ #elif defined(__linux__)
+ #include "linux/app.h"
++#elif defined(__zaos__)
++#include "zaos/app.h"
+ #endif
+ 
+ #endif // LLVM_LIBC_CONFIG_APP_H
+diff --git a/libc/config/zaos/app.h b/libc/config/zaos/app.h
+new file mode 100644
+index 000000000..3380795f8
+--- /dev/null
++++ b/libc/config/zaos/app.h
+@@ -0,0 +1,97 @@
++//===-- Classes to capture properites of linux applications -----*- C++ -*-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_LIBC_CONFIG_ZAOS_APP_H
++#define LLVM_LIBC_CONFIG_ZAOS_APP_H
++
++#include "src/__support/macros/config.h"
++#include "src/__support/macros/properties/architectures.h"
++
++#include <stdint.h>
++
++namespace LIBC_NAMESPACE_DECL {
++
++// Data structure to capture properties of the linux/ELF TLS image.
++struct TLSImage {
++  // The load address of the TLS.
++  uintptr_t address;
++
++  // The byte size of the TLS image consisting of both initialized and
++  // uninitialized memory. In ELF executables, it is size of .tdata + size of
++  // .tbss. Put in another way, it is the memsz field of the PT_TLS header.
++  uintptr_t size;
++
++  // The byte size of initialized memory in the TLS image. In ELF exectubles,
++  // this is the size of .tdata. Put in another way, it is the filesz of the
++  // PT_TLS header.
++  uintptr_t init_size;
++
++  // The alignment of the TLS layout. It assumed that the alignment
++  // value is a power of 2.
++  uintptr_t align;
++};
++
++struct AuxEntry {
++  uintptr_t id;
++  uintptr_t value;
++};
++
++struct Args {
++  uintptr_t argc;
++  uintptr_t argv[1];
++};
++
++// Data structure which captures properties of a linux application.
++struct AppProperties {
++  // Page size used for the application.
++  uintptr_t page_size;
++
++  Args *args;
++
++  // The properties of an application's TLS image.
++  TLSImage tls;
++
++  // Environment data.
++  uintptr_t *env_ptr;
++
++  // Auxiliary vector data.
++  AuxEntry *auxv_ptr;
++};
++
++[[gnu::weak]] extern AppProperties app;
++
++// The descriptor of a thread's TLS area.
++struct TLSDescriptor {
++  // The size of the TLS area.
++  uintptr_t size = 0;
++
++  // The address of the TLS area. This address can be passed to cleanup
++  // functions like munmap.
++  uintptr_t addr = 0;
++
++  // The value the thread pointer register should be initialized to.
++  // Note that, dependending the target architecture ABI, it can be the
++  // same as |addr| or something else.
++  uintptr_t tp = 0;
++
++  constexpr TLSDescriptor() = default;
++};
++
++// Create and initialize the TLS area for the current thread. Should not
++// be called before app.tls has been initialized.
++void init_tls(TLSDescriptor &tls);
++
++// Cleanup the TLS area as described in |tls_descriptor|.
++void cleanup_tls(uintptr_t tls_addr, uintptr_t tls_size);
++
++// Set the thread pointer for the current thread.
++bool set_thread_ptr(uintptr_t val);
++
++} // namespace LIBC_NAMESPACE_DECL
++
++#endif // LLVM_LIBC_CONFIG_ZAOS_APP_H
+diff --git a/libc/config/zaos/x86_64/entrypoints.txt b/libc/config/zaos/x86_64/entrypoints.txt
+new file mode 100644
+index 000000000..4ea16f33c
+--- /dev/null
++++ b/libc/config/zaos/x86_64/entrypoints.txt
+@@ -0,0 +1,1235 @@
++
++set(TARGET_LIBC_ENTRYPOINTS
++    # ctype.h entrypoints
++    libc.src.ctype.isalnum
++    libc.src.ctype.isalpha
++    libc.src.ctype.isascii
++    libc.src.ctype.isblank
++    libc.src.ctype.iscntrl
++    libc.src.ctype.isdigit
++    libc.src.ctype.isgraph
++    libc.src.ctype.islower
++    libc.src.ctype.isprint
++    libc.src.ctype.ispunct
++    libc.src.ctype.isspace
++    libc.src.ctype.isupper
++    libc.src.ctype.isxdigit
++    libc.src.ctype.toascii
++    libc.src.ctype.tolower
++    libc.src.ctype.toupper
++
++    # dlfcn.h entrypoints
++    # libc.src.dlfcn.dlclose
++    # libc.src.dlfcn.dlerror
++    # libc.src.dlfcn.dlopen
++    # libc.src.dlfcn.dlsym
++
++    # errno.h entrypoints
++    libc.src.errno.errno
++
++    # fcntl.h entrypoints
++    # libc.src.fcntl.creat
++    # libc.src.fcntl.fcntl
++    # libc.src.fcntl.open
++    # libc.src.fcntl.openat
++
++    # poll.h entrypoints
++    # libc.src.poll.poll
++
++    # sched.h entrypoints
++    # libc.src.sched.sched_get_priority_max
++    # libc.src.sched.sched_get_priority_min
++    # libc.src.sched.sched_getaffinity
++    # libc.src.sched.sched_getparam
++    # libc.src.sched.sched_getscheduler
++    # libc.src.sched.sched_rr_get_interval
++    # libc.src.sched.sched_setaffinity
++    # libc.src.sched.sched_setparam
++    # libc.src.sched.sched_setscheduler
++    # libc.src.sched.sched_yield
++
++    # string.h entrypoints
++    libc.src.string.memccpy
++    libc.src.string.memchr
++    libc.src.string.memcmp
++    libc.src.string.memcpy
++    libc.src.string.memmem
++    libc.src.string.memmove
++    libc.src.string.mempcpy
++    libc.src.string.memrchr
++    libc.src.string.memset
++    libc.src.string.memset_explicit
++    libc.src.string.stpcpy
++    libc.src.string.stpncpy
++    libc.src.string.strcasestr
++    libc.src.string.strcat
++    libc.src.string.strchr
++    libc.src.string.strchrnul
++    libc.src.string.strcmp
++    libc.src.string.strcoll
++    libc.src.string.strcpy
++    libc.src.string.strcspn
++    libc.src.string.strdup
++    libc.src.string.strerror
++    libc.src.string.strerror_r
++    libc.src.string.strlcat
++    libc.src.string.strlcpy
++    libc.src.string.strlen
++    libc.src.string.strncat
++    libc.src.string.strncmp
++    libc.src.string.strncpy
++    libc.src.string.strndup
++    libc.src.string.strnlen
++    libc.src.string.strpbrk
++    libc.src.string.strrchr
++    libc.src.string.strsep
++    # libc.src.string.strsignal
++    libc.src.string.strspn
++    libc.src.string.strstr
++    libc.src.string.strtok
++    libc.src.string.strtok_r
++    libc.src.string.strxfrm
++
++    # strings.h entrypoints
++    libc.src.strings.bcmp
++    libc.src.strings.bcopy
++    libc.src.strings.bzero
++    # libc.src.strings.ffs
++    # libc.src.strings.ffsl
++    # libc.src.strings.ffsll
++    libc.src.strings.index
++    libc.src.strings.rindex
++    libc.src.strings.strcasecmp
++    libc.src.strings.strncasecmp
++
++    # inttypes.h entrypoints
++    libc.src.inttypes.imaxabs
++    libc.src.inttypes.imaxdiv
++    libc.src.inttypes.strtoimax
++    libc.src.inttypes.strtoumax
++
++    # stdbit.h entrypoints
++    libc.src.stdbit.stdc_bit_ceil_uc
++    libc.src.stdbit.stdc_bit_ceil_ui
++    libc.src.stdbit.stdc_bit_ceil_ul
++    libc.src.stdbit.stdc_bit_ceil_ull
++    libc.src.stdbit.stdc_bit_ceil_us
++    libc.src.stdbit.stdc_bit_floor_uc
++    libc.src.stdbit.stdc_bit_floor_ui
++    libc.src.stdbit.stdc_bit_floor_ul
++    libc.src.stdbit.stdc_bit_floor_ull
++    libc.src.stdbit.stdc_bit_floor_us
++    libc.src.stdbit.stdc_bit_width_uc
++    libc.src.stdbit.stdc_bit_width_ui
++    libc.src.stdbit.stdc_bit_width_ul
++    libc.src.stdbit.stdc_bit_width_ull
++    libc.src.stdbit.stdc_bit_width_us
++    libc.src.stdbit.stdc_count_ones_uc
++    libc.src.stdbit.stdc_count_ones_ui
++    libc.src.stdbit.stdc_count_ones_ul
++    libc.src.stdbit.stdc_count_ones_ull
++    libc.src.stdbit.stdc_count_ones_us
++    libc.src.stdbit.stdc_count_zeros_uc
++    libc.src.stdbit.stdc_count_zeros_ui
++    libc.src.stdbit.stdc_count_zeros_ul
++    libc.src.stdbit.stdc_count_zeros_ull
++    libc.src.stdbit.stdc_count_zeros_us
++    libc.src.stdbit.stdc_first_leading_one_uc
++    libc.src.stdbit.stdc_first_leading_one_ui
++    libc.src.stdbit.stdc_first_leading_one_ul
++    libc.src.stdbit.stdc_first_leading_one_ull
++    libc.src.stdbit.stdc_first_leading_one_us
++    libc.src.stdbit.stdc_first_leading_zero_uc
++    libc.src.stdbit.stdc_first_leading_zero_ui
++    libc.src.stdbit.stdc_first_leading_zero_ul
++    libc.src.stdbit.stdc_first_leading_zero_ull
++    libc.src.stdbit.stdc_first_leading_zero_us
++    libc.src.stdbit.stdc_first_trailing_one_uc
++    libc.src.stdbit.stdc_first_trailing_one_ui
++    libc.src.stdbit.stdc_first_trailing_one_ul
++    libc.src.stdbit.stdc_first_trailing_one_ull
++    libc.src.stdbit.stdc_first_trailing_one_us
++    libc.src.stdbit.stdc_first_trailing_zero_uc
++    libc.src.stdbit.stdc_first_trailing_zero_ui
++    libc.src.stdbit.stdc_first_trailing_zero_ul
++    libc.src.stdbit.stdc_first_trailing_zero_ull
++    libc.src.stdbit.stdc_first_trailing_zero_us
++    libc.src.stdbit.stdc_has_single_bit_uc
++    libc.src.stdbit.stdc_has_single_bit_ui
++    libc.src.stdbit.stdc_has_single_bit_ul
++    libc.src.stdbit.stdc_has_single_bit_ull
++    libc.src.stdbit.stdc_has_single_bit_us
++    libc.src.stdbit.stdc_leading_ones_uc
++    libc.src.stdbit.stdc_leading_ones_ui
++    libc.src.stdbit.stdc_leading_ones_ul
++    libc.src.stdbit.stdc_leading_ones_ull
++    libc.src.stdbit.stdc_leading_ones_us
++    libc.src.stdbit.stdc_leading_zeros_uc
++    libc.src.stdbit.stdc_leading_zeros_ui
++    libc.src.stdbit.stdc_leading_zeros_ul
++    libc.src.stdbit.stdc_leading_zeros_ull
++    libc.src.stdbit.stdc_leading_zeros_us
++    libc.src.stdbit.stdc_trailing_ones_uc
++    libc.src.stdbit.stdc_trailing_ones_ui
++    libc.src.stdbit.stdc_trailing_ones_ul
++    libc.src.stdbit.stdc_trailing_ones_ull
++    libc.src.stdbit.stdc_trailing_ones_us
++    libc.src.stdbit.stdc_trailing_zeros_uc
++    libc.src.stdbit.stdc_trailing_zeros_ui
++    libc.src.stdbit.stdc_trailing_zeros_ul
++    libc.src.stdbit.stdc_trailing_zeros_ull
++    libc.src.stdbit.stdc_trailing_zeros_us
++
++    # stdlib.h entrypoints
++    # libc.src.stdlib.a64l
++    libc.src.stdlib.abs
++    libc.src.stdlib.atof
++    libc.src.stdlib.atoi
++    libc.src.stdlib.atol
++    libc.src.stdlib.atoll
++    libc.src.stdlib.bsearch
++    libc.src.stdlib.div
++    # libc.src.stdlib.l64a
++    libc.src.stdlib.labs
++    libc.src.stdlib.ldiv
++    libc.src.stdlib.llabs
++    libc.src.stdlib.lldiv
++    # libc.src.stdlib.memalignment
++    libc.src.stdlib.qsort
++    libc.src.stdlib.qsort_r
++    libc.src.stdlib.rand
++    libc.src.stdlib.srand
++    libc.src.stdlib.strfromd
++    libc.src.stdlib.strfromf
++    libc.src.stdlib.strfroml
++    libc.src.stdlib.strtod
++    libc.src.stdlib.strtof
++    libc.src.stdlib.strtol
++    libc.src.stdlib.strtold
++    libc.src.stdlib.strtoll
++    libc.src.stdlib.strtoul
++    libc.src.stdlib.strtoull
++
++    # stdlib.h entrypoints
++    libc.src.stdlib.aligned_alloc
++    libc.src.stdlib.calloc
++    libc.src.stdlib.free
++    libc.src.stdlib.malloc
++    libc.src.stdlib.realloc
++
++    # stdio.h entrypoints
++    libc.src.stdio.fprintf
++    libc.src.stdio.fscanf
++    libc.src.stdio.vfscanf
++    libc.src.stdio.printf
++    # libc.src.stdio.remove
++    # libc.src.stdio.rename
++    libc.src.stdio.scanf
++    libc.src.stdio.vscanf
++    libc.src.stdio.snprintf
++    libc.src.stdio.sprintf
++    libc.src.stdio.asprintf
++    libc.src.stdio.sscanf
++    libc.src.stdio.vsscanf
++    libc.src.stdio.vfprintf
++    libc.src.stdio.vprintf
++    libc.src.stdio.vsnprintf
++    libc.src.stdio.vsprintf
++    libc.src.stdio.vasprintf
++
++    # sys/epoll.h entrypoints
++    # libc.src.sys.epoll.epoll_create
++    # libc.src.sys.epoll.epoll_create1
++    # libc.src.sys.epoll.epoll_ctl
++    # libc.src.sys.epoll.epoll_pwait
++    # libc.src.sys.epoll.epoll_wait
++
++    # sys/mman.h entrypoints
++    # libc.src.sys.mman.madvise
++    # libc.src.sys.mman.mincore
++    # libc.src.sys.mman.mlock
++    # libc.src.sys.mman.mlock2
++    # libc.src.sys.mman.mlockall
++    # libc.src.sys.mman.mmap
++    # libc.src.sys.mman.mremap
++    # libc.src.sys.mman.mprotect
++    # libc.src.sys.mman.msync
++    # libc.src.sys.mman.munlock
++    # libc.src.sys.mman.munlockall
++    # libc.src.sys.mman.munmap
++    # libc.src.sys.mman.remap_file_pages
++    # libc.src.sys.mman.posix_madvise
++    # libc.src.sys.mman.shm_open
++    # libc.src.sys.mman.shm_unlink
++
++    # sys/random.h entrypoints
++    # libc.src.sys.random.getrandom
++
++    # sys/resource.h entrypoints
++    # libc.src.sys.resource.getrlimit
++    # libc.src.sys.resource.setrlimit
++
++    # sys/sendfile entrypoints
++    # libc.src.sys.sendfile.sendfile
++
++    # sys/stat.h entrypoints
++    # libc.src.sys.stat.chmod
++    # libc.src.sys.stat.fchmod
++    # libc.src.sys.stat.fchmodat
++    # libc.src.sys.stat.fstat
++    # libc.src.sys.stat.lstat
++    # libc.src.sys.stat.mkdir
++    # libc.src.sys.stat.mkdirat
++    # libc.src.sys.stat.stat
++
++    # sys/statvfs.h
++    # libc.src.sys.statvfs.fstatvfs
++    # libc.src.sys.statvfs.statvfs
++
++    # sys/utimes.h entrypoints
++    # libc.src.sys.time.utimes
++
++    # sys/utsname.h entrypoints
++    # libc.src.sys.utsname.uname
++
++    # sys/wait.h entrypoints
++    # libc.src.sys.wait.wait
++    # libc.src.sys.wait.wait4
++    # libc.src.sys.wait.waitpid
++
++    # sys/prctl.h entrypoints
++    # libc.src.sys.prctl.prctl
++
++    # sys/auxv.h entrypoints
++    # libc.src.sys.auxv.getauxval
++
++    # termios.h entrypoints
++    # libc.src.termios.cfgetispeed
++    # libc.src.termios.cfgetospeed
++    # libc.src.termios.cfsetispeed
++    # libc.src.termios.cfsetospeed
++    # libc.src.termios.tcdrain
++    # libc.src.termios.tcflow
++    # libc.src.termios.tcflush
++    # libc.src.termios.tcgetattr
++    # libc.src.termios.tcgetsid
++    # libc.src.termios.tcsendbreak
++    # libc.src.termios.tcsetattr
++
++    # unistd.h entrypoints
++    # libc.src.unistd.access
++    # libc.src.unistd.chdir
++    # libc.src.unistd.close
++    # libc.src.unistd.dup
++    # libc.src.unistd.dup2
++    # libc.src.unistd.dup3
++    # libc.src.unistd.execve
++    # libc.src.unistd.fchdir
++    # libc.src.unistd.fpathconf
++    # libc.src.unistd.fsync
++    # libc.src.unistd.ftruncate
++    # libc.src.unistd.getcwd
++    # libc.src.unistd.getentropy
++    # libc.src.unistd.geteuid
++    # libc.src.unistd.getpid
++    # libc.src.unistd.getppid
++    # libc.src.unistd.getsid
++    # libc.src.unistd.gettid
++    # libc.src.unistd.getuid
++    # libc.src.unistd.isatty
++    # libc.src.unistd.link
++    # libc.src.unistd.linkat
++    # libc.src.unistd.lseek
++    # libc.src.unistd.pathconf
++    # libc.src.unistd.pipe
++    # libc.src.unistd.pipe2
++    # libc.src.unistd.pread
++    # libc.src.unistd.pwrite
++    # libc.src.unistd.read
++    # libc.src.unistd.readlink
++    # libc.src.unistd.readlinkat
++    # libc.src.unistd.rmdir
++    # libc.src.unistd.setsid
++    # libc.src.unistd.symlink
++    # libc.src.unistd.symlinkat
++    # libc.src.unistd.sysconf
++    # libc.src.unistd.truncate
++    # libc.src.unistd.unlink
++    # libc.src.unistd.unlinkat
++    # libc.src.unistd.write
++
++    # wchar.h entrypoints
++    libc.src.wchar.btowc
++    libc.src.wchar.wcslen
++    libc.src.wchar.wctob
++    # libc.src.wchar.wmemset
++    # libc.src.wchar.wcschr
++    # libc.src.wchar.wcspbrk
++    # libc.src.wchar.wcsspn
++    # libc.src.wchar.wmemcmp
++    # libc.src.wchar.wmemcpy
++
++    # sys/uio.h entrypoints
++    # libc.src.sys.uio.writev
++    # libc.src.sys.uio.readv
++
++    # sys/time.h entrypoints
++    # libc.src.sys.time.setitimer
++    # libc.src.sys.time.getitimer
++)
++
++if(LLVM_LIBC_INCLUDE_SCUDO)
++  list(APPEND TARGET_LIBC_ENTRYPOINTS
++    # malloc.h external entrypoints
++    libc.src.stdlib.mallopt
++  )
++endif()
++
++set(TARGET_LIBM_ENTRYPOINTS
++    # complex.h entrypoints
++    libc.src.complex.creal
++    libc.src.complex.crealf
++    libc.src.complex.creall
++    libc.src.complex.cimag
++    libc.src.complex.cimagf
++    libc.src.complex.cimagl
++    libc.src.complex.conj
++    libc.src.complex.conjf
++    libc.src.complex.conjl
++    libc.src.complex.cproj
++    libc.src.complex.cprojf
++    libc.src.complex.cprojl
++
++    # fenv.h entrypoints
++    libc.src.fenv.feclearexcept
++    libc.src.fenv.fedisableexcept
++    libc.src.fenv.feenableexcept
++    libc.src.fenv.fegetenv
++    libc.src.fenv.fegetexcept
++    libc.src.fenv.fegetexceptflag
++    libc.src.fenv.fegetround
++    libc.src.fenv.feholdexcept
++    libc.src.fenv.feraiseexcept
++    libc.src.fenv.fesetenv
++    libc.src.fenv.fesetexcept
++    libc.src.fenv.fesetexceptflag
++    libc.src.fenv.fesetround
++    libc.src.fenv.fetestexcept
++    libc.src.fenv.fetestexceptflag
++    libc.src.fenv.feupdateenv
++
++    # math.h entrypoints
++    # libc.src.math.acos
++    libc.src.math.acosf
++    libc.src.math.acoshf
++    # libc.src.math.asin
++    libc.src.math.asinf
++    libc.src.math.asinhf
++    libc.src.math.atan2
++    libc.src.math.atan2f
++    # libc.src.math.atan
++    libc.src.math.atanf
++    libc.src.math.atanhf
++    libc.src.math.canonicalize
++    libc.src.math.canonicalizef
++    libc.src.math.canonicalizel
++    libc.src.math.cbrt
++    libc.src.math.cbrtf
++    libc.src.math.ceil
++    libc.src.math.ceilf
++    libc.src.math.ceill
++    libc.src.math.copysign
++    libc.src.math.copysignf
++    libc.src.math.copysignl
++    libc.src.math.cos
++    libc.src.math.cosf
++    libc.src.math.coshf
++    libc.src.math.cospif
++    libc.src.math.dfmal
++    libc.src.math.dmull
++    libc.src.math.dsqrtl
++    libc.src.math.daddl
++    libc.src.math.ddivl
++    libc.src.math.dsubl
++    libc.src.math.erff
++    libc.src.math.exp
++    libc.src.math.exp10
++    libc.src.math.exp10f
++    libc.src.math.exp10m1f
++    libc.src.math.exp2
++    libc.src.math.exp2f
++    libc.src.math.exp2m1f
++    libc.src.math.expf
++    libc.src.math.expm1
++    libc.src.math.expm1f
++    libc.src.math.fabs
++    libc.src.math.fabsf
++    libc.src.math.fabsl
++    libc.src.math.fadd
++    libc.src.math.faddl
++    libc.src.math.fadd
++    libc.src.math.fdim
++    libc.src.math.fdimf
++    libc.src.math.fdiml
++    libc.src.math.fdiv
++    libc.src.math.fdivl
++    libc.src.math.ffma
++    libc.src.math.ffmal
++    libc.src.math.floor
++    libc.src.math.floorf
++    libc.src.math.floorl
++    libc.src.math.fma
++    libc.src.math.fmaf
++    libc.src.math.fmax
++    libc.src.math.fmaxf
++    libc.src.math.fmaximum
++    libc.src.math.fmaximum_mag
++    libc.src.math.fmaximum_mag_num
++    libc.src.math.fmaximum_mag_numf
++    libc.src.math.fmaximum_mag_numl
++    libc.src.math.fmaximum_magf
++    libc.src.math.fmaximum_magl
++    libc.src.math.fmaximum_num
++    libc.src.math.fmaximum_numf
++    libc.src.math.fmaximum_numl
++    libc.src.math.fmaximumf
++    libc.src.math.fmaximuml
++    libc.src.math.fmaxl
++    libc.src.math.fmin
++    libc.src.math.fminf
++    libc.src.math.fminimum
++    libc.src.math.fminimum_mag
++    libc.src.math.fminimum_mag_num
++    libc.src.math.fminimum_mag_numf
++    libc.src.math.fminimum_mag_numl
++    libc.src.math.fminimum_magf
++    libc.src.math.fminimum_magl
++    libc.src.math.fminimum_num
++    libc.src.math.fminimum_numf
++    libc.src.math.fminimum_numl
++    libc.src.math.fminimumf
++    libc.src.math.fminimuml
++    libc.src.math.fminl
++    libc.src.math.fmod
++    libc.src.math.fmodf
++    libc.src.math.fmodl
++    libc.src.math.fmul
++    libc.src.math.fmull
++    libc.src.math.frexp
++    libc.src.math.frexpf
++    libc.src.math.frexpl
++    libc.src.math.fromfp
++    libc.src.math.fromfpf
++    libc.src.math.fromfpl
++    libc.src.math.fromfpx
++    libc.src.math.fromfpxf
++    libc.src.math.fromfpxl
++    libc.src.math.fsqrt
++    libc.src.math.fsqrtl
++    libc.src.math.fsub
++    libc.src.math.fsubl
++    libc.src.math.getpayload
++    libc.src.math.getpayloadf
++    libc.src.math.getpayloadl
++    libc.src.math.hypot
++    libc.src.math.hypotf
++    libc.src.math.ilogb
++    libc.src.math.ilogbf
++    libc.src.math.ilogbl
++    libc.src.math.iscanonical
++    libc.src.math.iscanonicalf
++    libc.src.math.iscanonicall
++    libc.src.math.isnan
++    libc.src.math.isnanf
++    libc.src.math.isnanl
++    libc.src.math.issignaling
++    libc.src.math.issignalingf
++    libc.src.math.issignalingl
++    libc.src.math.ldexp
++    libc.src.math.ldexpf
++    libc.src.math.ldexpl
++    libc.src.math.llogb
++    libc.src.math.llogbf
++    libc.src.math.llogbl
++    libc.src.math.llrint
++    libc.src.math.llrintf
++    libc.src.math.llrintl
++    libc.src.math.llround
++    libc.src.math.llroundf
++    libc.src.math.llroundl
++    libc.src.math.log
++    libc.src.math.log10
++    libc.src.math.log10f
++    libc.src.math.log1p
++    libc.src.math.log1pf
++    libc.src.math.log2
++    libc.src.math.log2f
++    libc.src.math.logb
++    libc.src.math.logbf
++    libc.src.math.logbl
++    libc.src.math.logf
++    libc.src.math.lrint
++    libc.src.math.lrintf
++    libc.src.math.lrintl
++    libc.src.math.lround
++    libc.src.math.lroundf
++    libc.src.math.lroundl
++    libc.src.math.modf
++    libc.src.math.modff
++    libc.src.math.modfl
++    libc.src.math.nan
++    libc.src.math.nanf
++    libc.src.math.nanl
++    libc.src.math.nearbyint
++    libc.src.math.nearbyintf
++    libc.src.math.nearbyintl
++    libc.src.math.nextafter
++    libc.src.math.nextafterf
++    libc.src.math.nextafterl
++    libc.src.math.nextdown
++    libc.src.math.nextdownf
++    libc.src.math.nextdownl
++    libc.src.math.nexttoward
++    libc.src.math.nexttowardf
++    libc.src.math.nexttowardl
++    libc.src.math.nextup
++    libc.src.math.nextupf
++    libc.src.math.nextupl
++    libc.src.math.pow
++    libc.src.math.powf
++    libc.src.math.remainder
++    libc.src.math.remainderf
++    libc.src.math.remainderl
++    libc.src.math.remquo
++    libc.src.math.remquof
++    libc.src.math.remquol
++    libc.src.math.rint
++    libc.src.math.rintf
++    libc.src.math.rintl
++    libc.src.math.round
++    libc.src.math.roundeven
++    libc.src.math.roundevenf
++    libc.src.math.roundevenl
++    libc.src.math.roundf
++    libc.src.math.roundl
++    libc.src.math.scalbln
++    libc.src.math.scalblnf
++    libc.src.math.scalblnl
++    libc.src.math.scalbn
++    libc.src.math.scalbnf
++    libc.src.math.scalbnl
++    libc.src.math.setpayload
++    libc.src.math.setpayloadf
++    libc.src.math.setpayloadl
++    libc.src.math.setpayloadsig
++    libc.src.math.setpayloadsigf
++    libc.src.math.setpayloadsigl
++    libc.src.math.sin
++    libc.src.math.sincos
++    libc.src.math.sincosf
++    libc.src.math.sinf
++    libc.src.math.sinhf
++    libc.src.math.sinpif
++    libc.src.math.sqrt
++    libc.src.math.sqrtf
++    libc.src.math.sqrtl
++    libc.src.math.tan
++    libc.src.math.tanf
++    libc.src.math.tanhf
++    libc.src.math.totalorder
++    libc.src.math.totalorderf
++    libc.src.math.totalorderl
++    libc.src.math.totalordermag
++    libc.src.math.totalordermagf
++    libc.src.math.totalordermagl
++    libc.src.math.trunc
++    libc.src.math.truncf
++    libc.src.math.truncl
++    libc.src.math.ufromfp
++    libc.src.math.ufromfpf
++    libc.src.math.ufromfpl
++    libc.src.math.ufromfpx
++    libc.src.math.ufromfpxf
++    libc.src.math.ufromfpxl
++)
++
++if(LIBC_TYPES_HAS_CFLOAT16)
++  list(APPEND TARGET_LIBM_ENTRYPOINTS
++    # complex.h C23 _Complex _Float16 entrypoints
++    # libc.src.complex.crealf16
++    # libc.src.complex.cimagf16
++    # libc.src.complex.conjf16
++    # libc.src.complex.cprojf16
++  )
++endif()
++
++if(LIBC_TYPES_HAS_FLOAT16)
++  list(APPEND TARGET_LIBM_ENTRYPOINTS
++    # math.h C23 _Float16 entrypoints
++    # libc.src.math.acosf16
++    # libc.src.math.acoshf16
++    # libc.src.math.acospif16
++    # libc.src.math.asinf16
++    # libc.src.math.asinhf16
++    # libc.src.math.atanhf16
++    # libc.src.math.canonicalizef16
++    # libc.src.math.ceilf16
++    # libc.src.math.copysignf16
++    # libc.src.math.cosf16
++    # libc.src.math.coshf16
++    # libc.src.math.cospif16
++    # libc.src.math.exp10f16
++    # libc.src.math.exp10m1f16
++    # libc.src.math.exp2f16
++    # libc.src.math.exp2m1f16
++    # libc.src.math.expf16
++    # libc.src.math.expm1f16
++    # libc.src.math.f16add
++    # libc.src.math.f16addf
++    # libc.src.math.f16addl
++    # libc.src.math.f16div
++    # libc.src.math.f16divf
++    # libc.src.math.f16divl
++    # libc.src.math.f16fma
++    # libc.src.math.f16fmaf
++    # libc.src.math.f16fmal
++    # libc.src.math.f16mul
++    # libc.src.math.f16mulf
++    # libc.src.math.f16mull
++    # libc.src.math.f16sqrt
++    # libc.src.math.f16sqrtf
++    # libc.src.math.f16sqrtl
++    # libc.src.math.f16sub
++    # libc.src.math.f16subf
++    # libc.src.math.f16subl
++    # libc.src.math.fabsf16
++    # libc.src.math.fdimf16
++    # libc.src.math.floorf16
++    # libc.src.math.fmaf16
++    # libc.src.math.fmaxf16
++    # libc.src.math.fmaximum_mag_numf16
++    # libc.src.math.fmaximum_magf16
++    # libc.src.math.fmaximum_numf16
++    # libc.src.math.fmaximumf16
++    # libc.src.math.fminf16
++    # libc.src.math.fminimum_mag_numf16
++    # libc.src.math.fminimum_magf16
++    # libc.src.math.fminimum_numf16
++    # libc.src.math.fminimumf16
++    # libc.src.math.fmodf16
++    # libc.src.math.frexpf16
++    # libc.src.math.fromfpf16
++    # libc.src.math.fromfpxf16
++    # libc.src.math.getpayloadf16
++    # libc.src.math.hypotf16
++    # libc.src.math.ilogbf16
++    # libc.src.math.iscanonicalf16
++    # libc.src.math.issignalingf16
++    # libc.src.math.ldexpf16
++    # libc.src.math.llogbf16
++    # libc.src.math.llrintf16
++    # libc.src.math.llroundf16
++    # libc.src.math.log10f16
++    # libc.src.math.log2f16
++    # libc.src.math.logbf16
++    # libc.src.math.logf16
++    # libc.src.math.lrintf16
++    # libc.src.math.lroundf16
++    # libc.src.math.modff16
++    # libc.src.math.nanf16
++    # libc.src.math.nearbyintf16
++    # libc.src.math.nextafterf16
++    # libc.src.math.nextdownf16
++    # libc.src.math.nexttowardf16
++    # libc.src.math.nextupf16
++    # libc.src.math.remainderf16
++    # libc.src.math.remquof16
++    # libc.src.math.rintf16
++    # libc.src.math.roundevenf16
++    # libc.src.math.roundf16
++    # libc.src.math.scalblnf16
++    # libc.src.math.scalbnf16
++    # libc.src.math.setpayloadf16
++    # libc.src.math.setpayloadsigf16
++    # libc.src.math.sinf16
++    # libc.src.math.sinhf16
++    # libc.src.math.sinpif16
++    # libc.src.math.sqrtf16
++    # libc.src.math.tanf16
++    # libc.src.math.tanhf16
++    # libc.src.math.tanpif16
++    # libc.src.math.totalorderf16
++    # libc.src.math.totalordermagf16
++    # libc.src.math.truncf16
++    # libc.src.math.ufromfpf16
++    # libc.src.math.ufromfpxf16
++  )
++
++  if(LIBC_TYPES_HAS_FLOAT128)
++    list(APPEND TARGET_LIBM_ENTRYPOINTS
++      # math.h C23 mixed _Float16 and _Float128 entrypoints
++      # libc.src.math.f16addf128
++      # libc.src.math.f16divf128
++      # libc.src.math.f16fmaf128
++      # libc.src.math.f16mulf128
++      # libc.src.math.f16sqrtf128
++      # libc.src.math.f16subf128
++    )
++  endif()
++endif()
++
++if(LIBC_TYPES_HAS_CFLOAT128)
++  list(APPEND TARGET_LIBM_ENTRYPOINTS
++    # complex.h C23 _Complex _Float128 entrypoints
++    # libc.src.complex.crealf128
++    # libc.src.complex.cimagf128
++    # libc.src.complex.conjf128
++    # libc.src.complex.cprojf128
++  )
++endif()
++
++if(LIBC_TYPES_HAS_FLOAT128)
++  list(APPEND TARGET_LIBM_ENTRYPOINTS
++    # math.h C23 _Float128 entrypoints
++    # libc.src.math.atan2f128
++    # libc.src.math.canonicalizef128
++    # libc.src.math.ceilf128
++    # libc.src.math.copysignf128
++    # libc.src.math.daddf128
++    # libc.src.math.ddivf128
++    # libc.src.math.dfmaf128
++    # libc.src.math.dmulf128
++    # libc.src.math.dsqrtf128
++    # libc.src.math.dsubf128
++    # libc.src.math.fabsf128
++    # libc.src.math.faddf128
++    # libc.src.math.fdimf128
++    # libc.src.math.fdivf128
++    # libc.src.math.ffmaf128
++    # libc.src.math.floorf128
++    # libc.src.math.fmaxf128
++    # libc.src.math.fmaximum_mag_numf128
++    # libc.src.math.fmaximum_magf128
++    # libc.src.math.fmaximum_numf128
++    # libc.src.math.fmaximumf128
++    # libc.src.math.fminf128
++    # libc.src.math.fminimum_mag_numf128
++    # libc.src.math.fminimum_magf128
++    # libc.src.math.fminimum_numf128
++    # libc.src.math.fminimumf128
++    # libc.src.math.fmodf128
++    # libc.src.math.fmulf128
++    # libc.src.math.frexpf128
++    # libc.src.math.fromfpf128
++    # libc.src.math.fromfpxf128
++    # libc.src.math.fsqrtf128
++    # libc.src.math.fsubf128
++    # libc.src.math.getpayloadf128
++    # libc.src.math.ilogbf128
++    # libc.src.math.iscanonicalf128
++    # libc.src.math.issignalingf128
++    # libc.src.math.ldexpf128
++    # libc.src.math.llogbf128
++    # libc.src.math.llrintf128
++    # libc.src.math.llroundf128
++    # libc.src.math.logbf128
++    # libc.src.math.lrintf128
++    # libc.src.math.lroundf128
++    # libc.src.math.modff128
++    # libc.src.math.nanf128
++    # libc.src.math.nearbyintf128
++    # libc.src.math.nextafterf128
++    # libc.src.math.nextdownf128
++    # libc.src.math.nextupf128
++    # libc.src.math.remainderf128
++    # libc.src.math.remquof128
++    # libc.src.math.rintf128
++    # libc.src.math.roundevenf128
++    # libc.src.math.roundf128
++    # libc.src.math.scalblnf128
++    # libc.src.math.scalbnf128
++    # libc.src.math.setpayloadf128
++    # libc.src.math.setpayloadsigf128
++    # libc.src.math.sqrtf128
++    # libc.src.math.totalorderf128
++    # libc.src.math.totalordermagf128
++    # libc.src.math.truncf128
++    # libc.src.math.ufromfpf128
++    # libc.src.math.ufromfpxf128
++  )
++endif()
++
++if(LIBC_COMPILER_HAS_FIXED_POINT)
++  list(APPEND TARGET_LIBM_ENTRYPOINTS
++    # stdfix.h _Fract and _Accum entrypoints
++    # libc.src.stdfix.abshk
++    # libc.src.stdfix.abshr
++    # libc.src.stdfix.absk
++    # libc.src.stdfix.abslk
++    # libc.src.stdfix.abslr
++    # libc.src.stdfix.absr
++    # libc.src.stdfix.exphk
++    # libc.src.stdfix.expk
++    # libc.src.stdfix.roundhk
++    # libc.src.stdfix.roundhr
++    # libc.src.stdfix.roundk
++    # libc.src.stdfix.roundlk
++    # libc.src.stdfix.roundlr
++    # libc.src.stdfix.roundr
++    # libc.src.stdfix.rounduhk
++    # libc.src.stdfix.rounduhr
++    # libc.src.stdfix.rounduk
++    # libc.src.stdfix.roundulk
++    # libc.src.stdfix.roundulr
++    # libc.src.stdfix.roundur
++    # libc.src.stdfix.sqrtuhk
++    # libc.src.stdfix.sqrtuhr
++    # libc.src.stdfix.sqrtuk
++    # libc.src.stdfix.sqrtur
++    # libc.src.stdfix.sqrtulk
++    # libc.src.stdfix.sqrtulr
++    # libc.src.stdfix.uhksqrtus
++    # libc.src.stdfix.uksqrtui
++    # libc.src.stdfix.hrbits
++    # libc.src.stdfix.uhrbits
++    # libc.src.stdfix.rbits
++    # libc.src.stdfix.urbits
++    # libc.src.stdfix.lrbits
++    # libc.src.stdfix.ulrbits
++    # libc.src.stdfix.hkbits
++    # libc.src.stdfix.uhkbits
++    # libc.src.stdfix.kbits
++    # libc.src.stdfix.ukbits
++    # libc.src.stdfix.lkbits
++    # libc.src.stdfix.ulkbits
++    # libc.src.stdfix.bitshr
++    # libc.src.stdfix.bitsr
++    # libc.src.stdfix.bitslr
++    # libc.src.stdfix.bitshk
++    # libc.src.stdfix.bitsk
++    # libc.src.stdfix.bitslk
++    # libc.src.stdfix.bitsuhr
++    # libc.src.stdfix.bitsur
++    # libc.src.stdfix.bitsulr
++    # libc.src.stdfix.bitsuhk
++    # libc.src.stdfix.bitsuk
++    # libc.src.stdfix.bitsulk
++    # libc.src.stdfix.countlshr
++    # libc.src.stdfix.countlsr
++    # libc.src.stdfix.countlslr
++    # libc.src.stdfix.countlshk
++    # libc.src.stdfix.countlsk
++    # libc.src.stdfix.countlslk
++    # libc.src.stdfix.countlsuhr
++    # libc.src.stdfix.countlsur
++    # libc.src.stdfix.countlsulr
++    # libc.src.stdfix.countlsuhk
++    # libc.src.stdfix.countlsuk
++    # libc.src.stdfix.countlsulk
++    # libc.src.stdfix.idivr
++    # libc.src.stdfix.idivlr
++    # libc.src.stdfix.idivk
++    # libc.src.stdfix.idivlk
++    # libc.src.stdfix.idivur
++    # libc.src.stdfix.idivulr
++    # libc.src.stdfix.idivuk
++    # libc.src.stdfix.idivulk
++  )
++endif()
++
++if(LLVM_LIBC_FULL_BUILD)
++  list(APPEND TARGET_LIBC_ENTRYPOINTS
++    # ctype.h entrypoints
++    libc.src.ctype.isalnum_l
++    libc.src.ctype.isalpha_l
++    libc.src.ctype.isblank_l
++    libc.src.ctype.iscntrl_l
++    libc.src.ctype.isdigit_l
++    libc.src.ctype.isgraph_l
++    libc.src.ctype.islower_l
++    libc.src.ctype.isprint_l
++    libc.src.ctype.ispunct_l
++    libc.src.ctype.isspace_l
++    libc.src.ctype.isupper_l
++    libc.src.ctype.isxdigit_l
++    libc.src.ctype.tolower_l
++    libc.src.ctype.toupper_l
++
++    # stdlib.h entrypoints
++    libc.src.stdlib.strtod_l
++    libc.src.stdlib.strtof_l
++    libc.src.stdlib.strtol_l
++    libc.src.stdlib.strtold_l
++    libc.src.stdlib.strtoll_l
++    libc.src.stdlib.strtoul_l
++    libc.src.stdlib.strtoull_l
++
++    # string.h entrypoints
++    libc.src.string.strcoll_l
++    libc.src.string.strxfrm_l
++
++    # strings.h entrypoints
++    # libc.src.strings.strcasecmp_l
++    # libc.src.strings.strncasecmp_l
++
++    # assert.h entrypoints
++    # libc.src.assert.__assert_fail
++
++    # compiler entrypoints (no corresponding header)
++    libc.src.compiler.__stack_chk_fail
++
++    # dirent.h entrypoints
++    # libc.src.dirent.closedir
++    # libc.src.dirent.dirfd
++    # libc.src.dirent.opendir
++    # libc.src.dirent.readdir
++
++    # arpa/inet.h entrypoints
++    # libc.src.arpa.inet.htonl
++    # libc.src.arpa.inet.htons
++    # libc.src.arpa.inet.ntohl
++    # libc.src.arpa.inet.ntohs
++
++    # pthread.h entrypoints
++    # libc.src.pthread.pthread_atfork
++    # libc.src.pthread.pthread_attr_destroy
++    # libc.src.pthread.pthread_attr_getdetachstate
++    # libc.src.pthread.pthread_attr_getguardsize
++    # libc.src.pthread.pthread_attr_getstack
++    # libc.src.pthread.pthread_attr_getstacksize
++    # libc.src.pthread.pthread_attr_init
++    # libc.src.pthread.pthread_attr_setdetachstate
++    # libc.src.pthread.pthread_attr_setguardsize
++    # libc.src.pthread.pthread_attr_setstack
++    # libc.src.pthread.pthread_attr_setstacksize
++    # libc.src.pthread.pthread_condattr_destroy
++    # libc.src.pthread.pthread_condattr_getclock
++    # libc.src.pthread.pthread_condattr_getpshared
++    # libc.src.pthread.pthread_condattr_init
++    # libc.src.pthread.pthread_condattr_setclock
++    # libc.src.pthread.pthread_condattr_setpshared
++    # libc.src.pthread.pthread_create
++    # libc.src.pthread.pthread_detach
++    # libc.src.pthread.pthread_equal
++    # libc.src.pthread.pthread_exit
++    # libc.src.pthread.pthread_getname_np
++    # libc.src.pthread.pthread_getspecific
++    # libc.src.pthread.pthread_join
++    # libc.src.pthread.pthread_key_create
++    # libc.src.pthread.pthread_key_delete
++    # libc.src.pthread.pthread_mutex_destroy
++    # libc.src.pthread.pthread_mutex_init
++    # libc.src.pthread.pthread_mutex_lock
++    # libc.src.pthread.pthread_mutex_unlock
++    # libc.src.pthread.pthread_mutexattr_destroy
++    # libc.src.pthread.pthread_mutexattr_getpshared
++    # libc.src.pthread.pthread_mutexattr_getrobust
++    # libc.src.pthread.pthread_mutexattr_gettype
++    # libc.src.pthread.pthread_mutexattr_init
++    # libc.src.pthread.pthread_mutexattr_setpshared
++    # libc.src.pthread.pthread_mutexattr_setrobust
++    # libc.src.pthread.pthread_mutexattr_settype
++    # libc.src.pthread.pthread_once
++    # libc.src.pthread.pthread_rwlock_clockrdlock
++    # libc.src.pthread.pthread_rwlock_clockwrlock
++    # libc.src.pthread.pthread_rwlock_destroy
++    # libc.src.pthread.pthread_rwlock_init
++    # libc.src.pthread.pthread_rwlock_rdlock
++    # libc.src.pthread.pthread_rwlock_timedrdlock
++    # libc.src.pthread.pthread_rwlock_timedwrlock
++    # libc.src.pthread.pthread_rwlock_tryrdlock
++    # libc.src.pthread.pthread_rwlock_trywrlock
++    # libc.src.pthread.pthread_rwlock_unlock
++    # libc.src.pthread.pthread_rwlock_wrlock
++    # libc.src.pthread.pthread_rwlockattr_destroy
++    # libc.src.pthread.pthread_rwlockattr_getkind_np
++    # libc.src.pthread.pthread_rwlockattr_getpshared
++    # libc.src.pthread.pthread_rwlockattr_init
++    # libc.src.pthread.pthread_rwlockattr_setkind_np
++    # libc.src.pthread.pthread_rwlockattr_setpshared
++    # libc.src.pthread.pthread_spin_destroy
++    # libc.src.pthread.pthread_spin_init
++    # libc.src.pthread.pthread_spin_lock
++    # libc.src.pthread.pthread_spin_trylock
++    # libc.src.pthread.pthread_spin_unlock
++    # libc.src.pthread.pthread_self
++    # libc.src.pthread.pthread_setname_np
++    # libc.src.pthread.pthread_setspecific
++
++    # sched.h entrypoints
++    # libc.src.sched.__sched_getcpucount
++    # libc.src.sched.__sched_setcpuzero
++    # libc.src.sched.__sched_setcpuset
++    # libc.src.sched.__sched_getcpuisset
++
++    # setjmp.h entrypoints
++    # libc.src.setjmp.longjmp
++    # libc.src.setjmp.setjmp
++    # libc.src.setjmp.siglongjmp
++    # libc.src.setjmp.sigsetjmp
++
++    # stdio.h entrypoints
++    libc.src.stdio.clearerr
++    libc.src.stdio.clearerr_unlocked
++    libc.src.stdio.fclose
++    # libc.src.stdio.fdopen
++    libc.src.stdio.feof
++    libc.src.stdio.feof_unlocked
++    libc.src.stdio.ferror
++    libc.src.stdio.ferror_unlocked
++    libc.src.stdio.fflush
++    libc.src.stdio.fgetc
++    libc.src.stdio.fgetc_unlocked
++    libc.src.stdio.fgets
++    libc.src.stdio.fileno
++    # libc.src.stdio.flockfile
++    libc.src.stdio.fopen
++    # libc.src.stdio.fopencookie
++    libc.src.stdio.fputc
++    libc.src.stdio.fputs
++    libc.src.stdio.fread
++    libc.src.stdio.fread_unlocked
++    # libc.src.stdio.fseek
++    # libc.src.stdio.fseeko
++    # libc.src.stdio.ftell
++    # libc.src.stdio.ftello
++    # libc.src.stdio.funlockfile
++    libc.src.stdio.fwrite
++    libc.src.stdio.fwrite_unlocked
++    libc.src.stdio.getc
++    libc.src.stdio.getc_unlocked
++    libc.src.stdio.getchar
++    libc.src.stdio.getchar_unlocked
++    libc.src.stdio.putc
++    libc.src.stdio.putchar
++    libc.src.stdio.puts
++    libc.src.stdio.setbuf
++    libc.src.stdio.setvbuf
++    libc.src.stdio.stderr
++    libc.src.stdio.stdin
++    libc.src.stdio.stdout
++    libc.src.stdio.ungetc
++
++    # stdlib.h entrypoints
++    libc.src.stdlib._Exit
++    libc.src.stdlib.abort
++    libc.src.stdlib.at_quick_exit
++    libc.src.stdlib.atexit
++    libc.src.stdlib.exit
++    libc.src.stdlib.getenv
++    libc.src.stdlib.quick_exit
++
++    # signal.h entrypoints
++    # libc.src.signal.kill
++    # libc.src.signal.raise
++    # libc.src.signal.sigaction
++    # libc.src.signal.sigaddset
++    # libc.src.signal.sigaltstack
++    # libc.src.signal.sigdelset
++    # libc.src.signal.sigemptyset
++    # libc.src.signal.sigfillset
++    # libc.src.signal.signal
++    # libc.src.signal.sigprocmask
++
++    # spawn.h entrypoints
++    # libc.src.spawn.posix_spawn
++    # libc.src.spawn.posix_spawn_file_actions_addclose
++    # libc.src.spawn.posix_spawn_file_actions_adddup2
++    # libc.src.spawn.posix_spawn_file_actions_addopen
++    # libc.src.spawn.posix_spawn_file_actions_destroy
++    # libc.src.spawn.posix_spawn_file_actions_init
++
++    # search.h entrypoints
++    # libc.src.search.hcreate
++    # libc.src.search.hcreate_r
++    # libc.src.search.hdestroy
++    # libc.src.search.hdestroy_r
++    # libc.src.search.hsearch
++    # libc.src.search.hsearch_r
++    # libc.src.search.insque
++    # libc.src.search.lfind
++    # libc.src.search.lsearch
++    # libc.src.search.remque
++
++    # threads.h entrypoints
++    # libc.src.threads.call_once
++    # libc.src.threads.cnd_broadcast
++    # libc.src.threads.cnd_destroy
++    # libc.src.threads.cnd_init
++    # libc.src.threads.cnd_signal
++    # libc.src.threads.cnd_wait
++    # libc.src.threads.mtx_destroy
++    # libc.src.threads.mtx_init
++    # libc.src.threads.mtx_lock
++    # libc.src.threads.mtx_unlock
++    libc.src.threads.thrd_create
++    libc.src.threads.thrd_current
++    libc.src.threads.thrd_detach
++    libc.src.threads.thrd_equal
++    libc.src.threads.thrd_exit
++    libc.src.threads.thrd_join
++    # libc.src.threads.tss_create
++    # libc.src.threads.tss_delete
++    # libc.src.threads.tss_get
++    # libc.src.threads.tss_set
++
++    # time.h entrypoints
++    libc.src.time.asctime
++    libc.src.time.asctime_r
++    libc.src.time.ctime
++    libc.src.time.ctime_r
++    libc.src.time.clock
++    libc.src.time.clock_gettime
++    libc.src.time.difftime
++    libc.src.time.gettimeofday
++    libc.src.time.gmtime
++    libc.src.time.gmtime_r
++    libc.src.time.mktime
++    libc.src.time.nanosleep
++    # libc.src.time.strftime
++    # libc.src.time.strftime_l
++    libc.src.time.time
++    libc.src.time.timespec_get
++
++    # locale.h entrypoints
++    # libc.src.locale.localeconv
++    # libc.src.locale.duplocale
++    # libc.src.locale.freelocale
++    # libc.src.locale.localeconv
++    # libc.src.locale.newlocale
++    # libc.src.locale.setlocale
++    # libc.src.locale.uselocale
++
++    # unistd.h entrypoints
++    # libc.src.unistd.__llvm_libc_syscall
++    # libc.src.unistd._exit
++    libc.src.unistd.environ
++    # libc.src.unistd.execv
++    # libc.src.unistd.fork
++    # libc.src.unistd.getopt
++    # libc.src.unistd.optarg
++    # libc.src.unistd.opterr
++    # libc.src.unistd.optind
++    # libc.src.unistd.optopt
++    # libc.src.unistd.swab
++
++    # sys/select.h entrypoints
++    # libc.src.sys.select.select
++
++    # sys/socket.h entrypoints
++    # libc.src.sys.socket.socket
++    # libc.src.sys.socket.bind
++    # libc.src.sys.socket.socketpair
++    # libc.src.sys.socket.send
++    # libc.src.sys.socket.sendto
++    # libc.src.sys.socket.sendmsg
++    # libc.src.sys.socket.recv
++    # libc.src.sys.socket.recvfrom
++    # libc.src.sys.socket.recvmsg
++  )
++endif()
++
++set(TARGET_LLVMLIBC_ENTRYPOINTS
++  ${TARGET_LIBC_ENTRYPOINTS}
++  ${TARGET_LIBM_ENTRYPOINTS}
++)
+diff --git a/libc/config/zaos/x86_64/headers.txt b/libc/config/zaos/x86_64/headers.txt
+new file mode 100644
+index 000000000..bb45127f5
+--- /dev/null
++++ b/libc/config/zaos/x86_64/headers.txt
+@@ -0,0 +1,60 @@
++set(TARGET_PUBLIC_HEADERS
++    # libc.include.arpa_inet
++    libc.include.assert
++    libc.include.complex
++    libc.include.ctype
++    # libc.include.dirent
++    # libc.include.dlfcn
++    # libc.include.elf
++    # libc.include.endian
++    libc.include.errno
++    # libc.include.fcntl
++    # libc.include.features
++    libc.include.fenv
++    # libc.include.float
++    libc.include.inttypes
++    libc.include.limits
++    # libc.include.link
++    # libc.include.locale
++    libc.include.malloc
++    libc.include.math
++    # libc.include.poll
++    # libc.include.pthread
++    # libc.include.sched
++    # libc.include.search
++    # libc.include.setjmp
++    # libc.include.signal
++    # libc.include.spawn
++    libc.include.stdbit
++    # libc.include.stdckdint
++    # libc.include.stdfix
++    libc.include.stdint
++    libc.include.stdio
++    libc.include.stdlib
++    libc.include.string
++    libc.include.strings
++    # libc.include.sys_auxv
++    # libc.include.sys_epoll
++    # libc.include.sys_ioctl
++    # libc.include.sys_mman
++    # libc.include.sys_prctl
++    # libc.include.sys_queue
++    # libc.include.sys_random
++    # libc.include.sys_resource
++    # libc.include.sys_select
++    # libc.include.sys_socket
++    # libc.include.sys_stat
++    # libc.include.sys_statvfs
++    # libc.include.sys_syscall
++    # libc.include.sys_time
++    # libc.include.sys_types
++    # libc.include.sys_utsname
++    # libc.include.sys_wait
++    # libc.include.sysexits
++    # libc.include.termios
++    # libc.include.threads
++    # libc.include.time
++    # libc.include.uchar
++    # libc.include.unistd
++    libc.include.wchar
++)
+diff --git a/libc/include/llvm-libc-macros/time-macros.h b/libc/include/llvm-libc-macros/time-macros.h
+index 445d8b3e8..d6d1ed073 100644
+--- a/libc/include/llvm-libc-macros/time-macros.h
++++ b/libc/include/llvm-libc-macros/time-macros.h
+@@ -5,6 +5,8 @@
+ #include "gpu/time-macros.h"
+ #elif defined(__linux__)
+ #include "linux/time-macros.h"
++#elif defined(__zaos__)
++#include "zaos/time-macros.h"
+ #endif
+ 
+ #define TIME_UTC 1
+diff --git a/libc/include/llvm-libc-macros/zaos/CMakeLists.txt b/libc/include/llvm-libc-macros/zaos/CMakeLists.txt
+new file mode 100644
+index 000000000..e0d184aec
+--- /dev/null
++++ b/libc/include/llvm-libc-macros/zaos/CMakeLists.txt
+@@ -0,0 +1,6 @@
++add_header(
++  time_macros
++  HDR
++    time-macros.h
++)
++
+diff --git a/libc/include/llvm-libc-macros/zaos/time-macros.h b/libc/include/llvm-libc-macros/zaos/time-macros.h
+new file mode 100644
+index 000000000..8eacebf45
+--- /dev/null
++++ b/libc/include/llvm-libc-macros/zaos/time-macros.h
+@@ -0,0 +1,20 @@
++//===-- Definition of macros from time.h ---------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_LIBC_MACROS_ZAOS_TIME_MACROS_H
++#define LLVM_LIBC_MACROS_ZAOS_TIME_MACROS_H
++
++// clock type macros
++#define CLOCK_REALTIME 0
++#define CLOCK_MONOTONIC 1
++#define CLOCK_PROCESS_CPUTIME_ID 2
++#define CLOCK_THREAD_CPUTIME_ID 3
++
++#define CLOCKS_PER_SEC 1000000
++
++#endif // LLVM_LIBC_MACROS_ZAOS_TIME_MACROS_H
+diff --git a/libc/include/llvm-libc-types/__mutex_type.h b/libc/include/llvm-libc-types/__mutex_type.h
+index 835561626..8ea767ae4 100644
+--- a/libc/include/llvm-libc-types/__mutex_type.h
++++ b/libc/include/llvm-libc-types/__mutex_type.h
+@@ -21,6 +21,8 @@ typedef struct {
+ 
+ #ifdef __linux__
+   __futex_word __ftxw;
++#elif defined __zaos__
++  __futex_word __ftxw;
+ #else
+ #error "Mutex type not defined for the target platform."
+ #endif
+diff --git a/libc/include/llvm-libc-types/once_flag.h b/libc/include/llvm-libc-types/once_flag.h
+index b3b7e0de9..bdb8daaad 100644
+--- a/libc/include/llvm-libc-types/once_flag.h
++++ b/libc/include/llvm-libc-types/once_flag.h
+@@ -13,6 +13,8 @@
+ 
+ #ifdef __linux__
+ typedef __futex_word once_flag;
++#elif defined __zaos__
++typedef __futex_word once_flag;
+ #else
+ #error "Once flag type not defined for the target platform."
+ #endif
+diff --git a/libc/src/__support/File/zaos/CMakeLists.txt b/libc/src/__support/File/zaos/CMakeLists.txt
+new file mode 100644
+index 000000000..90601e6cf
+--- /dev/null
++++ b/libc/src/__support/File/zaos/CMakeLists.txt
+@@ -0,0 +1,63 @@
++
++add_object_library(
++  file
++  SRCS
++    file.cpp
++  HDRS
++    file.h
++  DEPENDS
++    libc.hdr.fcntl_macros
++    libc.include.sys_syscall
++    libc.include.sys_stat
++    libc.src.__support.CPP.new
++    libc.src.__support.OSUtil.osutil
++    libc.src.errno.errno
++    libc.src.__support.error_or
++    libc.src.__support.File.file
++    libc.hdr.types.off_t
++    libc.hdr.types.FILE
++    libc.hdr.stdio_macros
++)
++
++add_object_library(
++  stdout
++  SRCS
++    stdout.cpp
++  DEPENDS
++    .file
++    libc.hdr.types.FILE
++    libc.hdr.stdio_macros
++)
++
++add_object_library(
++  stdin
++  SRCS
++    stdin.cpp
++  DEPENDS
++    .file
++    libc.hdr.types.FILE
++    libc.hdr.stdio_macros
++)
++
++add_object_library(
++  stderr
++  SRCS
++    stderr.cpp
++  DEPENDS
++    .file
++    libc.hdr.types.FILE
++    libc.hdr.stdio_macros
++)
++
++#add_object_library(
++#  linux_dir
++#  SRCS
++#    dir.cpp
++#  DEPENDS
++#    libc.hdr.fcntl_macros
++#    libc.include.sys_syscall
++#    libc.src.__support.OSUtil.osutil
++#    libc.src.__support.error_or
++#    libc.src.errno.errno
++#    libc.src.__support.File.dir
++#)
+diff --git a/libc/src/__support/File/zaos/file.cpp b/libc/src/__support/File/zaos/file.cpp
+new file mode 100644
+index 000000000..0e51fac8e
+--- /dev/null
++++ b/libc/src/__support/File/zaos/file.cpp
+@@ -0,0 +1,124 @@
++//===--- Implementation of the ZaOS specialization of File ----------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "file.h"
++
++#include "hdr/stdio_macros.h"
++#include "hdr/types/off_t.h"
++#include "src/__support/CPP/new.h"
++#include "src/__support/File/file.h"
++#include "src/__support/OSUtil/zaos/vdso.h"
++#include "src/__support/OSUtil/zaos/ioring.h"
++#include "src/__support/macros/config.h"
++#include "src/string/strlen.h"
++#include "src/errno/libc_errno.h" // For error macros
++
++#include "hdr/fcntl_macros.h" // For mode_t and other flags to the open syscall
++
++namespace LIBC_NAMESPACE_DECL {
++
++FileIOResult zaos_file_write(File *f, const void *data, size_t size) {
++  auto *lf = reinterpret_cast<ZaOSFile *>(f);
++  int ret = os::write(thread_ring, lf->get_fd(), data, size);
++  if (ret < 0) {
++    return {0, -ret};
++  }
++  return ret;
++}
++
++FileIOResult zaos_file_read(File *f, void *buf, size_t size) {
++  auto *lf = reinterpret_cast<ZaOSFile *>(f);
++  int ret = os::read(thread_ring, lf->get_fd(), buf, size);
++  if (ret < 0) {
++    return {0, -ret};
++  }
++  return ret;
++}
++
++ErrorOr<off_t> zaos_file_seek(File *f, off_t offset, int whence) {
++  (void)f;
++  (void)offset;
++  (void)whence;
++  //auto *lf = reinterpret_cast<ZaOSFile *>(f);
++  //auto result = internal::lseekimpl(lf->get_fd(), offset, whence);
++  //if (!result.has_value())
++  //  return result.error();
++  //return result.value();
++  int ret = -95;
++  return Error(-ret);
++}
++
++int zaos_file_close(File *f) {
++  auto *lf = reinterpret_cast<ZaOSFile *>(f);
++  int ret = os::close(thread_ring, lf->get_fd());
++  if (ret < 0) {
++    return -ret;
++  }
++  delete lf;
++  return 0;
++}
++
++ErrorOr<File *> openfile(const char *path, const char *mode) {
++  using namespace os;
++  
++  using ModeFlags = File::ModeFlags;
++  auto modeflags = File::mode_flags(mode);
++  if (modeflags == 0) {
++    // return {nullptr, EINVAL};
++    return Error(EINVAL);
++  }
++  long open_flags = 0;
++  if (modeflags & ModeFlags(File::OpenMode::APPEND)) {
++    open_flags = O_CREAT | O_APPEND;
++    if (modeflags & ModeFlags(File::OpenMode::PLUS))
++      open_flags |= O_RDWR;
++    else
++      open_flags |= O_WRONLY;
++  } else if (modeflags & ModeFlags(File::OpenMode::WRITE)) {
++    open_flags = O_CREAT | O_TRUNC;
++    if (modeflags & ModeFlags(File::OpenMode::PLUS))
++      open_flags |= O_RDWR;
++    else
++      open_flags |= O_WRONLY;
++  } else {
++    if (modeflags & ModeFlags(File::OpenMode::PLUS))
++      open_flags |= O_RDWR;
++    else
++      open_flags |= O_RDONLY;
++  }
++
++  // File created will have 0666 permissions.
++  constexpr long OPEN_MODE =
++      S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
++
++  int fd = os::open(thread_ring, os::string(path, strlen(path)), open_flags, OPEN_MODE);
++
++  if (fd < 0)
++    return Error(-fd);
++
++  uint8_t *buffer;
++  {
++    AllocChecker ac;
++    buffer = new (ac) uint8_t[File::DEFAULT_BUFFER_SIZE];
++    if (!ac)
++      return Error(ENOMEM);
++  }
++  AllocChecker ac;
++  auto *file = new (ac)
++      ZaOSFile(fd, buffer, File::DEFAULT_BUFFER_SIZE, _IOFBF, true, modeflags);
++  if (!ac)
++    return Error(ENOMEM);
++  return file;
++}
++
++int get_fileno(File *f) {
++  auto *lf = reinterpret_cast<ZaOSFile *>(f);
++  return lf->get_fd();
++}
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/__support/File/zaos/file.h b/libc/src/__support/File/zaos/file.h
+new file mode 100644
+index 000000000..77dadadb5
+--- /dev/null
++++ b/libc/src/__support/File/zaos/file.h
+@@ -0,0 +1,34 @@
++//===--- Zaos specialization of the File data structure -------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "hdr/types/off_t.h"
++#include "src/__support/File/file.h"
++#include "src/__support/macros/config.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++FileIOResult zaos_file_write(File *, const void *, size_t);
++FileIOResult zaos_file_read(File *, void *, size_t);
++ErrorOr<off_t> zaos_file_seek(File *, off_t, int);
++int zaos_file_close(File *);
++
++class ZaOSFile : public File {
++  int fd;
++
++public:
++  constexpr ZaOSFile(int file_descriptor, uint8_t *buffer, size_t buffer_size,
++                      int buffer_mode, bool owned, File::ModeFlags modeflags)
++      : File(&zaos_file_write, &zaos_file_read, &zaos_file_seek,
++             &zaos_file_close, buffer, buffer_size, buffer_mode, owned,
++             modeflags),
++        fd(file_descriptor) {}
++
++  int get_fd() const { return fd; }
++};
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/__support/File/zaos/stderr.cpp b/libc/src/__support/File/zaos/stderr.cpp
+new file mode 100644
+index 000000000..de5762a74
+--- /dev/null
++++ b/libc/src/__support/File/zaos/stderr.cpp
+@@ -0,0 +1,25 @@
++//===--- Definition of Linux stderr ---------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "file.h"
++#include "hdr/stdio_macros.h"
++#include "hdr/types/FILE.h"
++#include "src/__support/macros/config.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++constexpr size_t STDERR_BUFFER_SIZE = 0;
++static ZaOSFile StdErr(2, nullptr, STDERR_BUFFER_SIZE, _IONBF, false,
++                        File::ModeFlags(File::OpenMode::APPEND));
++File *stderr = &StdErr;
++
++} // namespace LIBC_NAMESPACE_DECL
++
++extern "C" {
++FILE *stderr = reinterpret_cast<FILE *>(&LIBC_NAMESPACE::StdErr);
++}
+diff --git a/libc/src/__support/File/zaos/stdin.cpp b/libc/src/__support/File/zaos/stdin.cpp
+new file mode 100644
+index 000000000..6e9a770de
+--- /dev/null
++++ b/libc/src/__support/File/zaos/stdin.cpp
+@@ -0,0 +1,26 @@
++//===--- Definition of Linux stdin ----------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "file.h"
++#include "hdr/stdio_macros.h"
++#include "hdr/types/FILE.h"
++#include "src/__support/macros/config.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++constexpr size_t STDIN_BUFFER_SIZE = 512;
++uint8_t stdin_buffer[STDIN_BUFFER_SIZE];
++static ZaOSFile StdIn(0, stdin_buffer, STDIN_BUFFER_SIZE, _IOFBF, false,
++                       File::ModeFlags(File::OpenMode::READ));
++File *stdin = &StdIn;
++
++} // namespace LIBC_NAMESPACE_DECL
++
++extern "C" {
++FILE *stdin = reinterpret_cast<FILE *>(&LIBC_NAMESPACE::StdIn);
++} // extern "C"
+diff --git a/libc/src/__support/File/zaos/stdout.cpp b/libc/src/__support/File/zaos/stdout.cpp
+new file mode 100644
+index 000000000..f0335ecc3
+--- /dev/null
++++ b/libc/src/__support/File/zaos/stdout.cpp
+@@ -0,0 +1,26 @@
++//===--- Definition of Linux stdout ---------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "file.h"
++#include "hdr/stdio_macros.h"
++#include "hdr/types/FILE.h"
++#include "src/__support/macros/config.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++constexpr size_t STDOUT_BUFFER_SIZE = 1024;
++uint8_t stdout_buffer[STDOUT_BUFFER_SIZE];
++static ZaOSFile StdOut(1, stdout_buffer, STDOUT_BUFFER_SIZE, _IOLBF, false,
++                        File::ModeFlags(File::OpenMode::APPEND));
++File *stdout = &StdOut;
++
++} // namespace LIBC_NAMESPACE_DECL
++
++extern "C" {
++FILE *stdout = reinterpret_cast<FILE *>(&LIBC_NAMESPACE::StdOut);
++} // extern "C"
+diff --git a/libc/src/__support/OSUtil/io.h b/libc/src/__support/OSUtil/io.h
+index 80119da77..a80c4b26d 100644
+--- a/libc/src/__support/OSUtil/io.h
++++ b/libc/src/__support/OSUtil/io.h
+@@ -17,6 +17,8 @@
+ #include "darwin/io.h"
+ #elif defined(__linux__)
+ #include "linux/io.h"
++#elif defined(__zaos__)
++#include "zaos/io.h"
+ #elif defined(__Fuchsia__)
+ #include "fuchsia/io.h"
+ #elif defined(_WIN32)
+diff --git a/libc/src/__support/OSUtil/zaos/CMakeLists.txt b/libc/src/__support/OSUtil/zaos/CMakeLists.txt
+new file mode 100644
+index 000000000..af8e71d32
+--- /dev/null
++++ b/libc/src/__support/OSUtil/zaos/CMakeLists.txt
+@@ -0,0 +1,27 @@
++if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${LIBC_TARGET_ARCHITECTURE})
++  return()
++endif()
++
++add_subdirectory(${LIBC_TARGET_ARCHITECTURE})
++
++add_object_library(
++  zaos_util
++  SRCS
++    exit.cpp
++    fcntl.cpp
++    vdso.cpp
++    ioring.cpp
++  HDRS
++    io.h
++    vdso.h
++    ioring.h
++  DEPENDS
++    libc.src.__support.common
++    libc.src.__support.CPP.string_view
++    libc.src.errno.errno
++    libc.hdr.fcntl_macros
++    libc.hdr.types.struct_flock
++    libc.hdr.types.struct_flock64
++    libc.hdr.types.struct_f_owner_ex
++    libc.hdr.types.off_t
++)
+diff --git a/libc/src/__support/OSUtil/zaos/exit.cpp b/libc/src/__support/OSUtil/zaos/exit.cpp
+new file mode 100644
+index 000000000..7faaf2cc6
+--- /dev/null
++++ b/libc/src/__support/OSUtil/zaos/exit.cpp
+@@ -0,0 +1,29 @@
++//===------------ Zaos implementation of an exit function -------*- C++ -*-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/__support/common.h"
++#include "src/__support/macros/config.h"
++#include "src/__support/OSUtil/zaos/vdso.h"
++
++namespace LIBC_NAMESPACE_DECL {
++namespace internal {
++
++// mark as no_stack_protector for x86 since TLS can be torn down before calling
++// exit so that the stack protector canary cannot be loaded.
++#ifdef LIBC_TARGET_ARCH_IS_X86
++__attribute__((no_stack_protector))
++#endif
++__attribute__((noreturn)) void
++exit(int status) {
++  for (;;) {
++    os::process_exit(status);
++  }
++}
++
++} // namespace internal
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/__support/OSUtil/zaos/fcntl.cpp b/libc/src/__support/OSUtil/zaos/fcntl.cpp
+new file mode 100644
+index 000000000..d4201c6a7
+--- /dev/null
++++ b/libc/src/__support/OSUtil/zaos/fcntl.cpp
+@@ -0,0 +1,120 @@
++//===-- Implementation of internal fcntl ----------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/__support/OSUtil/fcntl.h"
++
++#include "hdr/fcntl_macros.h"
++#include "hdr/types/off_t.h"
++#include "hdr/types/struct_f_owner_ex.h"
++#include "hdr/types/struct_flock.h"
++#include "hdr/types/struct_flock64.h"
++#include "src/__support/common.h"
++#include "src/__support/macros/config.h"
++#include "src/errno/libc_errno.h"
++
++#include <stdarg.h>
++
++namespace LIBC_NAMESPACE_DECL {
++namespace internal {
++
++int fcntl(int fd, int cmd, void *arg) {
++//#if SYS_fcntl
++//  constexpr auto FCNTL_SYSCALL_ID = SYS_fcntl;
++//#elif defined(SYS_fcntl64)
++//  constexpr auto FCNTL_SYSCALL_ID = SYS_fcntl64;
++//#else
++//#error "fcntl and fcntl64 syscalls not available."
++//#endif
++//
++//  int new_cmd = cmd;
++//  switch (new_cmd) {
++//  case F_OFD_SETLKW: {
++//    struct flock *flk = reinterpret_cast<struct flock *>(arg);
++//    // convert the struct to a flock64
++//    struct flock64 flk64;
++//    flk64.l_type = flk->l_type;
++//    flk64.l_whence = flk->l_whence;
++//    flk64.l_start = flk->l_start;
++//    flk64.l_len = flk->l_len;
++//    flk64.l_pid = flk->l_pid;
++//    // create a syscall
++//    return LIBC_NAMESPACE::syscall_impl<int>(FCNTL_SYSCALL_ID, fd, new_cmd,
++//                                             &flk64);
++//  }
++//  case F_OFD_GETLK:
++//  case F_OFD_SETLK: {
++//    struct flock *flk = reinterpret_cast<struct flock *>(arg);
++//    // convert the struct to a flock64
++//    struct flock64 flk64;
++//    flk64.l_type = flk->l_type;
++//    flk64.l_whence = flk->l_whence;
++//    flk64.l_start = flk->l_start;
++//    flk64.l_len = flk->l_len;
++//    flk64.l_pid = flk->l_pid;
++//    // create a syscall
++//    int retVal = LIBC_NAMESPACE::syscall_impl<int>(FCNTL_SYSCALL_ID, fd,
++//                                                   new_cmd, &flk64);
++//    // On failure, return
++//    if (retVal == -1)
++//      return -1;
++//    // Check for overflow, i.e. the offsets are not the same when cast
++//    // to off_t from off64_t.
++//    if (static_cast<off_t>(flk64.l_len) != flk64.l_len ||
++//        static_cast<off_t>(flk64.l_start) != flk64.l_start) {
++//      libc_errno = EOVERFLOW;
++//      return -1;
++//    }
++//    // Now copy back into flk, in case flk64 got modified
++//    flk->l_type = flk64.l_type;
++//    flk->l_whence = flk64.l_whence;
++//    flk->l_start = static_cast<decltype(flk->l_start)>(flk64.l_start);
++//    flk->l_len = static_cast<decltype(flk->l_len)>(flk64.l_len);
++//    flk->l_pid = flk64.l_pid;
++//    return retVal;
++//  }
++//  case F_GETOWN: {
++//    struct f_owner_ex fex;
++//    int ret = LIBC_NAMESPACE::syscall_impl<int>(FCNTL_SYSCALL_ID, fd,
++//                                                F_GETOWN_EX, &fex);
++//    if (ret >= 0)
++//      return fex.type == F_OWNER_PGRP ? -fex.pid : fex.pid;
++//    libc_errno = -ret;
++//    return -1;
++//  }
++//#ifdef SYS_fcntl64
++//  case F_GETLK: {
++//    if constexpr (FCNTL_SYSCALL_ID == SYS_fcntl64)
++//      new_cmd = F_GETLK64;
++//    break;
++//  }
++//  case F_SETLK: {
++//    if constexpr (FCNTL_SYSCALL_ID == SYS_fcntl64)
++//      new_cmd = F_SETLK64;
++//    break;
++//  }
++//  case F_SETLKW: {
++//    if constexpr (FCNTL_SYSCALL_ID == SYS_fcntl64)
++//      new_cmd = F_SETLKW64;
++//    break;
++//  }
++//#endif
++//  }
++//  int retVal = LIBC_NAMESPACE::syscall_impl<int>(FCNTL_SYSCALL_ID, fd, new_cmd,
++//                                                 reinterpret_cast<void *>(arg));
++//  if (retVal >= 0) {
++//    return retVal;
++//  }
++//  libc_errno = -retVal;
++  (void)fd;
++  (void)cmd;
++  (void)arg;
++  return -1;
++}
++
++} // namespace internal
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/__support/OSUtil/zaos/io.h b/libc/src/__support/OSUtil/zaos/io.h
+new file mode 100644
+index 000000000..3c52a973d
+--- /dev/null
++++ b/libc/src/__support/OSUtil/zaos/io.h
+@@ -0,0 +1,25 @@
++//===-------------- Zaos implementation of IO utils -------------*- C++ -*-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_IO_H
++#define LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_IO_H
++
++#include "src/__support/CPP/string_view.h"
++#include "src/__support/macros/config.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++LIBC_INLINE void write_to_stderr(cpp::string_view msg) {
++  (void)msg;
++//  LIBC_NAMESPACE::syscall_impl<long>(SYS_write, 2 /* stderr */, msg.data(),
++//                                     msg.size());
++}
++
++} // namespace LIBC_NAMESPACE_DECL
++
++#endif // LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_IO_H
+diff --git a/libc/src/__support/OSUtil/zaos/ioring.cpp b/libc/src/__support/OSUtil/zaos/ioring.cpp
+new file mode 100644
+index 000000000..7a59cda8c
+--- /dev/null
++++ b/libc/src/__support/OSUtil/zaos/ioring.cpp
+@@ -0,0 +1,950 @@
++//===---------- x86/x86_64 zaos configuration ---------------------* C++ *-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/__support/common.h"
++#include "src/__support/macros/config.h"
++#include "src/__support/OSUtil/zaos/ioring.h"
++
++extern "C" int32_t __attribute__((weak)) __vdso_ioring_setup(void *buffer, size_t bufferlen, uint64_t flags);
++extern "C" int32_t __attribute__((weak)) __vdso_ioring_enter(int32_t fd, uint32_t to_submit, uint32_t min_complete, uint64_t flags);
++extern "C" int32_t __attribute__((weak)) __vdso_ioring_destroy(int32_t fd);
++
++namespace os {
++
++int32_t ioring_setup(void *buffer, size_t bufferlen, uint64_t flags)
++{
++  return __vdso_ioring_setup(buffer, bufferlen, flags);
++}
++
++int32_t ioring_enter(int32_t fd, uint32_t to_submit, uint32_t min_complete, uint64_t flags)
++{
++  return __vdso_ioring_enter(fd, to_submit, min_complete, flags);
++}
++
++int32_t ioring_destroy(int32_t fd)
++{
++  return __vdso_ioring_destroy(fd);
++}
++
++auto ioring_get_sqe(ioring &ring) -> ioring_sqe *
++{
++  auto tail = ring.header->sq_tail;
++  auto index = tail & ring.header->sq_mask;
++  auto next = tail + 1;
++
++  if (next - __atomic_load_n(&ring.header->sq_head, __ATOMIC_RELAXED) > ring.header->sq_mask + 1)
++    return nullptr;
++
++  return reinterpret_cast<ioring_sqe *>(reinterpret_cast<uintptr_t>(ring.header) + static_cast<size_t>(ring.header->sq_offset + index * sizeof(ioring_sqe)));
++}
++
++auto ioring_advance_sqe(ioring &ring) -> void
++{
++  auto tail = ring.header->sq_tail;
++  auto next = tail + 1;
++
++  __atomic_store_n(&ring.header->sq_tail, next, __ATOMIC_SEQ_CST);
++}
++
++auto ioring_submit_sqe(ioring &ring) -> int32_t
++{
++  auto tail = ring.header->sq_tail;
++  auto next = tail + 1;
++
++  __atomic_store_n(&ring.header->sq_tail, next, __ATOMIC_SEQ_CST);
++
++  return __vdso_ioring_enter(ring.fd, 1, 0, 0);
++}
++
++auto ioring_get_cqe(ioring &ring) -> ioring_cqe const *
++{
++  auto head = ring.header->cq_head;
++  auto index = head & ring.header->cq_mask;
++
++  if (head == __atomic_load_n(&ring.header->cq_tail, __ATOMIC_RELAXED))
++    return nullptr;
++
++  __atomic_thread_fence(__ATOMIC_ACQUIRE);
++
++  return reinterpret_cast<ioring_cqe const *>(reinterpret_cast<uintptr_t>(ring.header) + static_cast<size_t>(ring.header->cq_offset + index * sizeof(ioring_cqe)));
++}
++
++auto ioring_wait_cqe(ioring &ring) -> int32_t
++{
++  auto head = ring.header->cq_head;
++
++  if (head == __atomic_load_n(&ring.header->sq_tail, __ATOMIC_RELAXED))
++  {
++    if (auto rc = __vdso_ioring_enter(ring.fd, 0, 1, 0); rc < 0)
++      return rc;
++  }
++
++  return 0;
++}
++
++auto ioring_advance_cqe(ioring &ring) -> void
++{
++  auto head = ring.header->cq_head;
++  auto next = head + 1;
++
++  __atomic_store_n(&ring.header->cq_head, next, __ATOMIC_RELAXED);
++}
++
++auto ioring_prep_sqe_open(ioring_sqe *sqe, int32_t dir, string path, uint64_t flags, uint32_t mode) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::open);
++  sqe->args[0] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(path.len);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(path.data);
++  sqe->args[2] = static_cast<uintptr_t>(flags);
++  sqe->args[3] = static_cast<uintptr_t>(mode);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_stat(ioring_sqe *sqe, int32_t fd, struct stat *statbuf, uint64_t flags) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::stat);
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(statbuf);
++  sqe->args[2] = static_cast<uintptr_t>(flags);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_read(ioring_sqe *sqe, int32_t fd, void *buffer, size_t buflen) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::read);
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(buffer);
++  sqe->args[2] = static_cast<uintptr_t>(buflen);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_write(ioring_sqe *sqe, int32_t fd, void const *buffer, size_t buflen) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::write);
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(buffer);
++  sqe->args[2] = static_cast<uintptr_t>(buflen);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_ioctl(ioring_sqe *sqe, int32_t fd, uint32_t op, void *buffer, size_t buflen) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::ioctl);
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = static_cast<uintptr_t>(op);
++  sqe->args[2] = reinterpret_cast<uintptr_t>(buffer);
++  sqe->args[3] = static_cast<uintptr_t>(buflen);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_close(ioring_sqe *sqe, int32_t fd) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::close);
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_select(ioring_sqe *sqe, pollevt *evts, size_t n, uint64_t timeout) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::select);
++  sqe->args[0] = reinterpret_cast<uintptr_t>(evts);
++  sqe->args[1] = static_cast<uintptr_t>(n);
++  sqe->args[2] = static_cast<uintptr_t>(timeout);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_dup(ioring_sqe *sqe, int32_t oldfd) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::dup);
++  sqe->args[0] = static_cast<uintptr_t>(oldfd);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_dup2(ioring_sqe *sqe, int32_t oldfd, int32_t newfd) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::dup2);
++  sqe->args[0] = static_cast<uintptr_t>(oldfd);
++  sqe->args[1] = static_cast<uintptr_t>(newfd);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_mkdir(ioring_sqe *sqe, int32_t dir, string path, uint64_t flags, uint32_t mode) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::mkdir);
++  sqe->args[0] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(path.len);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(path.data);
++  sqe->args[2] = static_cast<uintptr_t>(flags);
++  sqe->args[3] = static_cast<uintptr_t>(mode);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_rename(ioring_sqe *sqe, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::rename);
++  sqe->args[0] = static_cast<uintptr_t>(olddir) << 32 | static_cast<uintptr_t>(oldpath.len);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(oldpath.data);
++  sqe->args[2] = static_cast<uintptr_t>(newdir) << 32 | static_cast<uintptr_t>(newpath.len);
++  sqe->args[3] = reinterpret_cast<uintptr_t>(newpath.data);
++  sqe->args[4] = static_cast<uintptr_t>(flags);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_link(ioring_sqe *sqe, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::link);
++  sqe->args[0] = static_cast<uintptr_t>(olddir) << 32 | static_cast<uintptr_t>(oldpath.len);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(oldpath.data);
++  sqe->args[2] = static_cast<uintptr_t>(newdir) << 32 | static_cast<uintptr_t>(newpath.len);
++  sqe->args[3] = reinterpret_cast<uintptr_t>(newpath.data);
++  sqe->args[4] = static_cast<uintptr_t>(flags);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_symlink(ioring_sqe *sqe, int32_t dir, string path, string target, uint64_t flags) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::symlink);
++  sqe->args[0] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(path.len);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(path.data);
++  sqe->args[2] = static_cast<uintptr_t>(target.len);
++  sqe->args[3] = reinterpret_cast<uintptr_t>(target.data);
++  sqe->args[4] = static_cast<uintptr_t>(flags);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_chstat(ioring_sqe *sqe, int32_t fd, struct stat const *statbuf, uint64_t flags) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::chstat);
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(statbuf);
++  sqe->args[2] = static_cast<uintptr_t>(flags);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_unlink(ioring_sqe *sqe, int32_t dir, string path, uint64_t flags) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::unlink);
++  sqe->args[0] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(path.len);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(path.data);
++  sqe->args[2] = static_cast<uintptr_t>(flags);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_poll_create(ioring_sqe *sqe, uint64_t flags) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::poll_create);
++  sqe->args[0] = static_cast<uintptr_t>(flags);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_poll_add(ioring_sqe *sqe, int32_t fd, int32_t id, uint16_t type, uint16_t mask, uintptr_t user_data, uint64_t flags) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::poll_add);
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = static_cast<uintptr_t>(id);
++  sqe->args[2] = static_cast<uintptr_t>(type);
++  sqe->args[3] = static_cast<uintptr_t>(mask);
++  sqe->args[4] = static_cast<uintptr_t>(user_data);
++  sqe->args[5] = static_cast<uintptr_t>(flags);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_poll_remove(ioring_sqe *sqe, int32_t fd, int32_t id, uint16_t type) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::poll_remove);
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = static_cast<uintptr_t>(id);
++  sqe->args[2] = static_cast<uintptr_t>(type);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_poll_wait(ioring_sqe *sqe, int32_t fd, pollevt *evts, size_t n, uint64_t timeout) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::poll_wait);
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(evts);
++  sqe->args[2] = static_cast<uintptr_t>(n);
++  sqe->args[3] = static_cast<uintptr_t>(timeout);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_notify_create(ioring_sqe *sqe, uint64_t flags) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::notify_create);
++  sqe->args[0] = static_cast<uintptr_t>(flags);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_notify_add(ioring_sqe *sqe, int32_t fd, int32_t dir, string path, uint64_t mask, uintptr_t user_data, uint64_t flags) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::notify_add);
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(path.len);
++  sqe->args[2] = reinterpret_cast<uintptr_t>(path.data);
++  sqe->args[3] = static_cast<uintptr_t>(mask);
++  sqe->args[4] = static_cast<uintptr_t>(user_data);
++  sqe->args[5] = static_cast<uintptr_t>(flags);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_notify_remove(ioring_sqe *sqe, int32_t fd, int32_t dir, string path) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::notify_remove);
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(path.len);
++  sqe->args[2] = reinterpret_cast<uintptr_t>(path.data);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_event_create(ioring_sqe *sqe, uint64_t value, uint64_t maxvalue, uint64_t flags) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::event_create);
++  sqe->args[0] = static_cast<uintptr_t>(value);
++  sqe->args[1] = static_cast<uintptr_t>(maxvalue);
++  sqe->args[2] = static_cast<uintptr_t>(flags);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_buffer_create(ioring_sqe *sqe, int32_t *fds, size_t size, uint64_t flags) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::buffer_create);
++  sqe->args[0] = reinterpret_cast<uintptr_t>(fds);
++  sqe->args[1] = static_cast<uintptr_t>(size);
++  sqe->args[2] = static_cast<uintptr_t>(flags);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_channel_create(ioring_sqe *sqe, int32_t *fds, uint64_t flags) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::channel_create);
++  sqe->args[0] = reinterpret_cast<uintptr_t>(fds);
++  sqe->args[1] = static_cast<uintptr_t>(flags);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_channel_read(ioring_sqe *sqe, int32_t fd, int32_t *sid, struct msg *buffer, size_t *outbytes, size_t *outfds) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::channel_read);
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(sid);
++  sqe->args[2] = reinterpret_cast<uintptr_t>(buffer);
++  sqe->args[3] = reinterpret_cast<uintptr_t>(outbytes);
++  sqe->args[4] = reinterpret_cast<uintptr_t>(outfds);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_channel_write(ioring_sqe *sqe, int32_t fd, int32_t sid, struct cmsg const *msg) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::channel_write);
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = static_cast<uintptr_t>(sid);
++  sqe->args[2] = reinterpret_cast<uintptr_t>(msg);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto ioring_prep_sqe_channel_call(ioring_sqe *sqe, int32_t fd, struct cmsg *msg, struct msg *buffer, size_t *outbytes, size_t *outfds) -> void
++{
++  sqe->op = static_cast<uint8_t>(ioring_ops::channel_call);
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(msg);
++  sqe->args[2] = reinterpret_cast<uintptr_t>(buffer);
++  sqe->args[3] = reinterpret_cast<uintptr_t>(outbytes);
++  sqe->args[4] = reinterpret_cast<uintptr_t>(outfds);
++  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++}
++
++auto open(ioring &ring, int32_t dir, string path, uint64_t flags, uint32_t mode) -> int32_t
++{
++  if (dir < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_open(sqe, dir, path, flags, mode);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto open(ioring &ring, string path, uint64_t flags, uint32_t mode) -> int32_t
++{
++  auto dir = STDCWD_FILENO;
++
++  if (path.len > 0 && *path.data == '/')
++    dir = STDROOT_FILENO;
++
++  return open(ring, dir, path, flags, mode);
++}
++
++auto stat(ioring &ring, int32_t fd, struct stat *statbuf, uint64_t flags) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_stat(sqe, fd, statbuf, flags);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto read(ioring &ring, int32_t fd, void *buffer, size_t buflen) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_read(sqe, fd, buffer, buflen);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto write(ioring &ring, int32_t fd, void const *buffer, size_t buflen) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_write(sqe, fd, buffer, buflen);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto ioctl(ioring &ring, int32_t fd, uint32_t op, void *buffer, size_t buflen) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_ioctl(sqe, fd, op, buffer, buflen);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto close(ioring &ring, int32_t fd) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_close(sqe, fd);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto select(ioring &ring, pollevt *evts, size_t n, uint64_t timeout) -> int32_t
++{
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_select(sqe, evts, n, timeout);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto dup(ioring &ring, int32_t oldfd) -> int32_t
++{
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_dup(sqe, oldfd);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto dup2(ioring &ring, int32_t oldfd, int32_t newfd) -> int32_t
++{
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_dup2(sqe, oldfd, newfd);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto mkdir(ioring &ring, int32_t dir, string path, uint64_t flags, uint32_t mode) -> int32_t
++{
++  if (dir < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_mkdir(sqe, dir, path, flags, mode);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto mkdir(ioring &ring, string path, uint64_t flags, uint32_t mode) -> int32_t
++{
++  auto dir = STDCWD_FILENO;
++
++  if (path.len > 0 && *path.data == '/')
++    dir = STDROOT_FILENO;
++
++  return mkdir(ring, dir, path, flags, mode);
++}
++
++auto rename(ioring &ring, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> int32_t
++{
++  if (olddir < 0 || newdir < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_rename(sqe, olddir, oldpath, newdir, newpath, flags);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto rename(ioring &ring, string oldpath, string newpath, uint64_t flags) -> int32_t
++{
++  auto olddir = STDCWD_FILENO;
++
++  if (oldpath.len > 0 && *oldpath.data == '/')
++    olddir = STDROOT_FILENO;
++
++  auto newdir = STDCWD_FILENO;
++
++  if (newpath.len > 0 && *newpath.data == '/')
++    newdir = STDROOT_FILENO;
++
++  return rename(ring, olddir, oldpath, newdir, newpath, flags);
++}
++
++auto link(ioring &ring, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> int32_t
++{
++  if (olddir < 0 || newdir < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_link(sqe, olddir, oldpath, newdir, newpath, flags);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto link(ioring &ring, string oldpath, string newpath, uint64_t flags) -> int32_t
++{
++  auto olddir = STDCWD_FILENO;
++
++  if (oldpath.len > 0 && *oldpath.data == '/')
++    olddir = STDROOT_FILENO;
++
++  auto newdir = STDCWD_FILENO;
++
++  if (newpath.len > 0 && *newpath.data == '/')
++    newdir = STDROOT_FILENO;
++
++  return link(ring, olddir, oldpath, newdir, newpath, flags);
++}
++
++auto symlink(ioring &ring, int32_t dir, string path, string target, uint64_t flags) -> int32_t
++{
++  if (dir < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_symlink(sqe, dir, path, target, flags);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto symlink(ioring &ring, string path, string target, uint64_t flags) -> int32_t
++{
++  auto dir = STDCWD_FILENO;
++
++  if (path.len > 0 && *path.data == '/')
++    dir = STDROOT_FILENO;
++
++  return symlink(ring, dir, path, target, flags);
++}
++
++auto chstat(ioring &ring, int32_t fd, struct stat const *statbuf, uint64_t flags) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_chstat(sqe, fd, statbuf, flags);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto unlink(ioring &ring, int32_t dir, string path, uint64_t flags) -> int32_t
++{
++  if (dir < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_unlink(sqe, dir, path, flags);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto unlink(ioring &ring, string path, uint64_t flags) -> int32_t
++{
++  auto dir = STDCWD_FILENO;
++
++  if (path.len > 0 && *path.data == '/')
++    dir = STDROOT_FILENO;
++
++  return unlink(ring, dir, path, flags);
++}
++
++auto poll_create(ioring &ring, uint64_t flags) -> int32_t
++{
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_poll_create(sqe, flags);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto poll_add(ioring &ring, int32_t fd, int32_t id, uint16_t type, uint16_t mask, uintptr_t user_data, uint64_t flags) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  if (id < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_poll_add(sqe, fd, id, type, mask, user_data, flags);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto poll_remove(ioring &ring, int32_t fd, int32_t id, uint16_t type) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  if (id < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_poll_remove(sqe, fd, id, type);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto poll_wait(ioring &ring, int32_t fd, pollevt *evts, size_t n, uint64_t timeout) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_poll_wait(sqe, fd, evts, n, timeout);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto notify_create(ioring &ring, uint64_t flags) -> int32_t
++{
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_notify_create(sqe, flags);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto notify_add(ioring &ring, int32_t fd, int32_t dir, string path, uint64_t mask, uintptr_t user_data, uint64_t flags) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  if (dir < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_notify_add(sqe, fd, dir, path, mask, user_data, flags);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto notify_remove(ioring &ring, int32_t fd, int32_t dir, string path) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  if (dir < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_notify_remove(sqe, fd, dir, path);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto event_create(ioring &ring, uint64_t value, uint64_t maxvalue, uint64_t flags) -> int32_t
++{
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_event_create(sqe, value, maxvalue, flags);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto buffer_create(ioring &ring, int32_t *fds, size_t size, uint64_t flags) -> int32_t
++{
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_buffer_create(sqe, fds, size, flags);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto channel_create(ioring &ring, int32_t *fds, uint64_t flags) -> int32_t
++{
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_channel_create(sqe, fds, flags);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto channel_read(ioring &ring, int32_t fd, int32_t *sid, struct msg *buffer, size_t *outbytes, size_t *outfds) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_channel_read(sqe, fd, sid, buffer, outbytes, outfds);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto channel_write(ioring &ring, int32_t fd, int32_t sid, struct cmsg const *msg) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_channel_write(sqe, fd, sid, msg);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto channel_call(ioring &ring, int32_t fd, struct cmsg *msg, struct msg *buffer, size_t *outbytes, size_t *outfds) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_channel_call(sqe, fd, msg, buffer, outbytes, outfds);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++} // namespace os
+diff --git a/libc/src/__support/OSUtil/zaos/ioring.h b/libc/src/__support/OSUtil/zaos/ioring.h
+new file mode 100644
+index 000000000..46ce45d37
+--- /dev/null
++++ b/libc/src/__support/OSUtil/zaos/ioring.h
+@@ -0,0 +1,414 @@
++//===---------- x86/x86_64 zaos configuration ---------------------* C++ *-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++#ifndef LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_X86_64_IORING_H
++#define LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_X86_64_IORING_H
++#include <stdint.h>
++#include <stddef.h>
++#include "hdr/errno_macros.h"
++#include "src/__support/macros/attributes.h"
++
++namespace os {
++
++using uid_t = uint32_t;
++using gid_t = uint32_t;
++using mode_t = uint32_t;
++using off_t = uint64_t;
++using time_t = int64_t;
++using dev_t = uintptr_t;
++using ino_t = uintptr_t;
++
++constexpr uint64_t O_RDONLY = 0x1;
++constexpr uint64_t O_WRONLY = 0x2;
++constexpr uint64_t O_RDWR = 0x3;
++
++constexpr uint64_t O_CREAT = 0100;
++constexpr uint64_t O_EXCL = 0200;
++constexpr uint64_t O_TRUNC = 01000;
++constexpr uint64_t O_APPEND = 02000;
++constexpr uint64_t O_SYMLINK = 0100000;
++constexpr uint64_t O_DIRECTORY = 0200000;
++constexpr uint64_t O_NOFOLLOW = 0400000;
++constexpr uint64_t O_FILESYSTEM = 01000000;
++
++constexpr uint64_t S_IUMSK = 07777;  // user settable bits
++
++constexpr uint64_t S_IRWXU = 0700;   // read, write, execute: owner
++constexpr uint64_t S_IRUSR = 0400;   // read permission: owner
++constexpr uint64_t S_IWUSR = 0200;   // write permission: owner
++constexpr uint64_t S_IXUSR = 0100;   // execute permission: owner
++constexpr uint64_t S_IRWXG = 0070;   // read, write, execute: group
++constexpr uint64_t S_IRGRP = 0040;   // read permission: group
++constexpr uint64_t S_IWGRP = 0020;   // write permission: group
++constexpr uint64_t S_IXGRP = 0010;   // execute permission: group
++constexpr uint64_t S_IRWXO = 0007;   // read, write, execute: other
++constexpr uint64_t S_IROTH = 0004;   // read permission: other
++constexpr uint64_t S_IWOTH = 0002;   // write permission: other
++constexpr uint64_t S_IXOTH = 0001;   // execute permission: other
++
++constexpr uint64_t S_ISUID = 04000;  // set user id on execution
++constexpr uint64_t S_ISGID = 02000;  // set group id on execution */
++constexpr uint64_t S_ISVTX = 01000;  // sticky bit
++
++constexpr uint64_t S_IFMT = 0xf000;   // type of file
++constexpr uint64_t S_IFDATA = 0xb000; // socket dgram
++constexpr uint64_t S_IFSOCK = 0xc000; // socket stream
++constexpr uint64_t S_IFLNK = 0xa000;  // symbolic link
++constexpr uint64_t S_IFREG = 0x8000;  // regular
++constexpr uint64_t S_IFBLK = 0x6000;  // block device
++constexpr uint64_t S_IFDIR = 0x4000;  // directory
++constexpr uint64_t S_IFCHR = 0x2000;  // character device
++constexpr uint64_t S_IFIFO = 0x1000;  // fifo
++
++constexpr uint64_t N_ACCESS = 0x1;
++constexpr uint64_t N_ATTRIB = 0x2;
++constexpr uint64_t N_CLOSE_WRITE = 0x4;
++constexpr uint64_t N_CLOSE_NOWRITE = 0x8;
++constexpr uint64_t N_MKDIR = 0x10;
++constexpr uint64_t N_CREATE = 0x20;
++constexpr uint64_t N_UNLINK = 0x40;
++constexpr uint64_t N_MODIFY = 0x100;
++constexpr uint64_t N_MOVED = 0x400;
++constexpr uint64_t N_RENAME = 0x1000;
++constexpr uint64_t N_OPEN = 0x2000;
++constexpr uint64_t N_ALL = 0xffff;
++
++constexpr uint32_t STDIN_FILENO = 0;
++constexpr uint32_t STDOUT_FILENO = 1;
++constexpr uint32_t STDERR_FILENO = 2;
++constexpr uint32_t STDROOT_FILENO = 4;
++constexpr uint32_t STDCWD_FILENO = 5;
++
++enum class filetype
++{
++  unknown,
++  block_device,
++  character_device,
++  directory,
++  regular,
++  socket_dgram,
++  socket_stream,
++  symlink,
++};
++
++enum class stats
++{
++  uid = 0x01,
++  gid = 0x02,
++  mode = 0x04,
++  size = 0x08,
++  mtime = 0x10,
++  ctime = 0x20,
++  btime = 0x40,
++  inode = 0x100,
++  device = 0x200,
++};
++
++struct stat
++{
++  uid_t uid;
++  gid_t gid;
++  mode_t mode;
++
++  off_t size;
++
++  time_t mtime;
++  time_t ctime;
++  time_t btime;
++
++  ino_t inode;
++  dev_t device;
++
++  auto type() -> filetype
++  {
++    switch (this->mode & S_IFMT)
++    {
++      case S_IFREG:
++        return filetype::regular;
++
++      case S_IFBLK:
++        return filetype::block_device;
++
++      case S_IFDIR:
++        return filetype::directory;
++
++      case S_IFCHR:
++        return filetype::character_device;
++
++      case S_IFLNK:
++        return filetype::symlink;
++
++      case S_IFDATA:
++        return filetype::socket_dgram;
++
++      case S_IFSOCK:
++        return filetype::socket_stream;
++    }
++
++    return filetype::unknown;
++  }
++};
++
++struct dirent
++{
++  uint32_t rec_len;
++  uint16_t file_type;
++  uint16_t name_len;
++  uint8_t file_name[0];
++
++  //auto name() -> std::string_view
++  //{
++  //  return std::string_view(&this->file_name, static_cast<size_t>(this->name_len));
++  //}
++
++  auto type() -> filetype
++  {
++    return static_cast<filetype>(this->file_type);
++  }
++};
++
++constexpr uint16_t POLLIN = 0x001;
++constexpr uint16_t POLLOUT = 0x004;
++
++constexpr uint16_t POLLFD = 0x1;
++constexpr uint16_t POLLTHREAD = 0x2;
++
++struct pollevt
++{
++  int32_t id;
++  uint16_t type;
++  uint16_t mask;
++  uintptr_t user_data;
++
++  pollevt(int32_t id, uint16_t type, uint16_t mask, uintptr_t user_data)
++    : id(id), type(type), mask(mask), user_data(user_data)
++  {
++  }
++};
++
++struct watchevt
++{
++  uint32_t len;
++  uint32_t pad;
++  uint64_t mask;
++  uintptr_t user_data;
++
++  struct info
++  {
++    inline static constexpr uint16_t id = 1;
++    inline static constexpr uint16_t dir = 2;
++    inline static constexpr uint16_t name = 3;
++
++    uint16_t type;
++    uint16_t len;
++  };
++
++  struct id_info : public info
++  {
++    uintptr_t id;
++  };
++
++  struct dir_info : public info
++  {
++    uintptr_t id;
++  };
++
++  struct name_info : public info
++  {
++    uint8_t file_name[0];
++
++    //auto name() -> std::string_view
++    //{
++    //  return std::string_view(&this->file_name, static_cast<size_t>(this->len - sizeof<info>));
++    //}
++  };
++};
++
++struct string
++{
++  char const *data;
++  size_t len;
++
++  string(char const *data, size_t len)
++    : data(data), len(len)
++  {
++  }
++};
++
++struct msg
++{
++  uint8_t *bytes;
++  size_t nbytes;
++  int32_t *fds;
++  size_t nfds;
++};
++
++struct cmsg
++{
++  uint8_t const *bytes;
++  size_t nbytes;
++  int32_t const *fds;
++  size_t nfds;
++};
++
++enum class ioring_ops
++{
++  open = 0x01,
++  stat = 0x02,
++  read = 0x03,
++  write = 0x04,
++  ioctl = 0x05,
++  close = 0x06,
++  select = 0x07,
++  dup = 0x08,
++  dup2 = 0x09,
++  mkdir = 0x0a,
++  rename = 0x0b,
++  link = 0x0c,
++  symlink = 0x0d,
++  chstat = 0x0e,
++  unlink = 0x0f,
++  poll_create = 0x10,
++  poll_add = 0x11,
++  poll_modify = 0x12,
++  poll_remove = 0x13,
++  poll_wait = 0x14,
++  notify_create = 0x15,
++  notify_add = 0x16,
++  notify_modify = 0x17,
++  notify_remove = 0x18,
++  event_create = 0x19,
++  buffer_create = 0x1a,
++  channel_create = 0x1b,
++  channel_read = 0x1c,
++  channel_write = 0x1d,
++  channel_call = 0x1e,
++};
++
++enum class ioring_flags
++{
++  fin = 0x1,
++};
++
++struct ioring_header
++{
++  uint32_t sq_head;
++  uint32_t sq_tail;
++  uint32_t sq_mask;
++  uint32_t sq_offset;
++
++  uint32_t cq_head;
++  uint32_t cq_tail;
++  uint32_t cq_mask;
++  uint32_t cq_offset;
++
++  uint8_t reserved[32];
++};
++
++struct ioring_sqe
++{
++  uint8_t op;
++  uint8_t flags;
++  uint16_t reserved1;
++  uint32_t reserved2;
++  uintptr_t args[6];
++  uintptr_t user_data;
++};
++
++struct ioring_cqe
++{
++  uint32_t flags;
++  int32_t result;
++  uintptr_t user_data;
++};
++
++struct ioring
++{
++  int32_t fd;
++  ioring_header *header;
++};
++
++int32_t ioring_setup(void *buffer, size_t bufferlen, uint64_t flags);
++int32_t ioring_enter(int32_t fd, uint32_t to_submit, uint32_t min_complete, uint64_t flags);
++int32_t ioring_destroy(int32_t fd);
++
++auto ioring_get_sqe(ioring &ring) -> ioring_sqe *;
++auto ioring_advance_sqe(ioring &ring) -> void;
++auto ioring_submit_sqe(ioring &ring) -> int32_t;
++auto ioring_get_cqe(ioring &ring) -> ioring_cqe const *;
++auto ioring_wait_cqe(ioring &ring) -> int32_t;
++auto ioring_advance_cqe(ioring &ring) -> void;
++
++auto ioring_prep_sqe_open(ioring_sqe *sqe, int32_t dir, string path, uint64_t flags, uint32_t mode) -> void;
++auto ioring_prep_sqe_stat(ioring_sqe *sqe, int32_t fd, struct stat *statbuf, uint64_t flags) -> void;
++auto ioring_prep_sqe_read(ioring_sqe *sqe, int32_t fd, void *buffer, size_t buflen) -> void;
++auto ioring_prep_sqe_write(ioring_sqe *sqe, int32_t fd, void const *buffer, size_t buflen) -> void;
++auto ioring_prep_sqe_ioctl(ioring_sqe *sqe, int32_t fd, uint32_t op, void *buffer, size_t buflen) -> void;
++auto ioring_prep_sqe_close(ioring_sqe *sqe, int32_t fd) -> void;
++auto ioring_prep_sqe_select(ioring_sqe *sqe, pollevt *evts, size_t n, uint64_t timeout) -> void;
++auto ioring_prep_sqe_dup(ioring_sqe *sqe, int32_t oldfd) -> void;
++auto ioring_prep_sqe_dup2(ioring_sqe *sqe, int32_t oldfd, int32_t newfd) -> void;
++auto ioring_prep_sqe_mkdir(ioring_sqe *sqe, int32_t dir, string path, uint64_t flags, uint32_t mode) -> void;
++auto ioring_prep_sqe_rename(ioring_sqe *sqe, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> void;
++auto ioring_prep_sqe_link(ioring_sqe *sqe, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> void;
++auto ioring_prep_sqe_symlink(ioring_sqe *sqe, int32_t dir, string path, string target, uint64_t flags) -> void;
++auto ioring_prep_sqe_chstat(ioring_sqe *sqe, int32_t fd, struct stat const *statbuf, uint64_t flags) -> void;
++auto ioring_prep_sqe_unlink(ioring_sqe *sqe, int32_t dir, string path, uint64_t flags) -> void;
++auto ioring_prep_sqe_poll_create(ioring_sqe *sqe, uint64_t flags) -> void;
++auto ioring_prep_sqe_poll_add(ioring_sqe *sqe, int32_t fd, int32_t id, uint16_t type, uint16_t mask, uintptr_t user_data, uint64_t flags) -> void;
++auto ioring_prep_sqe_poll_remove(ioring_sqe *sqe, int32_t fd, int32_t id, uint16_t type) -> void;
++auto ioring_prep_sqe_poll_wait(ioring_sqe *sqe, int32_t fd, pollevt *evts, size_t n, uint64_t timeout) -> void;
++auto ioring_prep_sqe_notify_create(ioring_sqe *sqe, uint64_t flags) -> void;
++auto ioring_prep_sqe_notify_add(ioring_sqe *sqe, int32_t fd, int32_t dir, string path, uint64_t mask, uintptr_t user_data, uint64_t flags) -> void;
++auto ioring_prep_sqe_notify_remove(ioring_sqe *sqe, int32_t fd, int32_t dir, string path) -> void;
++auto ioring_prep_sqe_event_create(ioring_sqe *sqe, uint64_t value, uint64_t maxvalue, uint64_t flags) -> void;
++auto ioring_prep_sqe_buffer_create(ioring_sqe *sqe, int32_t *fds, size_t size, uint64_t flags) -> void;
++auto ioring_prep_sqe_channel_create(ioring_sqe *sqe, int32_t *fds, uint64_t flags) -> void;
++auto ioring_prep_sqe_channel_read(ioring_sqe *sqe, int32_t fd, int32_t *sid, struct msg *buffer, size_t *outbytes, size_t *outfds) -> void;
++auto ioring_prep_sqe_channel_write(ioring_sqe *sqe, int32_t fd, int32_t sid, struct cmsg const *msg) -> void;
++auto ioring_prep_sqe_channel_call(ioring_sqe *sqe, int32_t fd, struct cmsg *msg, struct msg *buffer, size_t *outbytes, size_t *outfds) -> void;
++
++auto open(ioring &ring, int32_t dir, string path, uint64_t flags, uint32_t mode) -> int32_t;
++auto open(ioring &ring, string path, uint64_t flags, uint32_t mode) -> int32_t;
++auto stat(ioring &ring, int32_t fd, struct stat *statbuf, uint64_t flags) -> int32_t;
++auto read(ioring &ring, int32_t fd, void *buffer, size_t buflen) -> int32_t;
++auto write(ioring &ring, int32_t fd, void const *buffer, size_t buflen) -> int32_t;
++auto ioctl(ioring &ring, int32_t fd, uint32_t op, void *buffer, size_t buflen) -> int32_t;
++auto close(ioring &ring, int32_t fd) -> int32_t;
++auto select(ioring &ring, pollevt *evts, size_t n, uint64_t timeout) -> int32_t;
++auto dup(ioring &ring, int32_t oldfd) -> int32_t;
++auto dup2(ioring &ring, int32_t oldfd, int32_t newfd) -> int32_t;
++auto mkdir(ioring &ring, int32_t dir, string path, uint64_t flags, uint32_t mode) -> int32_t;
++auto mkdir(ioring &ring, string path, uint64_t flags, uint32_t mode) -> int32_t;
++auto rename(ioring &ring, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> int32_t;
++auto rename(ioring &ring, string oldpath, string newpath, uint64_t flags) -> int32_t;
++auto link(ioring &ring, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> int32_t;
++auto link(ioring &ring, string oldpath, string newpath, uint64_t flags) -> int32_t;
++auto symlink(ioring &ring, int32_t dir, string path, string target, uint64_t flags) -> int32_t;
++auto symlink(ioring &ring, string path, string target, uint64_t flags) -> int32_t;
++auto chstat(ioring &ring, int32_t fd, struct stat const *statbuf, uint64_t flags) -> int32_t;
++auto unlink(ioring &ring, int32_t dir, string path, uint64_t flags) -> int32_t;
++auto unlink(ioring &ring, string path, uint64_t flags) -> int32_t;
++auto poll_create(ioring &ring, uint64_t flags) -> int32_t;
++auto poll_add(ioring &ring, int32_t fd, int32_t id, uint16_t type, uint16_t mask, uintptr_t user_data, uint64_t flags) -> int32_t;
++auto poll_remove(ioring &ring, int32_t fd, int32_t id, uint16_t type) -> int32_t;
++auto poll_wait(ioring &ring, int32_t fd, pollevt *evts, size_t n, uint64_t timeout) -> int32_t;
++auto notify_create(ioring &ring, uint64_t flags) -> int32_t;
++auto notify_add(ioring &ring, int32_t fd, int32_t dir, string path, uint64_t mask, uintptr_t user_data, uint64_t flags) -> int32_t;
++auto notify_remove(ioring &ring, int32_t fd, int32_t dir, string path, uint64_t mask) -> int32_t;
++auto event_create(ioring &ring, uint64_t value, uint64_t maxvalue, uint64_t flags) -> int32_t;
++auto buffer_create(ioring &ring, int32_t *fds, size_t size, uint64_t flags) -> int32_t;
++auto channel_create(ioring &ring, int32_t *fds, uint64_t flags) -> int32_t;
++auto channel_read(ioring &ring, int32_t fd, int32_t *sid, struct msg *buffer, size_t *outbytes, size_t *outfds) -> int32_t;
++auto channel_write(ioring &ring, int32_t fd, int32_t sid, struct cmsg const *msg) -> int32_t;
++auto channel_call(ioring &ring, int32_t fd, struct cmsg *msg, struct msg *buffer, size_t *outbytes, size_t *outfds) -> int32_t;
++
++} // namespace os
++
++LIBC_INLINE_VAR LIBC_THREAD_LOCAL os::ioring thread_ring;
++
++#endif // LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_X86_64_IORING_H
+diff --git a/libc/src/__support/OSUtil/zaos/vdso.cpp b/libc/src/__support/OSUtil/zaos/vdso.cpp
+new file mode 100644
+index 000000000..5691022f6
+--- /dev/null
++++ b/libc/src/__support/OSUtil/zaos/vdso.cpp
+@@ -0,0 +1,139 @@
++//===---------- x86/x86_64 vdso configuration ---------------------* C++ *-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/__support/common.h"
++#include "src/__support/macros/config.h"
++#include "src/__support/OSUtil/zaos/vdso.h"
++
++extern "C" int32_t __attribute__((weak)) __vdso_get_pid();
++extern "C" int32_t __attribute__((weak)) __vdso_get_tid();
++extern "C" uint32_t __attribute__((weak)) __vdso_get_uid();
++extern "C" uint32_t __attribute__((weak)) __vdso_get_euid();
++extern "C" uint32_t __attribute__((weak)) __vdso_get_gid();
++extern "C" uint32_t __attribute__((weak)) __vdso_get_egid();
++
++extern "C" int32_t __attribute__((weak)) __vdso_clock_res(int32_t clockid, uint64_t *res);
++extern "C" int32_t __attribute__((weak)) __vdso_clock_time(int32_t clockid, uint64_t *tp);
++
++extern "C" size_t __attribute__((weak)) __vdso_get_pagesize();
++extern "C" int32_t __attribute__((weak)) __vdso_mmap(int32_t fd, os::mmvec const *mmvs, size_t n, void **addrbuf, uint64_t flags);
++extern "C" int32_t __attribute__((weak)) __vdso_munmap(void *addr, size_t length);
++
++extern "C" int32_t __attribute__((weak)) __vdso_process_create(os::arg const *argv, size_t argc, os::arg const *envp, size_t envc, os::attr const *attrs, size_t n, uint64_t flags);
++extern "C" int32_t __attribute__((weak)) __vdso_thread_create(void *stack, void (*start_routine)(), void *start_argument, int32_t priority, int32_t *tid, uint64_t flags);
++extern "C" int32_t __attribute__((weak)) __vdso_wait(int32_t id, int32_t *rvalbuf, uint64_t flags);
++extern "C" int32_t __attribute__((weak)) __vdso_futex_wait(uint32_t *addr, uint32_t expected, uint64_t abstime);
++extern "C" int32_t __attribute__((weak)) __vdso_futex_wake(uint32_t *addr, uint32_t count);
++extern "C" int32_t __attribute__((weak)) __vdso_process_kill(int32_t pid);
++extern "C" int32_t __attribute__((weak)) __vdso_thread_munmap_exit(void *addr, size_t length);
++extern "C" void __attribute__((weak)) __vdso_thread_exit(int32_t rval);
++extern "C" void __attribute__((weak)) __vdso_process_exit(int32_t rval);
++
++namespace os {
++
++int32_t get_pid()
++{
++  return __vdso_get_pid();
++}
++
++int32_t get_tid()
++{
++  return __vdso_get_tid();
++}
++
++uint32_t get_uid()
++{
++  return __vdso_get_uid();
++}
++
++uint32_t get_euid()
++{
++  return __vdso_get_euid();
++}
++
++uint32_t get_gid()
++{
++  return __vdso_get_gid();
++}
++
++uint32_t get_egid()
++{
++  return __vdso_get_egid();
++}
++
++int32_t clock_res(int32_t clockid, uint64_t *res)
++{
++  return __vdso_clock_res(clockid, res);
++}
++
++int32_t clock_time(int32_t clockid, uint64_t *tp)
++{
++  return __vdso_clock_time(clockid, tp);
++}
++
++size_t get_pagesize()
++{
++  return __vdso_get_pagesize();
++}
++
++int32_t mmap(int32_t fd, os::mmvec const *mmvs, size_t n, void **addrbuf, uint64_t flags)
++{
++  return __vdso_mmap(fd, mmvs, n, addrbuf, flags);
++}
++
++int32_t munmap(void *addr, size_t length)
++{
++  return __vdso_munmap(addr, length);
++}
++
++int32_t process_create(os::arg const *argv, size_t argc, os::arg const *envp, size_t envc, os::attr const *attrs, size_t n, uint64_t flags)
++{
++  return __vdso_process_create(argv, argc, envp, envc, attrs, n, flags);
++}
++
++int32_t thread_create(void *stack, void (*start_routine)(), void *start_argument, int32_t priority, int32_t *tid, uint64_t flags)
++{
++  return __vdso_thread_create(stack, start_routine, start_argument, priority, tid, flags);
++}
++
++int32_t wait(int32_t id, int32_t *rvalbuf, uint64_t flags)
++{
++  return __vdso_wait(id, rvalbuf, flags);
++}
++
++int32_t futex_wait(uint32_t *addr, uint32_t expected, uint64_t abstime)
++{
++  return __vdso_futex_wait(addr, expected, abstime);
++}
++
++int32_t futex_wake(uint32_t *addr, uint32_t count)
++{
++  return __vdso_futex_wake(addr, count);
++}
++
++int32_t process_kill(int32_t pid)
++{
++  return __vdso_process_kill(pid);
++}
++
++int32_t thread_munmap_exit(void *addr, size_t length)
++{
++  return __vdso_thread_munmap_exit(addr, length);
++}
++
++void thread_exit(int32_t rval)
++{
++  return __vdso_thread_exit(rval);
++}
++
++void process_exit(int32_t rval)
++{
++  return __vdso_process_exit(rval);
++}
++
++} // namespace os
+diff --git a/libc/src/__support/OSUtil/zaos/vdso.h b/libc/src/__support/OSUtil/zaos/vdso.h
+new file mode 100644
+index 000000000..ae3f54941
+--- /dev/null
++++ b/libc/src/__support/OSUtil/zaos/vdso.h
+@@ -0,0 +1,107 @@
++//===---------- x86/x86_64 vdso configuration ---------------------* C++ *-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++#ifndef LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_X86_64_VDSO_H
++#define LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_X86_64_VDSO_H
++#include <stdint.h>
++#include <stddef.h>
++#include "hdr/errno_macros.h"
++
++#define ETIMEDOUT 110
++
++namespace os {
++
++struct arg
++{
++  uint8_t *beg;
++  uint8_t *end;
++};
++
++struct attr
++{
++  inline static constexpr int32_t stdin = 0;
++  inline static constexpr int32_t stdout = 1;
++  inline static constexpr int32_t stderr = 2;
++  inline static constexpr int32_t stdroot = 4;
++  inline static constexpr int32_t stdcwd = 5;
++  //inline constexpr  fn dupfd(i32 fd) -> i32 { return fd; }
++  inline static constexpr int32_t enddup = 255;
++
++  int32_t type;
++  uintptr_t value;
++};
++
++enum priority
++{
++  lowest = 1,
++  low = 5,
++  normal = 10,
++  display = 15,
++  high = 20,
++  max = 50,
++};
++
++constexpr uint64_t WNOHANG = 0x1;
++constexpr uint64_t WNOWAIT = 0x2;
++
++enum clock
++{
++  realtime = 0,
++  monotonic = 1,
++};
++
++enum mmap
++{
++  shared = 0x1,
++  privated = 0x2,
++  anonymous = 0x20,
++};
++
++enum prot
++{
++  none = 0,
++  readonly = 1,
++  readwrite = 2,
++  executable = 4,
++};
++
++struct mmvec
++{
++  uint64_t offset;
++  size_t length;
++  uintptr_t base;
++  uint32_t flags;
++  uint32_t prot;
++};
++
++int32_t get_tid();
++uint32_t get_uid();
++uint32_t get_euid();
++uint32_t get_gid();
++uint32_t get_egid();
++
++int32_t clock_res(int32_t clockid, uint64_t *res);
++int32_t clock_time(int32_t clockid, uint64_t *tp);
++
++size_t get_pagesize();
++int32_t mmap(int32_t fd, os::mmvec const *mmvs, size_t n, void **addrbuf, uint64_t flags);
++int32_t munmap(void *addr, size_t length);
++
++int32_t process_create(os::arg const *argv, size_t argc, os::arg const *envp, size_t envc, os::attr const *attrs, size_t n, uint64_t flags);
++int32_t thread_create(void *stack, void (*start_routine)(), void *start_argument, int32_t priority, int32_t *tid, uint64_t flags);
++int32_t wait(int32_t id, int32_t *rvalbuf, uint64_t flags);
++int32_t futex_wait(uint32_t *addr, uint32_t expected, uint64_t abstime);
++int32_t futex_wake(uint32_t *addr, uint32_t count);
++int32_t process_kill(int32_t pid);
++int32_t thread_munmap_exit(void *addr, size_t length);
++void thread_exit(int32_t rval);
++void process_exit(int32_t rval);
++
++} // namespace os
++
++
++#endif // LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_X86_64_VDSO_H
+diff --git a/libc/src/__support/OSUtil/zaos/x86_64/CMakeLists.txt b/libc/src/__support/OSUtil/zaos/x86_64/CMakeLists.txt
+new file mode 100644
+index 000000000..e69de29bb
+diff --git a/libc/src/__support/threads/mutex.h b/libc/src/__support/threads/mutex.h
+index 392b38984..5a9bd4a15 100644
+--- a/libc/src/__support/threads/mutex.h
++++ b/libc/src/__support/threads/mutex.h
+@@ -39,6 +39,8 @@
+ 
+ #if defined(__linux__)
+ #include "src/__support/threads/linux/mutex.h"
++#elif defined(__zaos__)
++#include "src/__support/threads/zaos/mutex.h"
+ #elif defined(LIBC_TARGET_ARCH_IS_GPU)
+ #include "src/__support/threads/gpu/mutex.h"
+ #endif // __linux__
+diff --git a/libc/src/__support/threads/thread.h b/libc/src/__support/threads/thread.h
+index f2b1f6bbb..567fb9ae1 100644
+--- a/libc/src/__support/threads/thread.h
++++ b/libc/src/__support/threads/thread.h
+@@ -18,7 +18,8 @@
+ #include "src/__support/macros/properties/architectures.h"
+ 
+ // TODO: fix this unguarded linux dep
+-#include <linux/param.h> // for exec_pagesize.
++//#include <linux/param.h> // for exec_pagesize.
++#define EXEC_PAGESIZE 4096
+ 
+ #include <stddef.h> // For size_t
+ #include <stdint.h>
+diff --git a/libc/src/__support/threads/zaos/CMakeLists.txt b/libc/src/__support/threads/zaos/CMakeLists.txt
+new file mode 100644
+index 000000000..51c11fa2e
+--- /dev/null
++++ b/libc/src/__support/threads/zaos/CMakeLists.txt
+@@ -0,0 +1,33 @@
++if(NOT TARGET libc.src.__support.OSUtil.osutil)
++  return()
++endif()
++
++add_header_library(
++  mutex
++  HDRS
++    mutex.h
++  DEPENDS
++    libc.src.__support.threads.mutex_common
++)
++
++add_object_library(
++  thread
++  SRCS
++    thread.cpp
++  DEPENDS
++    libc.config.app_h
++    libc.hdr.fcntl_macros
++    libc.src.errno.errno
++    libc.src.__support.CPP.atomic
++    libc.src.__support.CPP.stringstream
++    libc.src.__support.CPP.string_view
++    libc.src.__support.common
++    libc.src.__support.error_or
++    libc.src.__support.threads.thread_common
++  COMPILE_OPTIONS
++    ${libc_opt_high_flag}
++    -fno-omit-frame-pointer # This allows us to sniff out the thread args from
++                            # the new thread's stack reliably.
++    -Wno-frame-address      # Yes, calling __builtin_return_address with a
++                            # value other than 0 is dangerous. We know.
++)
+diff --git a/libc/src/__support/threads/zaos/mutex.h b/libc/src/__support/threads/zaos/mutex.h
+new file mode 100644
+index 000000000..a7e0ffd6c
+--- /dev/null
++++ b/libc/src/__support/threads/zaos/mutex.h
+@@ -0,0 +1,100 @@
++//===--- Implementation of a ZaOS mutex class -------------------*- C++ -*-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_LIBC_SRC___SUPPORT_THREADS_ZAOS_MUTEX_H
++#define LLVM_LIBC_SRC___SUPPORT_THREADS_ZAOS_MUTEX_H
++
++#include "hdr/types/pid_t.h"
++#include "src/__support/CPP/atomic.h"
++#include "src/__support/CPP/optional.h"
++#include "src/__support/libc_assert.h"
++#include "src/__support/macros/config.h"
++#include "src/__support/OSUtil/zaos/vdso.h"
++#include "src/__support/threads/mutex_common.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++// TODO: support shared/recursive/robust mutexes.
++class Mutex {
++  cpp::Atomic<uint32_t> futex;
++  LIBC_INLINE_VAR static constexpr uint32_t BUSY = 1;
++  LIBC_INLINE_VAR static constexpr uint32_t WAITING = 1 << 31;
++
++  // reserved timed, may be useful when combined with other flags.
++  unsigned char timed;
++  unsigned char recursive;
++  unsigned char robust;
++  unsigned char pshared;
++
++  // TLS address may not work across forked processes. Use thread id instead.
++  pid_t owner;
++  unsigned long long lock_count;
++
++public:
++  LIBC_INLINE constexpr Mutex(bool is_timed, bool is_recursive, bool is_robust,
++                              bool is_pshared)
++      : futex(), timed(is_timed), recursive(is_recursive), robust(is_robust),
++        pshared(is_pshared), owner(0), lock_count(0) {}
++
++  LIBC_INLINE static MutexError init(Mutex *mutex, bool is_timed, bool isrecur,
++                                     bool isrobust, bool is_pshared) {
++    mutex->futex = 0;
++    mutex->timed = is_timed;
++    mutex->recursive = isrecur;
++    mutex->robust = isrobust;
++    mutex->pshared = is_pshared;
++    mutex->owner = 0;
++    mutex->lock_count = 0;
++    return MutexError::NONE;
++  }
++
++  LIBC_INLINE static MutexError destroy(Mutex *mutex) {
++    LIBC_ASSERT(mutex->owner == 0 && mutex->lock_count == 0 &&
++                "Mutex destroyed while being locked.");
++    (void)mutex;
++    return MutexError::NONE;
++  }
++
++  LIBC_INLINE MutexError lock() {
++    uint32_t state = 0;
++    if (futex.compare_exchange_weak(state, BUSY))
++      return MutexError::NONE;
++    futex.fetch_or(WAITING);
++    for (;;) {
++      state = WAITING;
++      if (futex.compare_exchange_strong(state, BUSY))
++        break;
++
++      os::futex_wait(&futex.val, WAITING | BUSY, -1);
++    }
++    return MutexError::NONE;
++  }
++
++  LIBC_INLINE MutexError unlock() {
++    uint32_t state = BUSY;
++    if (futex.compare_exchange_strong(state, 0))
++      return MutexError::NONE;
++
++    futex.store(WAITING);
++
++    os::futex_wake(&futex.val, 1);
++    
++    return MutexError::NONE;
++  }
++
++  LIBC_INLINE MutexError try_lock() {
++    uint32_t state = 0;
++    if (futex.compare_exchange_strong(state, BUSY))
++      return MutexError::NONE;
++    return MutexError::BUSY;
++  }
++};
++
++} // namespace LIBC_NAMESPACE_DECL
++
++#endif // LLVM_LIBC_SRC___SUPPORT_THREADS_ZAOS_MUTEX_H
+diff --git a/libc/src/__support/threads/zaos/thread.cpp b/libc/src/__support/threads/zaos/thread.cpp
+new file mode 100755
+index 000000000..33c4fb885
+--- /dev/null
++++ b/libc/src/__support/threads/zaos/thread.cpp
+@@ -0,0 +1,316 @@
++//===--- Implementation of a ZaOS thread class ------------------*- C++ -*-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/__support/threads/thread.h"
++#include "config/app.h"
++#include "src/__support/CPP/atomic.h"
++#include "src/__support/CPP/string_view.h"
++#include "src/__support/CPP/stringstream.h"
++#include "src/__support/OSUtil/zaos/vdso.h"
++#include "src/__support/OSUtil/zaos/ioring.h"
++#include "src/__support/common.h"
++#include "src/__support/error_or.h"
++#include "src/__support/macros/config.h"
++#include "src/errno/libc_errno.h"                    // For error macros
++
++#include "hdr/fcntl_macros.h"
++#include <stdint.h>
++
++namespace LIBC_NAMESPACE_DECL {
++
++static constexpr ErrorOr<size_t> add_no_overflow(size_t lhs, size_t rhs) {
++  if (lhs > SIZE_MAX - rhs)
++    return Error{EINVAL};
++  if (rhs > SIZE_MAX - lhs)
++    return Error{EINVAL};
++  return lhs + rhs;
++}
++
++static constexpr ErrorOr<size_t> round_to_page(size_t v) {
++  auto vp_or_err = add_no_overflow(v, EXEC_PAGESIZE - 1);
++  if (!vp_or_err)
++    return vp_or_err;
++
++  return vp_or_err.value() & -EXEC_PAGESIZE;
++}
++
++LIBC_INLINE ErrorOr<void *> alloc_stack(size_t stacksize, size_t guardsize) {
++  (void)guardsize;
++
++  os::mmvec mmvec = {};
++  mmvec.length = stacksize;
++  mmvec.flags = os::mmap::anonymous;
++  mmvec.prot = os::prot::readwrite;
++
++  void *addr;
++  if (int32_t rc = os::mmap(-1, &mmvec, 1, &addr, 0); rc < 0)
++    os::process_exit(1);
++
++  return addr;
++}
++
++// This must always be inlined as we may be freeing the calling threads stack in
++// which case a normal return from the top the stack would cause an invalid
++// memory read.
++[[gnu::always_inline]] LIBC_INLINE void
++free_stack(void *stack, size_t stacksize, size_t guardsize) {
++  (void)guardsize;
++
++  os::munmap(stack, stacksize);
++}
++
++struct Thread;
++
++// We align the start args to 16-byte boundary as we adjust the allocated
++// stack memory with its size. We want the adjusted address to be at a
++// 16-byte boundary to satisfy the x86_64 and aarch64 ABI requirements.
++// If different architecture in future requires higher alignment, then we
++// can add a platform specific alignment spec.
++struct alignas(STACK_ALIGNMENT) StartArgs {
++  ThreadAttributes *thread_attrib;
++  ThreadRunner runner;
++  void *arg;
++};
++
++// This must always be inlined as we may be freeing the calling threads stack in
++// which case a normal return from the top the stack would cause an invalid
++// memory read.
++[[gnu::always_inline]] LIBC_INLINE void
++cleanup_thread_resources(ThreadAttributes *attrib) {
++  // Cleanup the TLS before the stack as the TLS information is stored on
++  // the stack.
++  cleanup_tls(attrib->tls, attrib->tls_size);
++  if (attrib->owned_stack)
++    free_stack(attrib->stack, attrib->stacksize, attrib->guardsize);
++}
++
++[[gnu::always_inline]] LIBC_INLINE uintptr_t get_start_args_addr() {
++// NOTE: For __builtin_frame_address to work reliably across compilers,
++// architectures and various optimization levels, the TU including this file
++// should be compiled with -fno-omit-frame-pointer.
++  return reinterpret_cast<uintptr_t>(__builtin_frame_address(0))
++         + sizeof(uintptr_t);
++
++}
++
++[[gnu::noinline]] void start_thread() {
++  auto *start_args = reinterpret_cast<StartArgs *>(get_start_args_addr());
++  auto *attrib = start_args->thread_attrib;
++  self.attrib = attrib;
++  self.attrib->atexit_callback_mgr = internal::get_thread_atexit_callback_mgr();
++
++  auto auxv_ptr = reinterpret_cast<AuxEntry *>(start_args + 1);
++
++  for (auto *aux_entry = auxv_ptr; aux_entry->id != 0; ++aux_entry) {
++    switch (aux_entry->id) {
++      case 37: // RINGFD
++        thread_ring.fd = static_cast<int32_t>(aux_entry->value);
++        break;
++      case 36: // RINGHDR
++        thread_ring.header = reinterpret_cast<os::ioring_header *>(aux_entry->value);
++        break;
++      default:
++        break;
++    }
++  }
++
++  if (attrib->style == ThreadStyle::POSIX) {
++    attrib->retval.posix_retval =
++        start_args->runner.posix_runner(start_args->arg);
++    thread_exit(ThreadReturnValue(attrib->retval.posix_retval),
++                ThreadStyle::POSIX);
++  } else {
++    attrib->retval.stdc_retval =
++        start_args->runner.stdc_runner(start_args->arg);
++    thread_exit(ThreadReturnValue(attrib->retval.stdc_retval),
++                ThreadStyle::STDC);
++  }
++}
++
++int Thread::run(ThreadStyle style, ThreadRunner runner, void *arg, void *stack,
++                size_t stacksize, size_t guardsize, bool detached) {
++  bool owned_stack = false;
++  if (stack == nullptr) {
++    // TODO: Should we return EINVAL here? Should we have a generic concept of a
++    //       minimum stacksize (like 16384 for pthread).
++    if (stacksize == 0)
++      stacksize = DEFAULT_STACKSIZE;
++    // Roundup stacksize/guardsize to page size.
++    // TODO: Should be also add sizeof(ThreadAttribute) and other internal
++    //       meta data?
++    auto round_or_err = round_to_page(guardsize);
++    if (!round_or_err)
++      return round_or_err.error();
++    guardsize = round_or_err.value();
++
++    round_or_err = round_to_page(stacksize);
++    if (!round_or_err)
++      return round_or_err.error();
++
++    stacksize = round_or_err.value();
++    auto alloc = alloc_stack(stacksize, guardsize);
++    if (!alloc)
++      return alloc.error();
++    else
++      stack = alloc.value();
++    owned_stack = true;
++  }
++
++  // Validate that stack/stacksize are validly aligned.
++  uintptr_t stackaddr = reinterpret_cast<uintptr_t>(stack);
++  if ((stackaddr % STACK_ALIGNMENT != 0) ||
++      ((stackaddr + stacksize) % STACK_ALIGNMENT != 0)) {
++    if (owned_stack)
++      free_stack(stack, stacksize, guardsize);
++    return EINVAL;
++  }
++
++  TLSDescriptor tls;
++  init_tls(tls);
++
++  // When the new thread is spawned by the kernel, the new thread gets the
++  // stack we pass to the clone syscall. However, this stack is empty and does
++  // not have any local vars present in this function. Hence, one cannot
++  // pass arguments to the thread start function, or use any local vars from
++  // here. So, we pack them into the new stack from where the thread can sniff
++  // them out.
++  //
++  // Likewise, the actual thread state information is also stored on the
++  // stack memory.
++
++  static constexpr size_t INTERNAL_STACK_DATA_SIZE =
++      sizeof(StartArgs) + sizeof(ThreadAttributes);
++
++  // This is pretty arbitrary, but at the moment we don't adjust user provided
++  // stacksize (or default) to account for this data as its assumed minimal. If
++  // this assert starts failing we probably should. Likewise if we can't bound
++  // this we may overflow when we subtract it from the top of the stack.
++  static_assert(INTERNAL_STACK_DATA_SIZE < EXEC_PAGESIZE);
++
++  // TODO: We are assuming stack growsdown here.
++  auto adjusted_stack_or_err =
++      add_no_overflow(reinterpret_cast<uintptr_t>(stack), stacksize);
++  if (!adjusted_stack_or_err) {
++    cleanup_tls(tls.addr, tls.size);
++    if (owned_stack)
++      free_stack(stack, stacksize, guardsize);
++    return adjusted_stack_or_err.error();
++  }
++
++  uintptr_t adjusted_stack =
++      adjusted_stack_or_err.value() - INTERNAL_STACK_DATA_SIZE;
++  adjusted_stack &= ~(uintptr_t(STACK_ALIGNMENT) - 1);
++
++  auto *start_args = reinterpret_cast<StartArgs *>(adjusted_stack);
++
++  attrib =
++      reinterpret_cast<ThreadAttributes *>(adjusted_stack + sizeof(StartArgs));
++  attrib->style = style;
++  attrib->detach_state =
++      uint32_t(detached ? DetachState::DETACHED : DetachState::JOINABLE);
++  attrib->stack = stack;
++  attrib->stacksize = stacksize;
++  attrib->guardsize = guardsize;
++  attrib->owned_stack = owned_stack;
++  attrib->tls = tls.addr;
++  attrib->tls_size = tls.size;
++
++  start_args->thread_attrib = attrib;
++  start_args->runner = runner;
++  start_args->arg = arg;
++
++  int32_t clone_result = os::thread_create(stack, start_thread, start_args, os::priority::normal, &attrib->tid, 0);
++
++  if (clone_result == 0) {
++    start_thread();
++  } else if (clone_result < 0) {
++    cleanup_thread_resources(attrib);
++    return static_cast<int>(-clone_result);
++  }
++
++  return 0;
++}
++
++int Thread::join(ThreadReturnValue &retval) {
++  wait();
++
++  if (attrib->style == ThreadStyle::POSIX)
++    retval.posix_retval = attrib->retval.posix_retval;
++  else
++    retval.stdc_retval = attrib->retval.stdc_retval;
++
++  cleanup_thread_resources(attrib);
++
++  return 0;
++}
++
++int Thread::detach() {
++  uint32_t joinable_state = uint32_t(DetachState::JOINABLE);
++  if (attrib->detach_state.compare_exchange_strong(
++          joinable_state, uint32_t(DetachState::DETACHED))) {
++    return int(DetachType::SIMPLE);
++  }
++
++  wait();
++
++  cleanup_thread_resources(attrib);
++
++  return int(DetachType::CLEANUP);
++}
++
++void Thread::wait() {
++  int32_t rval;
++  os::wait(attrib->tid, &rval, 0);
++}
++
++bool Thread::operator==(const Thread &thread) const {
++  return attrib->tid == thread.attrib->tid;
++}
++
++int Thread::set_name(const cpp::string_view &name) {
++  (void)name;
++  return 0;
++}
++
++int Thread::get_name(cpp::StringStream &name) const {
++  (void)name;
++  return 0;
++}
++
++void thread_exit(ThreadReturnValue retval, ThreadStyle style) {
++  (void)style;
++  (void)retval;
++
++  auto attrib = self.attrib;
++
++  // The very first thing we do is to call the thread's atexit callbacks.
++  // These callbacks could be the ones registered by the language runtimes,
++  // for example, the destructors of thread local objects. They can also
++  // be destructors of the TSS objects set using API like pthread_setspecific.
++  // NOTE: We cannot call the atexit callbacks as part of the
++  // cleanup_thread_resources function as that function can be called from a
++  // different thread. The destructors of thread local and TSS objects should
++  // be called by the thread which owns them.
++  internal::call_atexit_callbacks(attrib);
++
++  uint32_t joinable_state = uint32_t(DetachState::JOINABLE);
++  if (!attrib->detach_state.compare_exchange_strong(
++          joinable_state, uint32_t(DetachState::EXITING))) {
++    // Thread is detached so cleanup the resources.
++    cleanup_thread_resources(attrib);
++
++    os::thread_exit(0);
++    __builtin_unreachable();
++  }
++
++  os::thread_exit(0);
++
++  __builtin_unreachable();
++}
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/__support/time/zaos/CMakeLists.txt b/libc/src/__support/time/zaos/CMakeLists.txt
+new file mode 100644
+index 000000000..e37df39a6
+--- /dev/null
++++ b/libc/src/__support/time/zaos/CMakeLists.txt
+@@ -0,0 +1,13 @@
++add_object_library(
++  clock_gettime
++  HDRS
++    ../clock_gettime.h
++  SRCS
++    clock_gettime.cpp
++  DEPENDS
++    libc.hdr.types.struct_timespec
++    libc.hdr.types.clockid_t
++    libc.src.__support.common
++    libc.src.__support.error_or
++    libc.src.__support.OSUtil.osutil
++)
+diff --git a/libc/src/__support/time/zaos/clock_gettime.cpp b/libc/src/__support/time/zaos/clock_gettime.cpp
+new file mode 100644
+index 000000000..bed64492d
+--- /dev/null
++++ b/libc/src/__support/time/zaos/clock_gettime.cpp
+@@ -0,0 +1,38 @@
++//===--- clock_gettime ZaOS implementation ----------------------*- C++ -*-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/__support/time/clock_gettime.h"
++#include "hdr/types/clockid_t.h"
++#include "hdr/types/struct_timespec.h"
++#include "src/__support/OSUtil/zaos/vdso.h"
++#include "src/__support/common.h"
++#include "src/__support/error_or.h"
++#include "src/__support/macros/config.h"
++
++namespace LIBC_NAMESPACE_DECL {
++namespace internal {
++ErrorOr<int> clock_gettime(clockid_t clockid, timespec *ts) {
++  uint64_t tp = 0;
++  int32_t ret = os::clock_time(clockid, &tp);
++
++  static_assert(
++      sizeof(time_t) == sizeof(int64_t),
++      "clock_gettime requires struct timespec with 64-bit members.");
++
++  if (ret == 0) {
++    ts->tv_sec = static_cast<decltype(ts->tv_sec)>(tp / 1000000000);
++    ts->tv_nsec = static_cast<decltype(ts->tv_nsec)>(tp % 1000000000);
++  }
++
++  if (ret < 0)
++    return Error(-ret);
++  return ret;
++}
++
++} // namespace internal
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/stdlib/CMakeLists.txt b/libc/src/stdlib/CMakeLists.txt
+index 73a9fbf1e..877657164 100644
+--- a/libc/src/stdlib/CMakeLists.txt
++++ b/libc/src/stdlib/CMakeLists.txt
+@@ -323,7 +323,7 @@ add_entrypoint_object(
+     .rand_util
+ )
+ 
+-if(NOT LIBC_TARGET_OS_IS_BAREMETAL AND NOT LIBC_TARGET_OS_IS_GPU)
++if(NOT LIBC_TARGET_OS_IS_BAREMETAL AND NOT LIBC_TARGET_OS_IS_GPU AND NOT LIBC_TARGET_OS_IS_ZAOS)
+   if(LLVM_LIBC_INCLUDE_SCUDO)
+     set(SCUDO_DEPS "")
+ 
+@@ -495,7 +495,7 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${LIBC_TARGET_OS})
+   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/${LIBC_TARGET_OS})
+ endif()
+ 
+-if(LIBC_TARGET_OS_IS_BAREMETAL OR LIBC_TARGET_OS_IS_GPU)
++if(LIBC_TARGET_OS_IS_BAREMETAL OR LIBC_TARGET_OS_IS_GPU OR LIBC_TARGET_OS_IS_ZAOS)
+   add_entrypoint_object(
+     malloc
+     ALIAS
+diff --git a/libc/src/stdlib/zaos/CMakeLists.txt b/libc/src/stdlib/zaos/CMakeLists.txt
+new file mode 100644
+index 000000000..74f2a53a1
+--- /dev/null
++++ b/libc/src/stdlib/zaos/CMakeLists.txt
+@@ -0,0 +1,71 @@
++add_entrypoint_object(
++  abort
++  SRCS
++    abort.cpp
++  HDRS
++    ../abort.h
++  DEPENDS
++    libc.include.stdlib
++    libc.src.stdlib._Exit
++)
++
++add_object_library(
++  heap
++  SRCS
++    heap.cpp
++  HDRS
++    heap.h
++  DEPENDS
++    libc.src.__support.freestore
++    libc.src.__support.freetrie
++)
++
++add_entrypoint_object(
++  malloc
++  SRCS
++    malloc.cpp
++  HDRS
++    ../malloc.h
++  DEPENDS
++    libc.src.stdlib.zaos.heap
++)
++
++add_entrypoint_object(
++  free
++  SRCS
++    free.cpp
++  HDRS
++    ../free.h
++  DEPENDS
++    libc.src.stdlib.zaos.heap
++)
++
++add_entrypoint_object(
++  calloc
++  SRCS
++    calloc.cpp
++  HDRS
++    ../calloc.h
++  DEPENDS
++    libc.src.stdlib.zaos.heap
++)
++
++add_entrypoint_object(
++  realloc
++  SRCS
++    realloc.cpp
++  HDRS
++    ../realloc.h
++  DEPENDS
++    libc.src.stdlib.zaos.heap
++)
++
++add_entrypoint_object(
++  aligned_alloc
++  SRCS
++    aligned_alloc.cpp
++  HDRS
++    ../aligned_alloc.h
++  DEPENDS
++    libc.src.stdlib.zaos.heap
++)
+diff --git a/libc/src/stdlib/zaos/abort.cpp b/libc/src/stdlib/zaos/abort.cpp
+new file mode 100644
+index 000000000..5205b9b27
+--- /dev/null
++++ b/libc/src/stdlib/zaos/abort.cpp
+@@ -0,0 +1,21 @@
++//===-- Implementation of abort -------------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/__support/common.h"
++#include "src/__support/macros/config.h"
++#include "src/stdlib/_Exit.h"
++
++#include "src/stdlib/abort.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++LLVM_LIBC_FUNCTION(void, abort, ()) {
++  LIBC_NAMESPACE::_Exit(127);
++}
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/stdlib/zaos/aligned_alloc.cpp b/libc/src/stdlib/zaos/aligned_alloc.cpp
+new file mode 100644
+index 000000000..80e0ae3e0
+--- /dev/null
++++ b/libc/src/stdlib/zaos/aligned_alloc.cpp
+@@ -0,0 +1,22 @@
++//===-- Implementation for malloc -----------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/stdlib/aligned_alloc.h"
++#include "src/__support/common.h"
++#include "src/__support/macros/config.h"
++#include "src/stdlib/zaos/heap.h"
++
++#include <stddef.h>
++
++namespace LIBC_NAMESPACE_DECL {
++
++LLVM_LIBC_FUNCTION(void *, aligned_alloc, (size_t alignment, size_t size)) {
++  return heap->allocate(alignment, size);
++}
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/stdlib/zaos/calloc.cpp b/libc/src/stdlib/zaos/calloc.cpp
+new file mode 100644
+index 000000000..afd80217a
+--- /dev/null
++++ b/libc/src/stdlib/zaos/calloc.cpp
+@@ -0,0 +1,31 @@
++//===-- Implementation for malloc -----------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/stdlib/calloc.h"
++#include "src/__support/common.h"
++#include "src/__support/macros/config.h"
++#include "src/stdlib/zaos/heap.h"
++#include "src/string/memory_utils/inline_memset.h"
++
++#include <stddef.h>
++
++namespace LIBC_NAMESPACE_DECL {
++
++LLVM_LIBC_FUNCTION(void *, calloc, (size_t num, size_t size)) {
++  size_t bytes;
++  if (__builtin_mul_overflow(num, size, &bytes))
++    return nullptr;
++
++  void *ptr = heap->allocate(alignof(max_align_t), bytes);
++  if (ptr != nullptr)
++    inline_memset(ptr, 0, bytes);
++
++  return ptr;
++}
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/stdlib/zaos/free.cpp b/libc/src/stdlib/zaos/free.cpp
+new file mode 100644
+index 000000000..0b76e0b57
+--- /dev/null
++++ b/libc/src/stdlib/zaos/free.cpp
+@@ -0,0 +1,22 @@
++//===-- Implementation for malloc -----------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/stdlib/free.h"
++#include "src/__support/common.h"
++#include "src/__support/macros/config.h"
++#include "src/stdlib/zaos/heap.h"
++
++#include <stddef.h>
++
++namespace LIBC_NAMESPACE_DECL {
++
++LLVM_LIBC_FUNCTION(void, free, (void *ptr)) {
++  heap->free(ptr);
++}
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/stdlib/zaos/heap.cpp b/libc/src/stdlib/zaos/heap.cpp
+new file mode 100644
+index 000000000..f163e974b
+--- /dev/null
++++ b/libc/src/stdlib/zaos/heap.cpp
+@@ -0,0 +1,152 @@
++//===-- Implementation for heap -------------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/stdlib/zaos/heap.h"
++#include "src/__support/common.h"
++#include "src/__support/CPP/mutex.h"
++#include "src/__support/CPP/algorithm.h"
++#include "src/__support/OSUtil/zaos/vdso.h"
++#include "src/__support/macros/config.h"
++#include "src/string/memory_utils/inline_memcpy.h"
++#include "src/string/memory_utils/inline_memset.h"
++
++#include <stddef.h>
++
++namespace LIBC_NAMESPACE_DECL {
++
++static constexpr size_t MAX_BLOCK_SIZE = 32768;
++
++static LIBC_CONSTINIT Heap heap_symbols;
++Heap *heap = &heap_symbols;
++
++void *Heap::allocate(size_t alignment, size_t size) {
++  cpp::lock_guard lock(mutex);
++
++  if (size == 0)
++    return nullptr;
++
++  // The alignment must be an integral power of two.
++  if (alignment && (alignment & (alignment - 1)) != 0)
++    return nullptr;
++
++  // The size parameter must be an integral multiple of alignment.
++  if (size % alignment != 0)
++    return nullptr;
++
++  // The minimum alignment supported by Block is max_align_t.
++  alignment = cpp::max(alignment, alignof(max_align_t));
++
++  if (!is_initialized)
++  {
++    free_store.set_range({0, MAX_BLOCK_SIZE});
++    is_initialized = true;
++  }
++
++  size_t request_size = Block::min_size_for_allocation(alignment, size);
++  if (!request_size)
++    return nullptr;
++
++  Block *block = free_store.remove_best_fit(request_size);
++  if (!block)
++  {
++    os::mmvec mmvec = {};
++    mmvec.length = cpp::max(request_size, MAX_BLOCK_SIZE);
++    mmvec.flags = os::mmap::anonymous;
++    mmvec.prot = os::prot::readwrite;
++
++    void *addr;
++    if (int32_t rc = os::mmap(-1, &mmvec, 1, &addr, 0); rc < 0)
++      return nullptr;
++
++    block = *Block::init({static_cast<cpp::byte*>(addr), mmvec.length});
++  }
++
++  auto block_info = Block::allocate(block, alignment, size);
++
++  if (block_info.next)
++    free_store.insert(block_info.next);
++  if (block_info.prev)
++    free_store.insert(block_info.prev);
++
++  block_info.block->mark_used();
++
++  return block_info.block->usable_space();
++}
++
++void *Heap::realloc(void *ptr, size_t alignment, size_t size) {
++  if (size == 0) {
++    free(ptr);
++    return nullptr;
++  }
++
++  // If the pointer is nullptr, allocate a new memory.
++  if (ptr == nullptr)
++    return allocate(alignment, size);
++
++  cpp::byte *bytes = static_cast<cpp::byte *>(ptr);
++
++  Block *block = Block::from_usable_space(bytes);
++  if (!block->used())
++    return nullptr;
++  size_t old_size = block->inner_size();
++
++  // Do nothing and return ptr if the required memory size is smaller than
++  // the current size.
++  if (old_size >= size)
++    return ptr;
++
++  void *new_ptr = allocate(alignment, size);
++  // Don't invalidate ptr if allocate(size) fails to initilize the memory.
++  if (new_ptr == nullptr)
++    return nullptr;
++
++  inline_memcpy(new_ptr, ptr, old_size);
++
++  free(ptr);
++
++  return new_ptr;
++}
++
++void Heap::free(void *ptr) {
++  cpp::lock_guard lock(mutex);
++
++  cpp::byte *bytes = static_cast<cpp::byte *>(ptr);
++
++  Block *block = Block::from_usable_space(bytes);
++  LIBC_ASSERT(block->next() && "sentinel last block cannot be freed");
++  LIBC_ASSERT(block->used() && "double free");
++
++  if (block->outer_size() < MAX_BLOCK_SIZE)
++  {
++    block->mark_free();
++
++    // Can we combine with the left or right blocks?
++    Block *prev_free = block->prev_free();
++    Block *next = block->next();
++
++    if (prev_free != nullptr) {
++      // Remove from free store and merge.
++      free_store.remove(prev_free);
++      block = prev_free;
++      block->merge_next();
++    }
++    if (!next->used()) {
++      free_store.remove(next);
++      block->merge_next();
++    }
++    // Add back to the freelist
++    free_store.insert(block);
++  }
++  else
++  {
++    os::munmap(block->region().data(), block->region().size());
++  }
++}
++
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/stdlib/zaos/heap.h b/libc/src/stdlib/zaos/heap.h
+new file mode 100644
+index 000000000..4b4c3aa43
+--- /dev/null
++++ b/libc/src/stdlib/zaos/heap.h
+@@ -0,0 +1,37 @@
++//===-- Implementation header for heap --------------------------*- C++ -*-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_LIBC_SRC_STDLIB_ZAOS_HEAP_H
++#define LLVM_LIBC_SRC_STDLIB_ZAOS_HEAP_H
++
++#include "src/__support/macros/config.h"
++#include "src/__support/threads/mutex.h"
++#include "src/__support/freestore.h"
++#include "src/__support/CPP/span.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++class Heap {
++public:
++  constexpr Heap() : mutex(false, false, false, false) {}
++
++  void *allocate(size_t alignment, size_t size);
++  void *realloc(void *ptr, size_t alignment, size_t size);
++  void free(void *ptr);
++
++private:
++  Mutex mutex;
++  FreeStore free_store;
++  bool is_initialized = false;
++};
++
++extern Heap *heap;
++
++} // namespace LIBC_NAMESPACE_DECL
++
++#endif // LLVM_LIBC_SRC_STDLIB_ZAOS_HEAP_H
+diff --git a/libc/src/stdlib/zaos/malloc.cpp b/libc/src/stdlib/zaos/malloc.cpp
+new file mode 100644
+index 000000000..ae49e5035
+--- /dev/null
++++ b/libc/src/stdlib/zaos/malloc.cpp
+@@ -0,0 +1,22 @@
++//===-- Implementation for malloc -----------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/stdlib/malloc.h"
++#include "src/__support/common.h"
++#include "src/__support/macros/config.h"
++#include "src/stdlib/zaos/heap.h"
++
++#include <stddef.h>
++
++namespace LIBC_NAMESPACE_DECL {
++
++LLVM_LIBC_FUNCTION(void *, malloc, (size_t size)) {
++  return heap->allocate(alignof(max_align_t), size);
++}
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/stdlib/zaos/realloc.cpp b/libc/src/stdlib/zaos/realloc.cpp
+new file mode 100644
+index 000000000..9b9e0add5
+--- /dev/null
++++ b/libc/src/stdlib/zaos/realloc.cpp
+@@ -0,0 +1,23 @@
++//===-- Implementation for malloc -----------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/stdlib/realloc.h"
++#include "src/__support/common.h"
++#include "src/__support/macros/config.h"
++#include "src/stdlib/zaos/heap.h"
++
++#include <stddef.h>
++
++namespace LIBC_NAMESPACE_DECL {
++
++LLVM_LIBC_FUNCTION(void *, realloc, (void *ptr, size_t size)) {
++  return heap->realloc(ptr, alignof(max_align_t), size);
++}
++
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/time/zaos/CMakeLists.txt b/libc/src/time/zaos/CMakeLists.txt
+new file mode 100644
+index 000000000..314623f9f
+--- /dev/null
++++ b/libc/src/time/zaos/CMakeLists.txt
+@@ -0,0 +1,68 @@
++add_entrypoint_object(
++  timespec_get
++  SRCS
++    timespec_get.cpp
++  HDRS
++    ../timespec_get.h
++  DEPENDS
++    libc.hdr.time_macros
++    libc.hdr.types.struct_timespec
++    libc.src.__support.time.clock_gettime
++    libc.src.errno.errno
++)
++
++add_entrypoint_object(
++  clock
++  SRCS
++    clock.cpp
++  HDRS
++    ../clock.h
++  DEPENDS
++    libc.hdr.time_macros
++    libc.hdr.types.clock_t
++    libc.src.__support.time.units
++    libc.src.__support.time.clock_gettime
++    libc.src.__support.CPP.limits
++    libc.src.errno.errno
++)
++
++add_entrypoint_object(
++  nanosleep
++  SRCS
++    nanosleep.cpp
++  HDRS
++    ../nanosleep.h
++  DEPENDS
++    libc.hdr.types.struct_timespec
++    libc.include.sys_syscall
++    libc.src.__support.OSUtil.osutil
++    libc.src.__support.CPP.limits
++    libc.src.errno.errno
++)
++
++add_entrypoint_object(
++  clock_gettime
++  SRCS
++    clock_gettime.cpp
++  HDRS
++    ../clock_gettime.h
++  DEPENDS
++    libc.hdr.types.clockid_t
++    libc.hdr.types.struct_timespec
++    libc.src.__support.time.clock_gettime
++    libc.src.errno.errno
++)
++
++add_entrypoint_object(
++  gettimeofday
++  SRCS
++    gettimeofday.cpp
++  HDRS
++    ../gettimeofday.h
++  DEPENDS
++    libc.hdr.time_macros
++    libc.hdr.types.suseconds_t
++    libc.src.__support.time.clock_gettime
++    libc.src.__support.time.units
++    libc.src.errno.errno
++)
+diff --git a/libc/src/time/zaos/clock.cpp b/libc/src/time/zaos/clock.cpp
+new file mode 100644
+index 000000000..abbb6fb66
+--- /dev/null
++++ b/libc/src/time/zaos/clock.cpp
+@@ -0,0 +1,47 @@
++//===-- ZaOS implementation of the clock function -------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/time/clock.h"
++#include "hdr/time_macros.h"
++#include "src/__support/CPP/limits.h"
++#include "src/__support/common.h"
++#include "src/__support/macros/config.h"
++#include "src/__support/time/clock_gettime.h"
++#include "src/__support/time/units.h"
++#include "src/errno/libc_errno.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++LLVM_LIBC_FUNCTION(clock_t, clock, ()) {
++  using namespace time_units;
++  struct timespec ts;
++  auto result = internal::clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts);
++  if (!result.has_value()) {
++    libc_errno = result.error();
++    return -1;
++  }
++
++  // The above syscall gets the CPU time in seconds plus nanoseconds.
++  // The standard requires that we return clock_t(-1) if we cannot represent
++  // clocks as a clock_t value.
++  constexpr clock_t CLOCK_SECS_MAX =
++      cpp::numeric_limits<clock_t>::max() / CLOCKS_PER_SEC;
++  if (ts.tv_sec > CLOCK_SECS_MAX)
++    return clock_t(-1);
++  if (ts.tv_nsec / 1_s_ns > CLOCK_SECS_MAX - ts.tv_sec)
++    return clock_t(-1);
++
++  // For the integer computation converting tv_nsec to clocks to work
++  // correctly, we want CLOCKS_PER_SEC to be less than 1000000000.
++  static_assert(1_s_ns > CLOCKS_PER_SEC,
++                "Expected CLOCKS_PER_SEC to be less than 1'000'000'000.");
++  return clock_t(ts.tv_sec * CLOCKS_PER_SEC +
++                 ts.tv_nsec / (1_s_ns / CLOCKS_PER_SEC));
++}
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/time/zaos/clock_gettime.cpp b/libc/src/time/zaos/clock_gettime.cpp
+new file mode 100644
+index 000000000..da36373ad
+--- /dev/null
++++ b/libc/src/time/zaos/clock_gettime.cpp
+@@ -0,0 +1,30 @@
++//===---------- ZaOS implementation of the POSIX clock_gettime function ---===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/time/clock_gettime.h"
++#include "src/__support/common.h"
++#include "src/__support/macros/config.h"
++#include "src/__support/time/clock_gettime.h"
++#include "src/errno/libc_errno.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++LLVM_LIBC_FUNCTION(int, clock_gettime,
++                   (clockid_t clockid, struct timespec *ts)) {
++  auto result = internal::clock_gettime(clockid, ts);
++
++  // A negative return value indicates an error with the magnitude of the
++  // value being the error code.
++  if (!result.has_value()) {
++    libc_errno = result.error();
++    return -1;
++  }
++  return 0;
++}
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/time/zaos/gettimeofday.cpp b/libc/src/time/zaos/gettimeofday.cpp
+new file mode 100644
+index 000000000..e8ddf482f
+--- /dev/null
++++ b/libc/src/time/zaos/gettimeofday.cpp
+@@ -0,0 +1,42 @@
++//===-- Implementation of gettimeofday function ---------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/time/gettimeofday.h"
++#include "hdr/time_macros.h"
++#include "hdr/types/suseconds_t.h"
++#include "src/__support/common.h"
++#include "src/__support/macros/config.h"
++#include "src/__support/time/clock_gettime.h"
++#include "src/__support/time/units.h"
++#include "src/errno/libc_errno.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++// TODO(michaelrj): Move this into time/linux with the other syscalls.
++LLVM_LIBC_FUNCTION(int, gettimeofday,
++                   (struct timeval * tv, [[maybe_unused]] void *unused)) {
++  using namespace time_units;
++  if (tv == nullptr)
++    return 0;
++
++  struct timespec ts;
++  auto result = internal::clock_gettime(CLOCK_REALTIME, &ts);
++
++  // A negative return value indicates an error with the magnitude of the
++  // value being the error code.
++  if (!result.has_value()) {
++    libc_errno = result.error();
++    return -1;
++  }
++
++  tv->tv_sec = ts.tv_sec;
++  tv->tv_usec = static_cast<suseconds_t>(ts.tv_nsec / 1_us_ns);
++  return 0;
++}
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/time/zaos/nanosleep.cpp b/libc/src/time/zaos/nanosleep.cpp
+new file mode 100644
+index 000000000..9584bcd53
+--- /dev/null
++++ b/libc/src/time/zaos/nanosleep.cpp
+@@ -0,0 +1,48 @@
++//===-- ZaOS implementation of nanosleep function -------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/time/nanosleep.h"
++#include "hdr/time_macros.h"
++#include "src/__support/common.h"
++#include "src/__support/OSUtil/zaos/vdso.h"
++#include "src/__support/macros/config.h"
++#include "src/errno/libc_errno.h"
++
++#include <stdint.h>
++
++namespace LIBC_NAMESPACE_DECL {
++
++LLVM_LIBC_FUNCTION(int, nanosleep,
++                   (const struct timespec *req, struct timespec *rem)) {
++  uint64_t nsecs = req->tv_nsec + req->tv_sec * 1000000000;
++
++  uint64_t start = 0;
++  os::clock_time(os::clock::monotonic, &start);
++
++  uint64_t now = 0;
++  os::clock_time(os::clock::monotonic, &now);
++  
++  while (now - start < nsecs)
++  {
++    os::clock_time(os::clock::monotonic, &now);
++  }
++
++  uint64_t elapsed = (now - start);
++
++  if (elapsed < nsecs) {
++    if (rem) {
++      rem->tv_sec = (nsecs - elapsed) / 1000000000;
++      rem->tv_nsec = (nsecs - elapsed) % 1000000000;
++    }
++    return -1;
++  }
++    
++  return 0;
++}
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/time/zaos/timespec_get.cpp b/libc/src/time/zaos/timespec_get.cpp
+new file mode 100644
+index 000000000..71d8462c1
+--- /dev/null
++++ b/libc/src/time/zaos/timespec_get.cpp
+@@ -0,0 +1,45 @@
++//===-- Implementation of timespec_get for ZaOS ---------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/time/timespec_get.h"
++#include "hdr/time_macros.h"
++#include "src/__support/common.h"
++#include "src/__support/macros/config.h"
++#include "src/__support/time/clock_gettime.h"
++#include "src/errno/libc_errno.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++LLVM_LIBC_FUNCTION(int, timespec_get, (struct timespec * ts, int base)) {
++  clockid_t clockid;
++  switch (base) {
++  case TIME_UTC:
++    clockid = CLOCK_REALTIME;
++    break;
++  case TIME_MONOTONIC:
++    clockid = CLOCK_MONOTONIC;
++    break;
++  case TIME_ACTIVE:
++    clockid = CLOCK_PROCESS_CPUTIME_ID;
++    break;
++  case TIME_THREAD_ACTIVE:
++    clockid = CLOCK_THREAD_CPUTIME_ID;
++    break;
++  default:
++    return 0;
++  }
++
++  auto result = internal::clock_gettime(clockid, ts);
++  if (!result.has_value()) {
++    libc_errno = result.error();
++    return 0;
++  }
++  return base;
++}
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/startup/linux/do_start.cpp b/libc/startup/linux/do_start.cpp
+index ff104c7f0..57dbd3083 100644
+--- a/libc/startup/linux/do_start.cpp
++++ b/libc/startup/linux/do_start.cpp
+@@ -32,11 +32,6 @@ extern uintptr_t __init_array_start[];
+ extern uintptr_t __init_array_end[];
+ extern uintptr_t __fini_array_start[];
+ extern uintptr_t __fini_array_end[];
+-// https://refspecs.linuxbase.org/elf/gabi4+/ch5.dynamic.html#dynamic_section
+-// This symbol is provided by the dynamic linker. It can be undefined depending
+-// on how the program is loaded exactly.
+-[[gnu::weak,
+-  gnu::visibility("hidden")]] extern const Elf64_Dyn _DYNAMIC[]; // NOLINT
+ }
+ 
+ namespace LIBC_NAMESPACE_DECL {
+diff --git a/libc/startup/zaos/CMakeLists.txt b/libc/startup/zaos/CMakeLists.txt
+new file mode 100644
+index 000000000..2a1590802
+--- /dev/null
++++ b/libc/startup/zaos/CMakeLists.txt
+@@ -0,0 +1,139 @@
++# This function merges multiple objects into a single relocatable object
++#                     cc -r obj1.o obj2.o -o obj.o
++# A relocatable object is an object file that is not fully linked into an
++# executable or a shared library. It is an intermediate file format that can
++# be passed into the linker.
++# A crt object has arch-specific code and arch-agnostic code. To reduce code
++# duplication, the implementation is split into multiple units. As a result,
++# we need to merge them into a single relocatable object.
++# See also:  https://maskray.me/blog/2022-11-21-relocatable-linking
++function(merge_relocatable_object name)
++  set(obj_list "")
++  set(fq_link_libraries "")
++  get_fq_deps_list(fq_dep_list ${ARGN})
++  foreach(target IN LISTS fq_dep_list)
++    list(APPEND obj_list "$<TARGET_OBJECTS:${target}>")
++    get_target_property(libs ${target} DEPS)
++    list(APPEND fq_link_libraries "${libs}")
++  endforeach()
++  list(REMOVE_DUPLICATES obj_list)
++  list(REMOVE_DUPLICATES fq_link_libraries)
++  get_fq_target_name(${name} fq_name)
++  set(relocatable_target "${fq_name}.__relocatable__")
++  add_executable(
++    ${relocatable_target}
++    ${obj_list}
++  )
++  # Pass -r to the driver is much cleaner than passing -Wl,-r: the compiler knows it is
++  # a relocatable linking and will not pass other irrelevant flags to the linker.
++  set(link_opts -r -nostdlib)
++  if (explicit_target_triple AND LLVM_ENABLE_LLD)
++    list(APPEND link_opts --target=${explicit_target_triple})
++  endif()
++  target_link_options(${relocatable_target} PRIVATE ${link_opts})
++  set_target_properties(
++    ${relocatable_target}
++    PROPERTIES
++      RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
++      OUTPUT_NAME ${name}.o
++  )
++  add_library(${fq_name} OBJECT IMPORTED GLOBAL)
++  add_dependencies(${fq_name} ${relocatable_target})
++  target_link_libraries(${fq_name} INTERFACE ${fq_link_libraries})
++  set_target_properties(
++    ${fq_name}
++    PROPERTIES
++      LINKER_LANGUAGE CXX
++      IMPORTED_OBJECTS ${CMAKE_CURRENT_BINARY_DIR}/${name}.o
++      TARGET_TYPE ${OBJECT_LIBRARY_TARGET_TYPE}
++      DEPS "${fq_link_libraries}"
++  )
++endfunction()
++
++function(add_startup_object name)
++  cmake_parse_arguments(
++    "ADD_STARTUP_OBJECT"
++    "" # Option argument
++    "SRC"   # Single value arguments
++    "DEPENDS;COMPILE_OPTIONS" # Multi value arguments
++    ${ARGN}
++  )
++
++  get_fq_target_name(${name} fq_target_name)
++
++  add_object_library(
++    ${name}
++    SRCS ${ADD_STARTUP_OBJECT_SRC}
++    DEPENDS ${ADD_STARTUP_OBJECT_DEPENDS}
++    COMPILE_OPTIONS ${ADD_STARTUP_OBJECT_COMPILE_OPTIONS}
++  )
++  set_target_properties(
++    ${fq_target_name}
++    PROPERTIES
++      OUTPUT_NAME ${name}.o
++  )
++endfunction()
++
++check_cxx_compiler_flag("-r" LIBC_LINKER_SUPPORTS_RELOCATABLE)
++
++if(NOT LIBC_LINKER_SUPPORTS_RELOCATABLE)
++  message(STATUS "Skipping startup for target architecture ${LIBC_TARGET_ARCHITECTURE}: linker does not support -r")
++  return()
++endif()
++
++if(NOT (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${LIBC_TARGET_ARCHITECTURE}))
++  message(STATUS "Skipping startup for target architecture ${LIBC_TARGET_ARCHITECTURE}")
++  return()
++endif()
++
++add_subdirectory(${LIBC_TARGET_ARCHITECTURE})
++
++add_object_library(
++  do_start
++  SRCS
++    do_start.cpp
++  HDRS
++    do_start.h
++  DEPENDS
++    libc.config.app_h
++    libc.include.llvm-libc-macros.link_macros
++    libc.src.__support.threads.thread
++    libc.src.__support.OSUtil.osutil
++    libc.src.stdlib.exit
++    libc.src.stdlib.atexit
++    libc.src.unistd.environ
++  COMPILE_OPTIONS
++    -ffreestanding       # To avoid compiler warnings about calling the main function.
++    -fno-builtin         # avoid emit unexpected calls
++    -fno-stack-protector # stack protect canary is not available yet.
++)
++
++merge_relocatable_object(
++  Scrt1
++  .${LIBC_TARGET_ARCHITECTURE}.start
++  .${LIBC_TARGET_ARCHITECTURE}.tls
++  .do_start
++)
++
++add_startup_object(
++  crti
++  SRC
++    crti.cpp
++)
++
++add_startup_object(
++  crtn
++  SRC
++    crtn.cpp
++)
++
++add_custom_target(libc-startup)
++set(startup_components Scrt1 crti crtn)
++foreach(target IN LISTS startup_components)
++  set(fq_target_name libc.startup.zaos.${target})
++  add_dependencies(libc-startup ${fq_target_name})
++  install(FILES $<TARGET_OBJECTS:${fq_target_name}>
++          DESTINATION ${LIBC_INSTALL_LIBRARY_DIR}
++          RENAME $<TARGET_PROPERTY:${fq_target_name},OUTPUT_NAME>
++          COMPONENT libc)
++endforeach()
+diff --git a/libc/startup/zaos/crti.cpp b/libc/startup/zaos/crti.cpp
+new file mode 100644
+index 000000000..e69de29bb
+diff --git a/libc/startup/zaos/crtn.cpp b/libc/startup/zaos/crtn.cpp
+new file mode 100644
+index 000000000..e69de29bb
+diff --git a/libc/startup/zaos/do_start.cpp b/libc/startup/zaos/do_start.cpp
+new file mode 100644
+index 000000000..357d50d5f
+--- /dev/null
++++ b/libc/startup/zaos/do_start.cpp
+@@ -0,0 +1,204 @@
++//===-- Implementation file of do_start -----------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++#include "startup/zaos/do_start.h"
++#include "config/zaos/app.h"
++#include "src/__support/OSUtil/zaos/vdso.h"
++#include "src/__support/OSUtil/zaos/ioring.h"
++#include "src/__support/macros/config.h"
++#include "src/__support/threads/thread.h"
++#include "src/stdlib/atexit.h"
++#include "src/stdlib/exit.h"
++#include "src/unistd/environ.h"
++#include <stdint.h>
++
++struct Elf64_Phdr
++{
++  uint32_t p_type;
++  uint32_t p_flags;
++  uint64_t p_offset;
++  uint64_t p_vaddr;
++  uint64_t p_paddr;
++  uint64_t p_filesz;
++  uint64_t p_memsz;
++  uint64_t p_align;
++};
++
++struct Elf64_Ehdr
++{
++  unsigned char e_ident[16];
++  uint16_t e_type;
++  uint16_t e_machine;
++  uint32_t e_version;
++  uint64_t e_entry;
++  uint64_t e_phoff;
++  uint64_t e_shoff;
++  uint32_t e_flags;
++  uint16_t e_ehsize;
++  uint16_t e_phentsize;
++  uint16_t e_phnum;
++  uint16_t e_shentsize;
++  uint16_t e_shnum;
++  uint16_t e_shstrndx;
++};
++
++struct Elf64_Dyn
++{
++  uint64_t d_tag;
++  uint64_t d_val;
++};
++
++struct Elf64_Sym
++{
++  uint32_t st_name;
++  uint8_t st_info;
++  uint8_t st_other;
++  uint16_t st_shndx;
++  uint64_t st_value;
++  uint64_t st_size;
++};
++
++extern "C" int main(int argc, char **argv, char **envp);
++
++extern "C" {
++// These arrays are present in the .init_array and .fini_array sections.
++// The symbols are inserted by linker when it sees references to them.
++extern uintptr_t __preinit_array_start[];
++extern uintptr_t __preinit_array_end[];
++extern uintptr_t __init_array_start[];
++extern uintptr_t __init_array_end[];
++extern uintptr_t __fini_array_start[];
++extern uintptr_t __fini_array_end[];
++}
++
++namespace LIBC_NAMESPACE_DECL {
++AppProperties app;
++
++using InitCallback = void(int, char **, char **);
++using FiniCallback = void(void);
++
++static void call_init_array_callbacks(int argc, char **argv, char **env) {
++  size_t preinit_array_size = __preinit_array_end - __preinit_array_start;
++  for (size_t i = 0; i < preinit_array_size; ++i)
++    reinterpret_cast<InitCallback *>(__preinit_array_start[i])(argc, argv, env);
++  size_t init_array_size = __init_array_end - __init_array_start;
++  for (size_t i = 0; i < init_array_size; ++i)
++    reinterpret_cast<InitCallback *>(__init_array_start[i])(argc, argv, env);
++}
++
++static void call_fini_array_callbacks() {
++  size_t fini_array_size = __fini_array_end - __fini_array_start;
++  for (size_t i = fini_array_size; i > 0; --i)
++    reinterpret_cast<FiniCallback *>(__fini_array_start[i - 1])();
++}
++
++static ThreadAttributes main_thread_attrib;
++static TLSDescriptor tls;
++// We separate teardown_main_tls from callbacks as callback function themselves
++// may require TLS.
++void teardown_main_tls() { cleanup_tls(tls.addr, tls.size); }
++
++[[noreturn]] void do_start() {
++  auto tid = os::get_tid();
++  if (tid <= 0)
++    os::process_exit(1);
++  main_thread_attrib.tid = static_cast<int>(tid);
++
++  uintptr_t *env_ptr = app.args->argv + 2 * app.args->argc + 2;
++  uintptr_t *env_end_marker = env_ptr;
++  app.env_ptr = env_ptr;
++  while (*env_end_marker)
++    env_end_marker += 2;
++
++  // Initialize the POSIX global declared in unistd.h
++  environ = reinterpret_cast<char **>(env_ptr);
++
++  app.page_size = os::get_pagesize();
++
++  uintptr_t program_hdr_table = 0;
++  uintptr_t program_hdr_entry = 0;
++  uintptr_t program_hdr_count = 0;
++  app.auxv_ptr = reinterpret_cast<AuxEntry *>(env_end_marker + 2);
++  for (auto *aux_entry = app.auxv_ptr; aux_entry->id != 0; ++aux_entry) {
++    switch (aux_entry->id) {
++    case 3: // AT_PHDR
++      program_hdr_table = aux_entry->value;
++      break;
++    case 4: // AT_PHENT
++      program_hdr_entry = aux_entry->value;
++      break;
++    case 5: // AT_PHNUM
++      program_hdr_count = aux_entry->value;
++      break;
++    default:
++      break;
++    }
++  }
++
++  uintptr_t base = 0;
++  Elf64_Phdr *tls_phdr = nullptr;
++
++  for (uintptr_t i = 0; i < program_hdr_count; ++i) {
++    auto phdr = reinterpret_cast<Elf64_Phdr*>(program_hdr_table + i*program_hdr_entry);
++    switch (phdr->p_type) {
++    case 6: // PT_PHDR
++      base = program_hdr_table - phdr->p_vaddr;
++      break;
++    case 7: // PT_TLS
++      tls_phdr = phdr;
++      break;
++    default:
++      break;
++    }
++  }
++
++  app.tls.address = tls_phdr->p_vaddr + base;
++  app.tls.size = tls_phdr->p_memsz;
++  app.tls.init_size = tls_phdr->p_filesz;
++  app.tls.align = tls_phdr->p_align;
++
++  // This descriptor has to be static since its cleanup function cannot
++  // capture the context.
++  init_tls(tls);
++  if (tls.size != 0 && !set_thread_ptr(tls.tp))
++    os::process_exit(1);
++
++  for (auto *aux_entry = app.auxv_ptr; aux_entry->id != 0; ++aux_entry) {
++    switch (aux_entry->id) {
++    case 37: // RINGFD
++      thread_ring.fd = static_cast<int32_t>(aux_entry->value);
++      break;
++    case 36: // RINGHDR
++      thread_ring.header = reinterpret_cast<os::ioring_header *>(aux_entry->value);
++      break;
++    default:
++      break;
++    }
++  }
++
++  self.attrib = &main_thread_attrib;
++  main_thread_attrib.atexit_callback_mgr =
++      internal::get_thread_atexit_callback_mgr();
++
++  // We want the fini array callbacks to be run after other atexit
++  // callbacks are run. So, we register them before running the init
++  // array callbacks as they can potentially register their own atexit
++  // callbacks.
++  atexit(&call_fini_array_callbacks);
++
++  call_init_array_callbacks(static_cast<int>(app.args->argc),
++                            reinterpret_cast<char **>(app.args->argv),
++                            reinterpret_cast<char **>(env_ptr));
++
++  int retval = main(static_cast<int>(app.args->argc),
++                    reinterpret_cast<char **>(app.args->argv),
++                    reinterpret_cast<char **>(env_ptr));
++
++  exit(retval);
++}
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/startup/zaos/do_start.h b/libc/startup/zaos/do_start.h
+new file mode 100644
+index 000000000..231878606
+--- /dev/null
++++ b/libc/startup/zaos/do_start.h
+@@ -0,0 +1,15 @@
++//===-- Header file of do_start -------------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "config/zaos/app.h"
++#include "src/__support/macros/config.h"
++
++namespace LIBC_NAMESPACE_DECL {
++// setup the libc runtime and invoke the main routine.
++[[noreturn]] void do_start();
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/startup/zaos/x86_64/CMakeLists.txt b/libc/startup/zaos/x86_64/CMakeLists.txt
+new file mode 100644
+index 000000000..bd899be66
+--- /dev/null
++++ b/libc/startup/zaos/x86_64/CMakeLists.txt
+@@ -0,0 +1,28 @@
++add_startup_object(
++  tls
++  SRC
++    tls.cpp
++  DEPENDS
++    libc.config.app_h
++    libc.src.__support.OSUtil.osutil
++    libc.src.string.memory_utils.inline_memcpy
++  COMPILE_OPTIONS
++    -fno-stack-protector
++    -fno-omit-frame-pointer
++    -ffreestanding
++    -fno-builtin
++)
++
++add_startup_object(
++  start
++  SRC
++    start.cpp
++  DEPENDS
++    libc.config.app_h
++    libc.src.__support.macros.attributes
++  COMPILE_OPTIONS
++    -fno-stack-protector
++    -fno-omit-frame-pointer
++    -ffreestanding
++    -fno-builtin
++)
+diff --git a/libc/startup/zaos/x86_64/start.cpp b/libc/startup/zaos/x86_64/start.cpp
+new file mode 100644
+index 000000000..c4d5c1ed1
+--- /dev/null
++++ b/libc/startup/zaos/x86_64/start.cpp
+@@ -0,0 +1,33 @@
++//===-- Implementation of _start for x86_64 -------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++#include "src/__support/macros/attributes.h"
++#include "startup/zaos/do_start.h"
++
++extern "C" [[noreturn]] void _start() {
++  // This TU is compiled with -fno-omit-frame-pointer. Hence, the previous
++  // value of the base pointer is pushed on to the stack. So, we step over
++  // it (the "+ 1" below) to get to the args.
++  LIBC_NAMESPACE::app.args = reinterpret_cast<LIBC_NAMESPACE::Args *>(
++      reinterpret_cast<uintptr_t *>(__builtin_frame_address(0)) + 1);
++
++  // The x86_64 ABI requires that the stack pointer is aligned to a 16-byte
++  // boundary. We align it here but we cannot use any local variables created
++  // before the following alignment. Best would be to not create any local
++  // variables before the alignment. Also, note that we are aligning the stack
++  // downwards as the x86_64 stack grows downwards. This ensures that we don't
++  // tread on argc, argv etc.
++  // NOTE: Compiler attributes for alignment do not help here as the stack
++  // pointer on entry to this _start function is controlled by the OS. In fact,
++  // compilers can generate code assuming the alignment as required by the ABI.
++  // If the stack pointers as setup by the OS are already aligned, then the
++  // following code is a NOP.
++  asm volatile("andq $0xfffffffffffffff0, %rsp\n\t");
++  asm volatile("andq $0xfffffffffffffff0, %rbp\n\t");
++
++  LIBC_NAMESPACE::do_start();
++}
+diff --git a/libc/startup/zaos/x86_64/tls.cpp b/libc/startup/zaos/x86_64/tls.cpp
+new file mode 100644
+index 000000000..a5197b1c8
+--- /dev/null
++++ b/libc/startup/zaos/x86_64/tls.cpp
+@@ -0,0 +1,71 @@
++//===-- Implementation of tls for x86_64 ----------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/__support/OSUtil/zaos/vdso.h"
++#include "src/__support/macros/config.h"
++#include "src/string/memory_utils/inline_memcpy.h"
++#include "startup/zaos/do_start.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++void init_tls(TLSDescriptor &tls_descriptor) {
++  if (app.tls.size == 0) {
++    tls_descriptor.size = 0;
++    tls_descriptor.tp = 0;
++    return;
++  }
++
++  // We will assume the alignment is always a power of two.
++  uintptr_t tls_size = app.tls.size & -app.tls.align;
++  if (tls_size != app.tls.size)
++    tls_size += app.tls.align;
++
++  // Per the x86_64 TLS ABI, the entry pointed to by the thread pointer is the
++  // address of the TLS block. So, we add more size to accomodate this address
++  // entry.
++  // We also need to include space for the stack canary. The canary is at
++  // offset 0x28 (40) and is of size uintptr_t.
++  uintptr_t tls_size_with_addr = tls_size + sizeof(uintptr_t) + 40;
++
++  // We cannot call the mmap function here as the functions set errno on
++  // failure. Since errno is implemented via a thread local variable, we cannot
++  // use errno before TLS is setup.
++  os::mmvec mmvec = {};
++  mmvec.length = tls_size_with_addr;
++  mmvec.flags = os::mmap::anonymous;
++  mmvec.prot = os::prot::readwrite;
++
++  void *tls_addr;
++  if (int32_t rc = os::mmap(-1, &mmvec, 1, &tls_addr, 0); rc < 0)
++    os::process_exit(1);
++
++  uintptr_t end_ptr = reinterpret_cast<uintptr_t>(tls_addr) + tls_size;
++  *reinterpret_cast<uintptr_t *>(end_ptr) = end_ptr;
++
++  inline_memcpy(reinterpret_cast<char *>(tls_addr),
++                reinterpret_cast<const char *>(app.tls.address),
++                app.tls.init_size);
++  *reinterpret_cast<uintptr_t *>(end_ptr + 40) = 0xdeadbeef;
++
++  tls_descriptor = {tls_size_with_addr, reinterpret_cast<uintptr_t>(tls_addr),
++                    end_ptr};
++  return;
++}
++
++void cleanup_tls(uintptr_t addr, uintptr_t size) {
++  if (size == 0)
++    return;
++  os::munmap((void*)addr, size);
++}
++
++// Sets the thread pointer to |val|. Returns true on success, false on failure.
++bool set_thread_ptr(uintptr_t val) {
++  __asm("wrfsbase %0" :: "r"(val));
++  return true;
++}
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/lld/ELF/Writer.cpp b/lld/ELF/Writer.cpp
+index 0db922b07..451f768cf 100644
+--- a/lld/ELF/Writer.cpp
++++ b/lld/ELF/Writer.cpp
+@@ -284,7 +284,7 @@ static void demoteSymbolsAndComputeIsPreemptible(Ctx &ctx) {
+   llvm::TimeTraceScope timeScope("Demote symbols");
+   DenseMap<InputFile *, DenseMap<SectionBase *, size_t>> sectionIndexMap;
+   bool hasDynsym = ctx.hasDynsym;
+-  bool maybePreemptible = ctx.sharedFiles.size() || ctx.arg.shared;
++  bool maybePreemptible = ctx.sharedFiles.size() || ctx.arg.dynamicLinker.size() || ctx.arg.shared;
+   for (Symbol *sym : ctx.symtab->getSymbols()) {
+     if (auto *d = dyn_cast<Defined>(sym)) {
+       if (d->section && !d->section->isLive())
+diff --git a/llvm/include/llvm/TargetParser/Triple.h b/llvm/include/llvm/TargetParser/Triple.h
+index 7d67966d1..986b099b9 100644
+--- a/llvm/include/llvm/TargetParser/Triple.h
++++ b/llvm/include/llvm/TargetParser/Triple.h
+@@ -239,6 +239,7 @@ public:
+     LiteOS,
+     Serenity,
+     Vulkan, // Vulkan SPIR-V
++    ZaOS,
+     LastOSType = Vulkan
+   };
+   enum EnvironmentType {
+diff --git a/llvm/lib/TargetParser/Triple.cpp b/llvm/lib/TargetParser/Triple.cpp
+index e9e6f130f..83f85321e 100644
+--- a/llvm/lib/TargetParser/Triple.cpp
++++ b/llvm/lib/TargetParser/Triple.cpp
+@@ -319,6 +319,7 @@ StringRef Triple::getOSTypeName(OSType Kind) {
+   case LiteOS: return "liteos";
+   case XROS: return "xros";
+   case Vulkan: return "vulkan";
++  case ZaOS: return "zaos";
+   }
+ 
+   llvm_unreachable("Invalid OSType");
+@@ -711,6 +712,7 @@ static Triple::OSType parseOS(StringRef OSName) {
+     .StartsWith("liteos", Triple::LiteOS)
+     .StartsWith("serenity", Triple::Serenity)
+     .StartsWith("vulkan", Triple::Vulkan)
++    .StartsWith("zaos", Triple::ZaOS)
+     .Default(Triple::UnknownOS);
+ }
+ 
+-- 
+2.49.0
+

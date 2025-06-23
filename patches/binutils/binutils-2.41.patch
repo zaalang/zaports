@@ -1,0 +1,51 @@
+diff -ruN binutils-2.41/bfd/config.bfd binutils/bfd/config.bfd
+--- binutils-2.41/bfd/config.bfd	2023-07-03 09:00:00.000000000 +1000
++++ binutils/bfd/config.bfd	2025-05-30 08:34:09.231348017 +1000
+@@ -734,6 +734,11 @@
+     targ_selvecs="i386_elf32_vec iamcu_elf32_vec x86_64_elf32_vec"
+     want64=true
+     ;;
++  x86_64-*-zaos*)
++    targ_defvec=x86_64_elf64_vec
++    targ_selvecs="i386_elf32_vec"
++    want64=true
++    ;;
+ #endif
+   i[3-7]86-*-lynxos*)
+     targ_defvec=i386_elf32_vec
+diff -ruN binutils-2.41/config.sub binutils/config.sub
+--- binutils-2.41/config.sub	2023-07-03 09:00:00.000000000 +1000
++++ binutils/config.sub	2025-05-30 08:24:00.959922412 +1000
+@@ -1758,7 +1758,7 @@
+ 	     | onefs* | tirtos* | phoenix* | fuchsia* | redox* | bme* \
+ 	     | midnightbsd* | amdhsa* | unleashed* | emscripten* | wasi* \
+ 	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx* | zephyr* \
+-	     | fiwix* | mlibc* )
++	     | fiwix* | mlibc* | zaos* )
+ 		;;
+ 	# This one is extra strict with allowed versions
+ 	sco3.2v2 | sco3.2v[4-9]* | sco5v6*)
+diff -ruN binutils-2.41/gas/configure.tgt binutils/gas/configure.tgt
+--- binutils-2.41/gas/configure.tgt	2023-07-03 09:00:00.000000000 +1000
++++ binutils/gas/configure.tgt	2025-05-30 08:30:39.093037317 +1000
+@@ -241,6 +241,7 @@
+     esac ;;
+   i386-*-lynxos*)			fmt=elf em=lynx ;;
+   i386-*-redox*)			fmt=elf ;;
++  i386-*-zaos*)                         fmt=elf em=linux ;;
+   i386-*-solaris*)			fmt=elf em=solaris ;;
+   i386-*-freebsd* \
+   | i386-*-kfreebsd*-gnu)		fmt=elf em=freebsd ;;
+diff -ruN binutils-2.41/ld/configure.tgt binutils/ld/configure.tgt
+--- binutils-2.41/ld/configure.tgt	2023-07-03 09:00:00.000000000 +1000
++++ binutils/ld/configure.tgt	2025-05-30 08:28:48.378837789 +1000
+@@ -1011,6 +1011,9 @@
+ x86_64-*-redox*)	targ_emul=elf_x86_64
+ 			targ_extra_emuls=elf_i386
+ 			;;
++x86_64-*-zaos*)		targ_emul=elf_x86_64
++                        targ_extra_emuls="elf_x86_64 elf_i386"
++			;;
+ x86_64-*-solaris2*)	targ_emul=elf_x86_64_sol2
+ 			targ_extra_emuls="elf_x86_64 elf_i386_sol2 elf_i386_ldso elf_i386 elf_iamcu"
+ 			targ_extra_libpath=$targ_extra_emuls

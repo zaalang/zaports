@@ -1,0 +1,398 @@
+declare_options:
+  - name: arch
+    default: x86_64
+  - name: arch-triple
+    default: x86_64-unknown-zaos-llvm
+  - name: build-type
+    default: debug
+
+################################################################################
+#
+# Sources
+#
+################################################################################
+
+sources:
+
+  - name: binutils
+    subdir: 'sources'
+    url: 'https://ftp.gnu.org/gnu/binutils/binutils-2.41.tar.xz'
+    format: 'tar.xz'
+    extract_path: 'binutils-2.41'
+    version: '2.41'
+    patch-path-strip: 1
+      
+  - name: gcc
+    subdir: 'sources'
+    url: 'https://ftp.gnu.org/gnu/gcc/gcc-13.2.0/gcc-13.2.0.tar.xz'
+    format: 'tar.xz'
+    extract_path: 'gcc-13.2.0'
+    patch-path-strip: 1
+    version: '13.2.0'
+    tools_required:
+      - host-autoconf-2.69
+      - host-automake-1.16
+    regenerate:
+      - args: ['autoreconf',  '-fvi']
+      - args: ['autoconf']
+        workdir: '@THIS_SOURCE_DIR@/gcc'
+      - args: ['autoconf']
+        workdir: '@THIS_SOURCE_DIR@/libstdc++-v3'        
+
+  - name: cmake
+    subdir: 'sources'
+    git: 'https://gitlab.kitware.com/cmake/cmake.git'
+    tag: 'v4.0.0'
+    version: '4.0.0'
+
+  - name: ninja
+    subdir: 'sources'
+    git: 'https://github.com/ninja-build/ninja.git'
+    tag: 'v1.12.1'
+    version: '1.12.1'
+
+  - name: pkg-config
+    subdir: 'sources'
+    git: 'https://gitlab.freedesktop.org/pkg-config/pkg-config.git'
+    tag: 'pkg-config-0.29.2'
+    version: '0.29.2'
+    tools_required:
+      - host-autoconf-v2.69
+      - host-automake-v1.16
+      - host-libtool
+    regenerate:
+      - args: ['./autogen.sh']
+        environ:
+          'NOCONFIGURE': 'yes'
+
+  - name: llvm
+    subdir: 'sources'
+    git: 'https://github.com/llvm/llvm-project'
+    tag: 'llvmorg-20.1.6'
+    version: '20.1.6'
+
+################################################################################
+#
+# Tools
+#
+################################################################################
+
+tools:
+
+  - name: host-autoconf-2.69
+    architecture: 'noarch'
+    source:
+      name: autoconf-2.69
+      subdir: 'sources'
+      url: 'https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz'
+      format: 'tar.xz'
+      extract_path: 'autoconf-2.69'
+      version: '2.69'
+    configure:
+      - args: ['@THIS_SOURCE_DIR@/configure', '--prefix=@PREFIX@']
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
+
+  - name: host-autoconf-archive
+    architecture: noarch
+    exports_aclocal: true
+    source:
+      subdir: 'sources'
+      url: 'https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2019.01.06.tar.xz'
+      format: 'tar.xz'
+      extract_path: 'autoconf-archive-2019.01.06'
+      version: '2019.01.06'
+    install:
+      - args: ['mkdir', '-p', '@BUILD_ROOT@/tools/host-autoconf-archive/share/']
+      - args: ['cp', '-r', '@THIS_SOURCE_DIR@/m4', '@BUILD_ROOT@/tools/host-autoconf-archive/share/aclocal']
+
+  - name: host-automake-1.16
+    architecture: 'noarch'
+    source:
+      name: automake-1.16
+      subdir: 'sources'
+      url: 'https://ftp.gnu.org/gnu/automake/automake-1.16.tar.xz'
+      format: 'tar.xz'
+      extract_path: 'automake-1.16'
+      version: '1.16'
+      patch-path-strip: 1
+      tools_required:
+        - host-autoconf-2.69
+      regenerate:
+        - args: ['./bootstrap']
+    tools_required:
+      - host-autoconf-2.69
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=@PREFIX@'
+    compile:
+      - args: |
+          set -e
+          export PATH="`pwd`/bin:$PATH"
+          make bin/aclocal-1.16 bin/automake-1.16 -j@PARALLELISM@
+          make -j@PARALLELISM@
+    install:
+      - args: ['make', 'install-strip']
+      - args: ['ln', '-sf', '@PREFIX@/share/aclocal-1.16', '@PREFIX@/share/aclocal']
+
+  - name: host-libtool
+    architecture: 'noarch'
+    exports_aclocal: true
+    source:
+      name: libtool
+      subdir: 'sources'
+      url: 'https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.xz'
+      format: 'tar.xz'
+      extract_path: 'libtool-2.4.7'
+      patch-path-strip: 1
+      version: '2.4.7'
+      tools_required:
+        - host-autoconf-2.69
+        - host-automake-1.16
+      regenerate:
+        - args: ['./bootstrap', '--force']
+    tools_required:
+      - host-autoconf-2.69
+      - host-automake-1.16
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=@PREFIX@'
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
+
+  - name: host-cmake
+    architecture: noarch
+    from_source: cmake
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/bootstrap'
+        - '--prefix=@PREFIX@'
+        - '--parallel=@PARALLELISM@'
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
+      - args: ['ln', '-sf', '@SOURCE_ROOT@/scripts/ZaOS.cmake', '@PREFIX@/share/cmake-4.0/Modules/Platform/']
+      - args: ['ln', '-sf', '@SOURCE_ROOT@/scripts/ZaOS-Initialize.cmake', '@PREFIX@/share/cmake-4.0/Modules/Platform/']
+
+  - name: host-ninja
+    architecture: noarch
+    from_source: ninja
+    configure:
+      - args:
+        - 'cmake'
+        - '-DCMAKE_INSTALL_PREFIX=@PREFIX@'
+        - '-DBUILD_TESTING=OFF'
+        - '@THIS_SOURCE_DIR@'
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
+
+  - name: host-pkgconf
+    architecture: 'noarch'
+    exports_aclocal: true
+    from_source: pkgconf
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=@PREFIX@'
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
+      - args: ['ln', '-sf', 'pkgconf', '@PREFIX@/bin/pkg-config']
+
+  - name: host-binutils
+    architecture: '@OPTION:arch@'
+    from_source: binutils
+    configure:
+      - args:
+        - '@THIS_SOURCE_DIR@/configure'
+        - '--prefix=@PREFIX@'
+        - '--target=@OPTION:arch-triple@'
+        - '--with-sysroot=@SYSROOT_DIR@'
+        - '--disable-werror'
+        - 'CFLAGS=-pipe'
+    compile:
+      - args: ['make', '-j@PARALLELISM@']
+    install:
+      - args: ['make', 'install']
+
+#  - name: host-llvm
+#    architecture: '@OPTION:arch@'
+#    exports_shared_libs: true
+#    from_source: llvm
+#    sources_required:
+#      - binutils
+#    tools_required:
+#      - host-cmake
+#    revision: 1
+#    configure:
+#      - args:
+#        - 'cmake'
+#        - '-GNinja'
+#        - '-DCMAKE_INSTALL_PREFIX=@PREFIX@'
+#        - '-DCMAKE_BUILD_TYPE=Release'
+#        - '-DLLVM_LINK_LLVM_DYLIB=ON'
+#        - '-DLLVM_TARGETS_TO_BUILD=X86'
+#        - '-DLLVM_ENABLE_PROJECTS=clang;lld'
+#        - '-DLLVM_ENABLE_RUNTIMES=libc;compiler-rt'
+#        - '-DLLVM_INCLUDE_TESTS=OFF'
+#        - '-DLLVM_LIBC_FULL_BUILD=ON'
+#        - '-DCOMPILER_RT_BUILD_BUILTINS=ON'
+#        - '-DCOMPILER_RT_BUILD_SANITIZERS=OFF'
+#        - '-DCOMPILER_RT_BUILD_LIBFUZZER=OFF'
+#        - '-DCOMPILER_RT_BUILD_MEMPROF=OFF'
+#        - '-DCOMPILER_RT_BUILD_XRAY=OFF'
+#        - '-DCOMPILER_RT_BUILD_ORC=OFF'
+#        #- '-DLLVM_LIBC_INCLUDE_SCUDO=ON'
+#        #- '-DCOMPILER_RT_BUILD_SCUDO_STANDALONE_WITH_LLVM_LIBC=ON'
+#        #- '-DCOMPILER_RT_BUILD_GWP_ASAN=OFF'
+#        #- '-DCOMPILER_RT_SCUDO_STANDALONE_BUILD_SHARED=OFF'
+#        - '-DLLVM_DEFAULT_TARGET_TRIPLE=@OPTION:arch-triple@'
+#        - '-DDEFAULT_SYSROOT=@SYSROOT_DIR@'
+#        - '@THIS_SOURCE_DIR@/llvm'
+#    compile:
+#      - args: ['mkdir', '-p', '@SYSROOT_DIR@/usr/include']
+#      - args: ['mkdir', '-p', '@SYSROOT_DIR@/usr/include/llvm-libc-macros']
+#      - args: ['cp', '@THIS_SOURCE_DIR@/libc/include/__llvm-libc-common.h', '@SYSROOT_DIR@/usr/include/__llvm-libc-common.h']
+#      - args: ['cp', '@THIS_SOURCE_DIR@/libc/include/llvm-libc-macros/assert-macros.h', '@SYSROOT_DIR@/usr/include/llvm-libc-macros/assert-macros.h']
+#      - args: ['python', '@THIS_SOURCE_DIR@/libc/utils/hdrgen/main.py', '-o', '@SYSROOT_DIR@/usr/include/assert.h', '@THIS_SOURCE_DIR@/libc/include/assert.yaml']
+#      - args: ['ninja', '-j8']
+#    install:
+#      - args: ['ninja', 'install']
+#        quiet: true
+
+  - name: host-llvm
+    architecture: '@OPTION:arch@'
+    exports_shared_libs: true
+    from_source: llvm
+    sources_required:
+      - binutils
+    tools_required:
+      - host-cmake
+    revision: 1
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DCMAKE_INSTALL_PREFIX=@PREFIX@'
+        - '-DCMAKE_BUILD_TYPE=Release'
+        - '-DLLVM_LINK_LLVM_DYLIB=ON'
+        - '-DLLVM_TARGETS_TO_BUILD=X86'
+        - '-DLLVM_ENABLE_PROJECTS=clang;lld'
+        - '-DLLVM_ENABLE_RUNTIMES=compiler-rt'
+        - '-DCOMPILER_RT_BUILD_BUILTINS=ON'
+        - '-DCOMPILER_RT_BUILD_SANITIZERS=OFF'
+        - '-DCOMPILER_RT_BUILD_LIBFUZZER=OFF'
+        - '-DCOMPILER_RT_BUILD_MEMPROF=OFF'
+        - '-DCOMPILER_RT_BUILD_XRAY=OFF'
+        - '-DCOMPILER_RT_BUILD_ORC=OFF'
+        - '-DCOMPILER_RT_CRT_USE_EH_FRAME_REGISTRY=OFF'
+        - '-DLLVM_DEFAULT_TARGET_TRIPLE=@OPTION:arch-triple@'
+        - '-DDEFAULT_SYSROOT=@SYSROOT_DIR@'
+        - '@THIS_SOURCE_DIR@/llvm'
+    stages:
+      - name: compiler
+        compile:
+          - args: ['ninja', 'clang', 'lld']
+        install:
+          - args: ['ninja', 'install-llvm-headers', 'install-llvm-libraries', 'install-clang-resource-headers', 'install-clang-libraries', 'install-clang', 'install-lld']
+      - name: compiler-rt
+        tools_required:
+          - tool: host-llvm
+            stage_dependencies: [compiler]
+        pkgs_required:
+          - libc
+        compile:
+          - args: ['ninja']
+        install:
+          - args: ['ninja', 'install']
+          
+################################################################################
+#
+# Packages
+#
+################################################################################
+
+packages:
+
+  - name: libc
+    architecture: '@OPTION:arch@'
+    from_source: llvm
+    tools_required:
+      - tool: host-cmake
+      - tool: host-llvm
+        stage_dependencies: [compiler]
+    revision: 1
+    configure:
+      - args:
+        - 'cmake'
+        - '-GNinja'
+        - '-DCMAKE_BUILD_TYPE=Release'
+        - '-DCMAKE_TOOLCHAIN_FILE=@SOURCE_ROOT@/scripts/@OPTION:arch@/toolchain.cmake'
+        - '-DLLVM_ENABLE_RUNTIMES=libc;compiler-rt'
+        - '-DCMAKE_C_COMPILER_WORKS=TRUE'
+        - '-DCMAKE_CXX_COMPILER_WORKS=TRUE'
+        - '-DLLVM_INCLUDE_TESTS=OFF'
+        - '-DLLVM_LIBC_FULL_BUILD=ON'
+        #- '-DLLVM_LIBC_INCLUDE_SCUDO=ON'
+        #- '-DCOMPILER_RT_BUILD_SCUDO_STANDALONE_WITH_LLVM_LIBC=ON'
+        #- '-DCOMPILER_RT_BUILD_GWP_ASAN=OFF'
+        #- '-DCOMPILER_RT_SCUDO_STANDALONE_BUILD_SHARED=OFF'
+        - '-DCMAKE_INSTALL_PREFIX=/usr'
+        - '@THIS_SOURCE_DIR@/runtimes'
+    build:
+      - args: ['ninja']
+      - args: ['ninja', 'install']
+        environ:
+          DESTDIR: '@THIS_COLLECT_DIR@'
+        quiet: true
+
+  - name: test
+    architecture: '@OPTION:arch@'
+    from_source: llvm
+    tools_required:
+      - host-llvm
+    revision: 1
+
+#  - name: bash
+#    architecture: '@OPTION:arch@'
+#    source:
+#      url: https://ftp.gnu.org/gnu/bash/bash-5.2.15.tar.gz
+#      version: '5.2.15'
+#      subdir: 'sources'
+#      format: 'tar.gz'
+#      extract_path: 'bash-5.2.15'
+#      patch-path-strip: 1
+#      regenerate:
+#        - args: [ 'libtoolize', '-cfvi' ]
+#        - args: [ 'env', 'AUTOHEADER=true', 'autoreconf', '-fvi' ]
+#      tools_required:
+#        - host-libtool
+#        - host-autoconf-2.69
+#        - host-automake-1.16
+#    #tools_required:
+#    #  - host-gcc
+#    #  - host-libtool
+#    pkgs_required:
+#      - llvm
+#    configure:
+#      - args:
+#        - '@THIS_SOURCE_DIR@/configure'
+#        - '--host=@OPTION:arch-triple@'
+#        - '--prefix=/usr'
+#        - '--without-bash-malloc'
+#        environ:
+#          ac_cv_func_wcswidth: 'no'
+#    build:
+#      - args: ['make', '-j@PARALLELISM@']
+#      - args: ['make', 'DESTDIR=@THIS_COLLECT_DIR@', 'install']
+#      - args: ['ln', '-sf', '/usr/bin/bash', '@THIS_COLLECT_DIR@/usr/bin/sh']
