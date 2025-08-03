@@ -1,7 +1,7 @@
-From bcea36d0337ac31b49ad5c02717c35b189b62316 Mon Sep 17 00:00:00 2001
+From c630eb73ecfe8fc96286e09288d4a75b7e930cc2 Mon Sep 17 00:00:00 2001
 From: Peter Niekamp <pniekamp@gmail.com>
-Date: Mon, 23 Jun 2025 21:54:32 +1000
-Subject: [PATCH] a
+Date: Sun, 3 Aug 2025 19:22:07 +1000
+Subject: [PATCH] 1
 
 ---
  clang/lib/Basic/Targets.cpp                   |    2 +
@@ -14,28 +14,34 @@ Subject: [PATCH] a
  .../cmake/modules/LLVMLibCArchitectures.cmake |    2 +
  libc/config/app.h                             |    2 +
  libc/config/zaos/app.h                        |   97 ++
- libc/config/zaos/x86_64/entrypoints.txt       | 1235 +++++++++++++++++
- libc/config/zaos/x86_64/headers.txt           |   60 +
+ libc/config/zaos/x86_64/entrypoints.txt       | 1234 +++++++++++++++++
+ libc/config/zaos/x86_64/headers.txt           |   62 +
+ libc/include/CMakeLists.txt                   |   18 +
  libc/include/llvm-libc-macros/time-macros.h   |    2 +
  .../llvm-libc-macros/zaos/CMakeLists.txt      |    6 +
  .../llvm-libc-macros/zaos/time-macros.h       |   20 +
  libc/include/llvm-libc-types/__mutex_type.h   |    2 +
  libc/include/llvm-libc-types/once_flag.h      |    2 +
- libc/src/__support/File/zaos/CMakeLists.txt   |   63 +
- libc/src/__support/File/zaos/file.cpp         |  124 ++
- libc/src/__support/File/zaos/file.h           |   34 +
+ libc/include/stdio.yaml                       |   20 +
+ libc/include/zaos/ioring.h.def                |  373 +++++
+ libc/include/zaos/ioring.yaml                 |    7 +
+ libc/include/zaos/vdso.h.def                  |  106 ++
+ libc/include/zaos/vdso.yaml                   |    7 +
+ libc/src/__support/File/zaos/CMakeLists.txt   |   62 +
+ libc/src/__support/File/zaos/file.cpp         |  244 ++++
+ libc/src/__support/File/zaos/file.h           |   42 +
  libc/src/__support/File/zaos/stderr.cpp       |   25 +
  libc/src/__support/File/zaos/stdin.cpp        |   26 +
  libc/src/__support/File/zaos/stdout.cpp       |   26 +
  libc/src/__support/OSUtil/io.h                |    2 +
- libc/src/__support/OSUtil/zaos/CMakeLists.txt |   27 +
+ libc/src/__support/OSUtil/zaos/CMakeLists.txt |   29 +
  libc/src/__support/OSUtil/zaos/exit.cpp       |   29 +
  libc/src/__support/OSUtil/zaos/fcntl.cpp      |  120 ++
  libc/src/__support/OSUtil/zaos/io.h           |   25 +
- libc/src/__support/OSUtil/zaos/ioring.cpp     |  950 +++++++++++++
- libc/src/__support/OSUtil/zaos/ioring.h       |  414 ++++++
- libc/src/__support/OSUtil/zaos/vdso.cpp       |  139 ++
- libc/src/__support/OSUtil/zaos/vdso.h         |  107 ++
+ libc/src/__support/OSUtil/zaos/ioring.cpp     | 1092 +++++++++++++++
+ libc/src/__support/OSUtil/zaos/ioring.h       |   23 +
+ libc/src/__support/OSUtil/zaos/vdso.cpp       |  172 +++
+ libc/src/__support/OSUtil/zaos/vdso.h         |   17 +
  .../OSUtil/zaos/x86_64/CMakeLists.txt         |    0
  libc/src/__support/threads/mutex.h            |    2 +
  libc/src/__support/threads/thread.h           |    3 +-
@@ -44,13 +50,19 @@ Subject: [PATCH] a
  libc/src/__support/threads/zaos/thread.cpp    |  316 +++++
  libc/src/__support/time/zaos/CMakeLists.txt   |   13 +
  .../src/__support/time/zaos/clock_gettime.cpp |   38 +
+ libc/src/stdio/freadat.h                      |   23 +
+ libc/src/stdio/fwriteat.h                     |   23 +
+ libc/src/stdio/zaos/CMakeLists.txt            |   35 +
+ libc/src/stdio/zaos/fdopen.cpp                |   26 +
+ libc/src/stdio/zaos/remove.cpp                |   31 +
+ libc/src/stdio/zaos/rename.cpp                |   29 +
  libc/src/stdlib/CMakeLists.txt                |    4 +-
  libc/src/stdlib/zaos/CMakeLists.txt           |   71 +
  libc/src/stdlib/zaos/abort.cpp                |   21 +
  libc/src/stdlib/zaos/aligned_alloc.cpp        |   22 +
  libc/src/stdlib/zaos/calloc.cpp               |   31 +
  libc/src/stdlib/zaos/free.cpp                 |   22 +
- libc/src/stdlib/zaos/heap.cpp                 |  152 ++
+ libc/src/stdlib/zaos/heap.cpp                 |  154 ++
  libc/src/stdlib/zaos/heap.h                   |   37 +
  libc/src/stdlib/zaos/malloc.cpp               |   22 +
  libc/src/stdlib/zaos/realloc.cpp              |   23 +
@@ -64,15 +76,15 @@ Subject: [PATCH] a
  libc/startup/zaos/CMakeLists.txt              |  139 ++
  libc/startup/zaos/crti.cpp                    |    0
  libc/startup/zaos/crtn.cpp                    |    0
- libc/startup/zaos/do_start.cpp                |  204 +++
+ libc/startup/zaos/do_start.cpp                |  206 +++
  libc/startup/zaos/do_start.h                  |   15 +
  libc/startup/zaos/x86_64/CMakeLists.txt       |   28 +
  libc/startup/zaos/x86_64/start.cpp            |   33 +
- libc/startup/zaos/x86_64/tls.cpp              |   71 +
+ libc/startup/zaos/x86_64/tls.cpp              |   73 +
  lld/ELF/Writer.cpp                            |    2 +-
  llvm/include/llvm/TargetParser/Triple.h       |    1 +
  llvm/lib/TargetParser/Triple.cpp              |    2 +
- 68 files changed, 5438 insertions(+), 17 deletions(-)
+ 80 files changed, 5966 insertions(+), 17 deletions(-)
  create mode 100644 clang/lib/Driver/ToolChains/ZaOS.cpp
  create mode 100644 clang/lib/Driver/ToolChains/ZaOS.h
  create mode 100644 libc/config/zaos/app.h
@@ -80,6 +92,10 @@ Subject: [PATCH] a
  create mode 100644 libc/config/zaos/x86_64/headers.txt
  create mode 100644 libc/include/llvm-libc-macros/zaos/CMakeLists.txt
  create mode 100644 libc/include/llvm-libc-macros/zaos/time-macros.h
+ create mode 100644 libc/include/zaos/ioring.h.def
+ create mode 100644 libc/include/zaos/ioring.yaml
+ create mode 100644 libc/include/zaos/vdso.h.def
+ create mode 100644 libc/include/zaos/vdso.yaml
  create mode 100644 libc/src/__support/File/zaos/CMakeLists.txt
  create mode 100644 libc/src/__support/File/zaos/file.cpp
  create mode 100644 libc/src/__support/File/zaos/file.h
@@ -97,9 +113,15 @@ Subject: [PATCH] a
  create mode 100644 libc/src/__support/OSUtil/zaos/x86_64/CMakeLists.txt
  create mode 100644 libc/src/__support/threads/zaos/CMakeLists.txt
  create mode 100644 libc/src/__support/threads/zaos/mutex.h
- create mode 100755 libc/src/__support/threads/zaos/thread.cpp
+ create mode 100644 libc/src/__support/threads/zaos/thread.cpp
  create mode 100644 libc/src/__support/time/zaos/CMakeLists.txt
  create mode 100644 libc/src/__support/time/zaos/clock_gettime.cpp
+ create mode 100644 libc/src/stdio/freadat.h
+ create mode 100644 libc/src/stdio/fwriteat.h
+ create mode 100644 libc/src/stdio/zaos/CMakeLists.txt
+ create mode 100644 libc/src/stdio/zaos/fdopen.cpp
+ create mode 100644 libc/src/stdio/zaos/remove.cpp
+ create mode 100644 libc/src/stdio/zaos/rename.cpp
  create mode 100644 libc/src/stdlib/zaos/CMakeLists.txt
  create mode 100644 libc/src/stdlib/zaos/abort.cpp
  create mode 100644 libc/src/stdlib/zaos/aligned_alloc.cpp
@@ -555,10 +577,10 @@ index 000000000..3380795f8
 +#endif // LLVM_LIBC_CONFIG_ZAOS_APP_H
 diff --git a/libc/config/zaos/x86_64/entrypoints.txt b/libc/config/zaos/x86_64/entrypoints.txt
 new file mode 100644
-index 000000000..4ea16f33c
+index 000000000..0538912fb
 --- /dev/null
 +++ b/libc/config/zaos/x86_64/entrypoints.txt
-@@ -0,0 +1,1235 @@
+@@ -0,0 +1,1234 @@
 +
 +set(TARGET_LIBC_ENTRYPOINTS
 +    # ctype.h entrypoints
@@ -1633,7 +1655,7 @@ index 000000000..4ea16f33c
 +    libc.src.stdio.clearerr
 +    libc.src.stdio.clearerr_unlocked
 +    libc.src.stdio.fclose
-+    # libc.src.stdio.fdopen
++    libc.src.stdio.fdopen
 +    libc.src.stdio.feof
 +    libc.src.stdio.feof_unlocked
 +    libc.src.stdio.ferror
@@ -1643,18 +1665,18 @@ index 000000000..4ea16f33c
 +    libc.src.stdio.fgetc_unlocked
 +    libc.src.stdio.fgets
 +    libc.src.stdio.fileno
-+    # libc.src.stdio.flockfile
++    libc.src.stdio.flockfile
 +    libc.src.stdio.fopen
-+    # libc.src.stdio.fopencookie
++    libc.src.stdio.fopencookie
 +    libc.src.stdio.fputc
 +    libc.src.stdio.fputs
 +    libc.src.stdio.fread
 +    libc.src.stdio.fread_unlocked
-+    # libc.src.stdio.fseek
-+    # libc.src.stdio.fseeko
-+    # libc.src.stdio.ftell
-+    # libc.src.stdio.ftello
-+    # libc.src.stdio.funlockfile
++    libc.src.stdio.fseek
++    libc.src.stdio.fseeko
++    libc.src.stdio.ftell
++    libc.src.stdio.ftello
++    libc.src.stdio.funlockfile
 +    libc.src.stdio.fwrite
 +    libc.src.stdio.fwrite_unlocked
 +    libc.src.stdio.getc
@@ -1762,8 +1784,7 @@ index 000000000..4ea16f33c
 +    # libc.src.locale.uselocale
 +
 +    # unistd.h entrypoints
-+    # libc.src.unistd.__llvm_libc_syscall
-+    # libc.src.unistd._exit
++    libc.src.unistd._exit
 +    libc.src.unistd.environ
 +    # libc.src.unistd.execv
 +    # libc.src.unistd.fork
@@ -1796,11 +1817,13 @@ index 000000000..4ea16f33c
 +)
 diff --git a/libc/config/zaos/x86_64/headers.txt b/libc/config/zaos/x86_64/headers.txt
 new file mode 100644
-index 000000000..bb45127f5
+index 000000000..c7c4a36b4
 --- /dev/null
 +++ b/libc/config/zaos/x86_64/headers.txt
-@@ -0,0 +1,60 @@
+@@ -0,0 +1,62 @@
 +set(TARGET_PUBLIC_HEADERS
++    libc.include.zaos_vdso
++    libc.include.zaos_ioring
 +    # libc.include.arpa_inet
 +    libc.include.assert
 +    libc.include.complex
@@ -1810,7 +1833,7 @@ index 000000000..bb45127f5
 +    # libc.include.elf
 +    # libc.include.endian
 +    libc.include.errno
-+    # libc.include.fcntl
++    libc.include.fcntl
 +    # libc.include.features
 +    libc.include.fenv
 +    # libc.include.float
@@ -1855,11 +1878,40 @@ index 000000000..bb45127f5
 +    # libc.include.sysexits
 +    # libc.include.termios
 +    # libc.include.threads
-+    # libc.include.time
++    libc.include.time
 +    # libc.include.uchar
-+    # libc.include.unistd
++    libc.include.unistd
 +    libc.include.wchar
 +)
+diff --git a/libc/include/CMakeLists.txt b/libc/include/CMakeLists.txt
+index e5ceea360..d8c4ccf99 100644
+--- a/libc/include/CMakeLists.txt
++++ b/libc/include/CMakeLists.txt
+@@ -704,6 +704,24 @@ add_header_macro(
+     .llvm-libc-types.struct_lconv
+ )
+ 
++file(MAKE_DIRECTORY ${LIBC_INCLUDE_DIR}/zaos)
++
++add_header_macro(
++  zaos_vdso
++  ../libc/include/zaos/vdso.yaml
++  zaos/vdso.h
++  DEPENDS
++    .llvm_libc_common_h
++)
++
++add_header_macro(
++  zaos_ioring
++  ../libc/include/zaos/ioring.yaml
++  zaos/ioring.h
++  DEPENDS
++    .llvm_libc_common_h
++)
++
+ if(NOT LLVM_LIBC_FULL_BUILD)
+   # We don't install headers in non-fullbuild mode.
+   return()
 diff --git a/libc/include/llvm-libc-macros/time-macros.h b/libc/include/llvm-libc-macros/time-macros.h
 index 445d8b3e8..d6d1ed073 100644
 --- a/libc/include/llvm-libc-macros/time-macros.h
@@ -1937,12 +1989,567 @@ index b3b7e0de9..bdb8daaad 100644
  #else
  #error "Once flag type not defined for the target platform."
  #endif
+diff --git a/libc/include/stdio.yaml b/libc/include/stdio.yaml
+index 2619984cc..b76ea69ff 100644
+--- a/libc/include/stdio.yaml
++++ b/libc/include/stdio.yaml
+@@ -171,6 +171,16 @@ functions:
+       - type: size_t
+       - type: size_t
+       - type: FILE *__restrict
++  - name: freadat
++    standards:
++      - stdc
++    return_type: size_t
++    arguments:
++      - type: void *__restrict
++      - type: size_t
++      - type: size_t
++      - type: long
++      - type: FILE *__restrict
+   - name: fscanf
+     standards:
+       - stdc
+@@ -225,6 +235,16 @@ functions:
+       - type: size_t
+       - type: size_t
+       - type: FILE *__restrict
++  - name: fwriteat
++    standards:
++      - stdc
++    return_type: size_t
++    arguments:
++      - type: const void *__restrict
++      - type: size_t
++      - type: size_t
++      - type: long
++      - type: FILE *__restrict
+   - name: getc
+     standards:
+       - stdc
+diff --git a/libc/include/zaos/ioring.h.def b/libc/include/zaos/ioring.h.def
+new file mode 100644
+index 000000000..0ec0576d3
+--- /dev/null
++++ b/libc/include/zaos/ioring.h.def
+@@ -0,0 +1,373 @@
++//===-- ZAOS header ioring.h ----------------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_LIBC_ZAOS_IORING_H
++#define LLVM_LIBC_ZAOS_IORING_H
++
++#include "__llvm-libc-common.h"
++
++#include <stdint.h>
++#include <stddef.h>
++#include <errno.h>
++
++typedef uint32_t uid_t;
++typedef uint32_t gid_t;
++typedef uint32_t mode_t;
++typedef int64_t time_t;
++typedef uintptr_t dev_t;
++typedef uintptr_t ino_t;
++
++#define O_RDONLY 0x1
++#define O_WRONLY 0x2
++#define O_RDWR 0x3
++
++#define O_CREAT 0100
++#define O_EXCL 0200
++#define O_TRUNC 01000
++#define O_APPEND 02000
++#define O_SYMLINK 0100000
++#define O_DIRECTORY 0200000
++#define O_NOFOLLOW 0400000
++#define O_FILESYSTEM 01000000
++
++#define S_IUMSK 07777
++
++#define S_IRWXU 0700
++#define S_IRUSR 0400
++#define S_IWUSR 0200
++#define S_IXUSR 0100
++#define S_IRWXG 0070
++#define S_IRGRP 0040
++#define S_IWGRP 0020
++#define S_IXGRP 0010
++#define S_IRWXO 0007
++#define S_IROTH 0004
++#define S_IWOTH 0002
++#define S_IXOTH 0001
++
++#define S_ISUID 04000
++#define S_ISGID 02000
++#define S_ISVTX 01000
++
++#define S_IFMT 0xf000
++#define S_IFDATA 0xb000
++#define S_IFSOCK 0xc000
++#define S_IFLNK 0xa000
++#define S_IFREG 0x8000
++#define S_IFBLK 0x6000
++#define S_IFDIR 0x4000
++#define S_IFCHR 0x2000
++#define S_IFIFO 0x1000
++
++#define N_ACCESS 0x1
++#define N_ATTRIB 0x2
++#define N_CLOSE_WRITE 0x4
++#define N_CLOSE_NOWRITE 0x8
++#define N_MKDIR 0x10
++#define N_CREATE 0x20
++#define N_UNLINK 0x40
++#define N_MODIFY 0x100
++#define N_MOVED 0x400
++#define N_RENAME 0x1000
++#define N_OPEN 0x2000
++#define N_ALL 0xffff
++
++#define STDIN_FILENO 0
++#define STDOUT_FILENO 1
++#define STDERR_FILENO 2
++#define STDROOT_FILENO 4
++#define STDCWD_FILENO 5
++
++#define STAT_UID 0x01
++#define STAT_GID 0x02
++#define STAT_MODE 0x04
++#define STAT_SIZE 0x08
++#define STAT_MTIME 0x10
++#define STAT_CTIME 0x20
++#define STAT_BTIME 0x40
++#define STAT_INODE 0x100
++#define STAT_DEVICE 0x200
++
++struct stat
++{
++  uid_t uid;
++  gid_t gid;
++  mode_t mode;
++
++  uint64_t size;
++
++  time_t mtime;
++  time_t ctime;
++  time_t btime;
++
++  ino_t inode;
++  dev_t device;
++};
++
++struct dirent
++{
++  uint32_t rec_len;
++  uint16_t file_type;
++  uint16_t name_len;
++  uint8_t file_name[0];
++};
++
++#define POLLIN 0x001
++#define POLLOUT 0x004
++
++#define POLLFD 0x1
++#define POLLTHREAD 0x2
++
++typedef struct
++{
++  int32_t id;
++  uint16_t type;
++  uint16_t mask;
++  uintptr_t user_data;
++} pollevt;
++
++#define WATCH_TYPE_ID 1
++#define WATCH_TYPE_DIR 2
++#define WATCH_TYPE_NAME 3
++
++typedef struct
++{
++  uint32_t len;
++  uint32_t pad;
++  uint64_t mask;
++  uintptr_t user_data;
++} watchevt;
++
++typedef struct
++{
++  uint16_t type;
++  uint16_t len;
++} watchevt_info;
++
++typedef struct
++{
++  watchevt_info info;
++  uintptr_t id;
++} watchevt_id_info;
++
++typedef struct
++{
++  watchevt_info info;
++  uintptr_t id;
++} watchevt_dir_info;
++
++typedef struct
++{
++  watchevt_info info;
++  uint8_t file_name[0];
++} watchevt_name_info;
++
++struct iovec
++{
++  void *data;
++  size_t len;
++};
++
++struct ciovec
++{
++  void const *data;
++  size_t len;
++};
++
++struct msg
++{
++  uint8_t *bytes;
++  size_t nbytes;
++  int32_t *fds;
++  size_t nfds;
++};
++
++struct cmsg
++{
++  uint8_t const *bytes;
++  size_t nbytes;
++  int32_t const *fds;
++  size_t nfds;
++};
++
++enum ioring_ops
++{
++  ioring_op_open = 0x01,
++  ioring_op_stat = 0x02,
++  ioring_op_read = 0x03,
++  ioring_op_readv = 0x04,
++  ioring_op_preadv = 0x05,
++  ioring_op_write = 0x06,
++  ioring_op_writev = 0x07,
++  ioring_op_pwritev = 0x08,
++  ioring_op_ioctl = 0x09,
++  ioring_op_close = 0x0a,
++  ioring_op_select = 0x0b,
++  ioring_op_dup = 0x0c,
++  ioring_op_dup2 = 0x0d,
++  ioring_op_mkdir = 0x0e,
++  ioring_op_rename = 0x0f,
++  ioring_op_link = 0x10,
++  ioring_op_symlink = 0x11,
++  ioring_op_chstat = 0x12,
++  ioring_op_unlink = 0x13,
++  ioring_op_poll_create = 0x14,
++  ioring_op_poll_add = 0x15,
++  ioring_op_poll_modify = 0x16,
++  ioring_op_poll_remove = 0x17,
++  ioring_op_poll_wait = 0x18,
++  ioring_op_notify_create = 0x19,
++  ioring_op_notify_add = 0x1a,
++  ioring_op_notify_modify = 0x1b,
++  ioring_op_notify_remove = 0x1c,
++  ioring_op_event_create = 0x1d,
++  ioring_op_buffer_create = 0x1e,
++  ioring_op_channel_create = 0x1f,
++  ioring_op_channel_read = 0x20,
++  ioring_op_channel_write = 0x21,
++  ioring_op_channel_call = 0x22,
++  ioring_op_sleep = 0x23,
++};
++
++enum ioring_flags
++{
++  ioring_flag_fin = 0x1,
++};
++
++typedef struct
++{
++  uint32_t sq_head;
++  uint32_t sq_tail;
++  uint32_t sq_mask;
++  uint32_t sq_offset;
++
++  uint32_t cq_head;
++  uint32_t cq_tail;
++  uint32_t cq_mask;
++  uint32_t cq_offset;
++
++  uint8_t reserved[32];
++} ioring_header;
++
++typedef struct
++{
++  uint8_t op;
++  uint8_t flags;
++  uint16_t reserved1;
++  uint32_t reserved2;
++  uintptr_t args[6];
++  uintptr_t user_data;
++} ioring_sqe;
++
++typedef struct
++{
++  uint32_t flags;
++  int32_t result;
++  uintptr_t user_data;
++} ioring_cqe;
++
++typedef struct
++{
++  int32_t fd;
++  ioring_header *header;
++} ioring;
++
++__BEGIN_C_DECLS
++
++int32_t ioring_setup(void *buffer, size_t bufferlen, uint64_t flags);
++int32_t ioring_enter(int32_t fd, uint32_t to_submit, uint32_t min_complete, uint64_t flags);
++int32_t ioring_destroy(int32_t fd);
++
++ioring_sqe * ioring_get_sqe(ioring *ring);
++void ioring_advance_sqe(ioring *ring);
++int32_t ioring_submit_sqe(ioring *ring);
++ioring_cqe const * ioring_get_cqe(ioring *ring);
++int32_t ioring_wait_cqe(ioring *ring);
++void ioring_advance_cqe(ioring *ring);
++
++void ioring_prep_sqe_open(ioring_sqe *sqe, int32_t dir, char const *path, size_t pathlen, uint64_t flags, uint32_t mode);
++void ioring_prep_sqe_stat(ioring_sqe *sqe, int32_t fd, struct stat *statbuf, uint64_t flags);
++void ioring_prep_sqe_read(ioring_sqe *sqe, int32_t fd, void *buffer, size_t length);
++void ioring_prep_sqe_readv(ioring_sqe *sqe, int32_t fd, struct iovec *iovs, size_t n);
++void ioring_prep_sqe_preadv(ioring_sqe *sqe, int32_t fd, struct iovec *iovs, size_t n, uint64_t position);
++void ioring_prep_sqe_write(ioring_sqe *sqe, int32_t fd, void const *buffer, size_t length);
++void ioring_prep_sqe_writev(ioring_sqe *sqe, int32_t fd, struct ciovec const *iovs, size_t n);
++void ioring_prep_sqe_pwritev(ioring_sqe *sqe, int32_t fd, struct ciovec const *iovs, size_t n, uint64_t position);
++void ioring_prep_sqe_ioctl(ioring_sqe *sqe, int32_t fd, uint32_t op, void *buffer, size_t buflen);
++void ioring_prep_sqe_close(ioring_sqe *sqe, int32_t fd);
++void ioring_prep_sqe_select(ioring_sqe *sqe, pollevt *evts, size_t n, uint64_t abstime);
++void ioring_prep_sqe_dup(ioring_sqe *sqe, int32_t oldfd);
++void ioring_prep_sqe_dup2(ioring_sqe *sqe, int32_t oldfd, int32_t newfd);
++void ioring_prep_sqe_mkdir(ioring_sqe *sqe, int32_t dir, char const *path, size_t pathlen, uint64_t flags, uint32_t mode);
++void ioring_prep_sqe_rename(ioring_sqe *sqe, int32_t olddir, char const *oldpath, size_t oldpathlen, int32_t newdir, char const *newpath, size_t newpathlen, uint64_t flags);
++void ioring_prep_sqe_link(ioring_sqe *sqe, int32_t olddir, char const *oldpath, size_t oldpathlen, int32_t newdir, char const *newpath, size_t newpathlen, uint64_t flags);
++void ioring_prep_sqe_symlink(ioring_sqe *sqe, int32_t dir, char const *path, size_t pathlen, char const *target, size_t targetlen, uint64_t flags);
++void ioring_prep_sqe_chstat(ioring_sqe *sqe, int32_t fd, struct stat const *statbuf, uint64_t flags);
++void ioring_prep_sqe_unlink(ioring_sqe *sqe, int32_t dir, char const *path, size_t pathlen, uint64_t flags);
++void ioring_prep_sqe_poll_create(ioring_sqe *sqe, uint64_t flags);
++void ioring_prep_sqe_poll_add(ioring_sqe *sqe, int32_t fd, int32_t id, uint16_t type, uint16_t mask, uintptr_t user_data, uint64_t flags);
++void ioring_prep_sqe_poll_remove(ioring_sqe *sqe, int32_t fd, int32_t id, uint16_t type);
++void ioring_prep_sqe_poll_wait(ioring_sqe *sqe, int32_t fd, pollevt *evts, size_t n, uint64_t abstime);
++void ioring_prep_sqe_notify_create(ioring_sqe *sqe, uint64_t flags);
++void ioring_prep_sqe_notify_add(ioring_sqe *sqe, int32_t fd, int32_t dir, char const *path, size_t pathlen, uint64_t mask, uintptr_t user_data, uint64_t flags);
++void ioring_prep_sqe_notify_remove(ioring_sqe *sqe, int32_t fd, int32_t dir, char const *path, size_t pathlen);
++void ioring_prep_sqe_event_create(ioring_sqe *sqe, uint64_t value, uint64_t maxvalue, uint64_t flags);
++void ioring_prep_sqe_buffer_create(ioring_sqe *sqe, int32_t *fds, size_t size, uint64_t flags);
++void ioring_prep_sqe_channel_create(ioring_sqe *sqe, int32_t *fds, uint64_t flags);
++void ioring_prep_sqe_channel_read(ioring_sqe *sqe, int32_t fd, int32_t *sid, struct msg *buffer, size_t *outbytes, size_t *outfds);
++void ioring_prep_sqe_channel_write(ioring_sqe *sqe, int32_t fd, int32_t sid, struct cmsg const *msg);
++void ioring_prep_sqe_channel_call(ioring_sqe *sqe, int32_t fd, struct cmsg *msg, struct msg *buffer, size_t *outbytes, size_t *outfds);
++void ioring_prep_sqe_sleep_until(ioring_sqe *sqe, uint64_t abstime);
++
++int32_t openat(ioring *ring, int32_t dir, char const *path, size_t pathlen, uint64_t flags, uint32_t mode);
++int32_t open(ioring *ring, char const *path, size_t pathlen, uint64_t flags, uint32_t mode);
++int32_t stat(ioring *ring, int32_t fd, struct stat *statbuf, uint64_t flags);
++int32_t read(ioring *ring, int32_t fd, void *buffer, size_t buflen);
++int32_t readv(ioring *ring, int32_t fd, struct iovec *iovs, size_t n);
++int32_t preadv(ioring *ring, int32_t fd, struct iovec *iovs, size_t n, uint64_t position);
++int32_t write(ioring *ring, int32_t fd, void const *buffer, size_t buflen);
++int32_t writev(ioring *ring, int32_t fd, struct ciovec const *iovs, size_t n);
++int32_t pwritev(ioring *ring, int32_t fd, struct ciovec const *iovs, size_t n, uint64_t position);
++int32_t ioctl(ioring *ring, int32_t fd, uint32_t op, void *buffer, size_t buflen);
++int32_t close(ioring *ring, int32_t fd);
++int32_t select(ioring *ring, pollevt *evts, size_t n, uint64_t abstime);
++int32_t dup(ioring *ring, int32_t oldfd);
++int32_t dup2(ioring *ring, int32_t oldfd, int32_t newfd);
++int32_t mkdirat(ioring *ring, int32_t dir, char const *path, size_t pathlen, uint64_t flags, uint32_t mode);
++int32_t mkdir(ioring *ring, char const *path, size_t pathlen, uint64_t flags, uint32_t mode);
++int32_t renameat(ioring *ring, int32_t olddir, char const *oldpath, size_t oldpathlen, int32_t newdir, char const *newpath, size_t newpathlen, uint64_t flags);
++int32_t rename(ioring *ring, char const *oldpath, size_t oldpathlen, char const *newpath, size_t newpathlen, uint64_t flags);
++int32_t linkat(ioring *ring, int32_t olddir, char const *oldpath, size_t oldpathlen, int32_t newdir, char const *newpath, size_t newpathlen, uint64_t flags);
++int32_t link(ioring *ring, char const *oldpath, size_t oldpathlen, char const *newpath, size_t newpathlen, uint64_t flags);
++int32_t symlinkat(ioring *ring, int32_t dir, char const *path, size_t pathlen, char const *target, size_t targetlen, uint64_t flags);
++int32_t symlink(ioring *ring, char const *path, size_t pathlen, char const *target, size_t targetlen, uint64_t flags);
++int32_t chstat(ioring *ring, int32_t fd, struct stat const *statbuf, uint64_t flags);
++int32_t unlinkat(ioring *ring, int32_t dir, char const *path, size_t pathlen, uint64_t flags);
++int32_t unlink(ioring *ring, char const *path, size_t pathlen, uint64_t flags);
++int32_t poll_create(ioring *ring, uint64_t flags);
++int32_t poll_add(ioring *ring, int32_t fd, int32_t id, uint16_t type, uint16_t mask, uintptr_t user_data, uint64_t flags);
++int32_t poll_remove(ioring *ring, int32_t fd, int32_t id, uint16_t type);
++int32_t poll_wait(ioring *ring, int32_t fd, pollevt *evts, size_t n, uint64_t abstime);
++int32_t notify_create(ioring *ring, uint64_t flags);
++int32_t notify_add(ioring *ring, int32_t fd, int32_t dir, char const *path, size_t pathlen, uint64_t mask, uintptr_t user_data, uint64_t flags);
++int32_t notify_remove(ioring *ring, int32_t fd, int32_t dir, char const *path, size_t pathlen);
++int32_t event_create(ioring *ring, uint64_t value, uint64_t maxvalue, uint64_t flags);
++int32_t buffer_create(ioring *ring, int32_t *fds, size_t size, uint64_t flags);
++int32_t channel_create(ioring *ring, int32_t *fds, uint64_t flags);
++int32_t channel_read(ioring *ring, int32_t fd, int32_t *sid, struct msg *buffer, size_t *outbytes, size_t *outfds);
++int32_t channel_write(ioring *ring, int32_t fd, int32_t sid, struct cmsg const *msg);
++int32_t channel_call(ioring *ring, int32_t fd, struct cmsg *msg, struct msg *buffer, size_t *outbytes, size_t *outfds);
++int32_t sleep_until(ioring *ring, uint64_t abstime);
++
++ioring *thread_ring();
++
++__END_C_DECLS
++
++%%public_api()
++
++#endif // LLVM_LIBC_ZAOS_IORING_H
+diff --git a/libc/include/zaos/ioring.yaml b/libc/include/zaos/ioring.yaml
+new file mode 100644
+index 000000000..088e5f4ac
+--- /dev/null
++++ b/libc/include/zaos/ioring.yaml
+@@ -0,0 +1,7 @@
++header: zaos/ioring.h
++header_template: ioring.h.def
++macros: []
++types: []
++enums: []
++objects: []
++functions: []
+diff --git a/libc/include/zaos/vdso.h.def b/libc/include/zaos/vdso.h.def
+new file mode 100644
+index 000000000..8cb727237
+--- /dev/null
++++ b/libc/include/zaos/vdso.h.def
+@@ -0,0 +1,106 @@
++//===-- ZAOS header vdso.h ------------------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_LIBC_ZAOS_VDSO_H
++#define LLVM_LIBC_ZAOS_VDSO_H
++
++#include "__llvm-libc-common.h"
++
++#include <stdint.h>
++#include <stddef.h>
++#include <errno.h>
++
++struct arg
++{
++  uint8_t *beg;
++  uint8_t *end;
++};
++
++#define ATTR_STDIN 0
++#define ATTR_STDOUT 1
++#define ATTR_STDERR 2
++#define ATTR_STDROOT 4
++#define ATTR_STDCWD 5
++#define ATTR_DUPFD(fd) (fd)
++#define ATTR_ENDDUP 255
++
++struct attr
++{
++  int32_t type;
++  uintptr_t value;
++};
++
++#define SCHED_LOWEST 1
++#define SCHED_LOW 5
++#define SCHED_NORMAL 10
++#define SCHED_DISPLAY 15
++#define SCHED_HIGH 20
++#define SCHED_MAX 50
++
++typedef struct
++{
++  int32_t sched_priority;
++} sched_param;
++
++#define WNOHANG 0x1
++
++#define CLOCK_REALTIME 0
++#define CLOCK_MONOTONIC 1
++
++#define MMAP_SHARED 0x1
++#define MMAP_PRIVATED 0x2
++#define MMAP_ANONYMOUS 0x20
++
++#define PROT_NONE 0
++#define PROT_READONLY 1
++#define PROT_READWRITE 2
++#define PROT_EXECUTABLE 4
++
++typedef struct
++{
++  uint64_t offset;
++  size_t length;
++  uintptr_t base;
++  uint32_t flags;
++  uint32_t prot;
++} mmvec;
++
++__BEGIN_C_DECLS
++
++int32_t get_tid();
++uint32_t get_uid();
++uint32_t get_euid();
++uint32_t get_gid();
++uint32_t get_egid();
++
++int32_t clock_res(int32_t clockid, uint64_t *res);
++int32_t clock_time(int32_t clockid, uint64_t *tp);
++
++size_t get_pagesize();
++int32_t mmap(int32_t fd, mmvec const *mmvs, size_t n, void **addrbuf, uint64_t flags);
++int32_t munmap(void *addr, size_t length);
++
++int32_t process_create(struct arg const *argv, size_t argc, struct arg const *envp, size_t envc, struct attr const *attrs, size_t n, uint64_t flags);
++int32_t thread_create(void *stack, void (*start_routine)(), void *start_argument, int32_t priority, int32_t *tid, uint64_t flags);
++int32_t wait(int32_t id, int32_t *rvalbuf, uint64_t flags);
++int32_t sleep(uint64_t timeout);
++int32_t futex_wait(uint32_t *addr, uint32_t expected, uint64_t abstime);
++int32_t futex_wake(uint32_t *addr, uint32_t count);
++int32_t sched_get_param(int32_t id, sched_param *param);
++int32_t sched_set_param(int32_t id, sched_param const *param);
++int32_t thread_munmap_exit(void *addr, size_t length);
++void thread_exit(int32_t rval);
++void process_exit(int32_t rval);
++int32_t process_kill(int32_t pid);
++int32_t kill(char const *uuid, size_t uuidlen, uint64_t flags);
++
++__END_C_DECLS
++
++%%public_api()
++
++#endif // LLVM_LIBC_ZAOS_VDSO_H
+diff --git a/libc/include/zaos/vdso.yaml b/libc/include/zaos/vdso.yaml
+new file mode 100644
+index 000000000..1a053e833
+--- /dev/null
++++ b/libc/include/zaos/vdso.yaml
+@@ -0,0 +1,7 @@
++header: zaos/vdso.h
++header_template: vdso.h.def
++macros: []
++types: []
++enums: []
++objects: []
++functions: []
 diff --git a/libc/src/__support/File/zaos/CMakeLists.txt b/libc/src/__support/File/zaos/CMakeLists.txt
 new file mode 100644
-index 000000000..90601e6cf
+index 000000000..357a18b5e
 --- /dev/null
 +++ b/libc/src/__support/File/zaos/CMakeLists.txt
-@@ -0,0 +1,63 @@
+@@ -0,0 +1,62 @@
 +
 +add_object_library(
 +  file
@@ -1952,7 +2559,6 @@ index 000000000..90601e6cf
 +    file.h
 +  DEPENDS
 +    libc.hdr.fcntl_macros
-+    libc.include.sys_syscall
 +    libc.include.sys_stat
 +    libc.src.__support.CPP.new
 +    libc.src.__support.OSUtil.osutil
@@ -2008,10 +2614,10 @@ index 000000000..90601e6cf
 +#)
 diff --git a/libc/src/__support/File/zaos/file.cpp b/libc/src/__support/File/zaos/file.cpp
 new file mode 100644
-index 000000000..0e51fac8e
+index 000000000..fd1b55dc2
 --- /dev/null
 +++ b/libc/src/__support/File/zaos/file.cpp
-@@ -0,0 +1,124 @@
+@@ -0,0 +1,244 @@
 +//===--- Implementation of the ZaOS specialization of File ----------------===//
 +//
 +// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
@@ -2036,50 +2642,7 @@ index 000000000..0e51fac8e
 +
 +namespace LIBC_NAMESPACE_DECL {
 +
-+FileIOResult zaos_file_write(File *f, const void *data, size_t size) {
-+  auto *lf = reinterpret_cast<ZaOSFile *>(f);
-+  int ret = os::write(thread_ring, lf->get_fd(), data, size);
-+  if (ret < 0) {
-+    return {0, -ret};
-+  }
-+  return ret;
-+}
-+
-+FileIOResult zaos_file_read(File *f, void *buf, size_t size) {
-+  auto *lf = reinterpret_cast<ZaOSFile *>(f);
-+  int ret = os::read(thread_ring, lf->get_fd(), buf, size);
-+  if (ret < 0) {
-+    return {0, -ret};
-+  }
-+  return ret;
-+}
-+
-+ErrorOr<off_t> zaos_file_seek(File *f, off_t offset, int whence) {
-+  (void)f;
-+  (void)offset;
-+  (void)whence;
-+  //auto *lf = reinterpret_cast<ZaOSFile *>(f);
-+  //auto result = internal::lseekimpl(lf->get_fd(), offset, whence);
-+  //if (!result.has_value())
-+  //  return result.error();
-+  //return result.value();
-+  int ret = -95;
-+  return Error(-ret);
-+}
-+
-+int zaos_file_close(File *f) {
-+  auto *lf = reinterpret_cast<ZaOSFile *>(f);
-+  int ret = os::close(thread_ring, lf->get_fd());
-+  if (ret < 0) {
-+    return -ret;
-+  }
-+  delete lf;
-+  return 0;
-+}
-+
 +ErrorOr<File *> openfile(const char *path, const char *mode) {
-+  using namespace os;
-+  
 +  using ModeFlags = File::ModeFlags;
 +  auto modeflags = File::mode_flags(mode);
 +  if (modeflags == 0) {
@@ -2110,7 +2673,7 @@ index 000000000..0e51fac8e
 +  constexpr long OPEN_MODE =
 +      S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
 +
-+  int fd = os::open(thread_ring, os::string(path, strlen(path)), open_flags, OPEN_MODE);
++  int fd = open(&thread_ring, path, strlen(path), open_flags, OPEN_MODE);
 +
 +  if (fd < 0)
 +    return Error(-fd);
@@ -2130,6 +2693,169 @@ index 000000000..0e51fac8e
 +  return file;
 +}
 +
++FileIOResult zaos_file_read(File *f, void *buf, size_t size) {
++  auto *zf = reinterpret_cast<ZaOSFile *>(f);
++  FileIOResult ret(0);
++  if (zf->stream)
++  {
++    ret = zf->read(buf, size);
++  }
++  else
++  {
++    ret = zf->readat(buf, size, zf->cursor);
++  }
++  zf->cursor += ret.value;
++  return ret;
++}
++
++FileIOResult zaos_file_write(File *f, const void *data, size_t size) {
++  auto *zf = reinterpret_cast<ZaOSFile *>(f);
++  FileIOResult ret(0);
++  if (zf->stream)
++  {
++    ret = zf->write(data, size);
++  }
++  else
++  {
++    ret = zf->writeat(data, size, zf->cursor);
++  }
++  zf->cursor += ret.value;
++  return ret;
++}
++
++ErrorOr<off_t> zaos_file_seek(File *f, off_t offset, int whence) {
++  auto *zf = reinterpret_cast<ZaOSFile *>(f);
++  int fd = zf->get_fd();
++  off_t result = 0;
++  struct stat sb;
++  switch (whence)
++  {
++    case SEEK_SET:
++      result = offset;
++      break;
++    case SEEK_CUR:
++      result = zf->cursor + offset;
++      break;
++    case SEEK_END:
++      if (int ret = stat(&thread_ring, fd, &sb, STAT_SIZE); ret < 0)
++        return Error(-ret);
++      result = sb.size + offset;
++      break;
++  }
++  zf->stream = false;
++  zf->cursor = result;
++  return result;
++}
++
++int zaos_file_close(File *f) {
++  auto *zf = reinterpret_cast<ZaOSFile *>(f);
++  int ret = close(&thread_ring, zf->get_fd());
++  if (ret < 0) {
++    return -ret;
++  }
++  delete zf;
++  return 0;
++}
++
++FileIOResult ZaOSFile::read(void *buf, size_t size) {
++  int fd = get_fd();
++  int ret = ::read(&thread_ring, fd, buf, size);
++  if (ret < 0) {
++    while (ret == EAGAIN)
++    {
++      pollevt pollset[] = { pollevt{ fd, POLLFD, POLLIN, 0 } };
++
++      select(&thread_ring, pollset, 1, ~0);
++
++      ret = ::read(&thread_ring, fd, buf, size);
++    }
++    if (ret < 0)
++    {
++      return {0, -ret};
++    }
++  }
++  return ret;
++}
++
++FileIOResult ZaOSFile::readat(void *buf, size_t size, long offset) {
++  int fd = get_fd();
++  iovec iovs[1] = { iovec{ buf, size } };
++  int ret = ::preadv(&thread_ring, fd, iovs, 1, offset);
++  if (ret < 0) {
++    while (ret == EAGAIN)
++    {
++      pollevt pollset[] = { pollevt{ fd, POLLFD, POLLIN, 0 } };
++
++      select(&thread_ring, pollset, 1, ~0);
++
++      ret = ::preadv(&thread_ring, fd, iovs, 1, offset);
++    }
++    if (ret < 0)
++    {
++      return {0, -ret};
++    }
++  }
++  return ret;
++}
++
++FileIOResult ZaOSFile::write(const void *data, size_t size) {
++  int cnt = 0;
++  int fd = get_fd();
++  while (size != 0)
++  {
++    int ret = ::write(&thread_ring, fd, data, size);
++    if (ret < 0) {
++      while (ret == EAGAIN)
++      {
++        pollevt pollset[] = { pollevt{ fd, POLLFD, POLLOUT, 0 } };
++
++        select(&thread_ring, pollset, 1, ~0);
++
++        ret = ::write(&thread_ring, fd, data, size);
++      }
++      if (ret < 0)
++      {
++        return {0, -ret};
++      }
++    }
++
++    data = (const void *)((size_t)data + ret);
++    size -= ret;
++    cnt += ret;
++  }
++  return cnt;
++}
++
++FileIOResult ZaOSFile::writeat(const void *data, size_t size, long offset) {
++  int cnt = 0;
++  int fd = get_fd();
++  while (size != 0)
++  {
++    ciovec iovs[1] = { ciovec{ data, size } };
++    int ret = ::pwritev(&thread_ring, fd, iovs, 1, offset);
++    if (ret < 0) {
++      while (ret == EAGAIN)
++      {
++        pollevt pollset[] = { pollevt{ fd, POLLFD, POLLOUT, 0 } };
++
++        select(&thread_ring, pollset, 1, ~0);
++
++        ret = ::pwritev(&thread_ring, fd, iovs, 1, offset);
++      }
++      if (ret < 0)
++      {
++        return {0, -ret};
++      }
++    }
++
++    data = (const void *)((size_t)data + ret);
++    offset += ret;
++    size -= ret;
++    cnt += ret;
++  }
++  return cnt;
++}
++
 +int get_fileno(File *f) {
 +  auto *lf = reinterpret_cast<ZaOSFile *>(f);
 +  return lf->get_fd();
@@ -2138,10 +2864,10 @@ index 000000000..0e51fac8e
 +} // namespace LIBC_NAMESPACE_DECL
 diff --git a/libc/src/__support/File/zaos/file.h b/libc/src/__support/File/zaos/file.h
 new file mode 100644
-index 000000000..77dadadb5
+index 000000000..b36f09d99
 --- /dev/null
 +++ b/libc/src/__support/File/zaos/file.h
-@@ -0,0 +1,34 @@
+@@ -0,0 +1,42 @@
 +//===--- Zaos specialization of the File data structure -------------------===//
 +//
 +// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
@@ -2156,8 +2882,8 @@ index 000000000..77dadadb5
 +
 +namespace LIBC_NAMESPACE_DECL {
 +
-+FileIOResult zaos_file_write(File *, const void *, size_t);
 +FileIOResult zaos_file_read(File *, void *, size_t);
++FileIOResult zaos_file_write(File *, const void *, size_t);
 +ErrorOr<off_t> zaos_file_seek(File *, off_t, int);
 +int zaos_file_close(File *);
 +
@@ -2165,14 +2891,22 @@ index 000000000..77dadadb5
 +  int fd;
 +
 +public:
++  bool stream;
++  size_t cursor;
 +  constexpr ZaOSFile(int file_descriptor, uint8_t *buffer, size_t buffer_size,
 +                      int buffer_mode, bool owned, File::ModeFlags modeflags)
 +      : File(&zaos_file_write, &zaos_file_read, &zaos_file_seek,
 +             &zaos_file_close, buffer, buffer_size, buffer_mode, owned,
 +             modeflags),
-+        fd(file_descriptor) {}
++        fd(file_descriptor), stream(true), cursor(0) {}
 +
-+  int get_fd() const { return fd; }
++  FileIOResult read(void *buf, size_t size);
++  FileIOResult readat(void *buf, size_t size, long offset);
++
++  FileIOResult write(const void *data, size_t size);
++  FileIOResult writeat(const void *data, size_t size, long offset);
++
++  int get_fd() const { return fd; }  
 +};
 +
 +} // namespace LIBC_NAMESPACE_DECL
@@ -2286,10 +3020,10 @@ index 80119da77..a80c4b26d 100644
  #elif defined(_WIN32)
 diff --git a/libc/src/__support/OSUtil/zaos/CMakeLists.txt b/libc/src/__support/OSUtil/zaos/CMakeLists.txt
 new file mode 100644
-index 000000000..af8e71d32
+index 000000000..76894aed7
 --- /dev/null
 +++ b/libc/src/__support/OSUtil/zaos/CMakeLists.txt
-@@ -0,0 +1,27 @@
+@@ -0,0 +1,29 @@
 +if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${LIBC_TARGET_ARCHITECTURE})
 +  return()
 +endif()
@@ -2316,10 +3050,12 @@ index 000000000..af8e71d32
 +    libc.hdr.types.struct_flock64
 +    libc.hdr.types.struct_f_owner_ex
 +    libc.hdr.types.off_t
++    libc.include.zaos_vdso
++    libc.include.zaos_ioring
 +)
 diff --git a/libc/src/__support/OSUtil/zaos/exit.cpp b/libc/src/__support/OSUtil/zaos/exit.cpp
 new file mode 100644
-index 000000000..7faaf2cc6
+index 000000000..9233b1a6c
 --- /dev/null
 +++ b/libc/src/__support/OSUtil/zaos/exit.cpp
 @@ -0,0 +1,29 @@
@@ -2332,8 +3068,8 @@ index 000000000..7faaf2cc6
 +//===----------------------------------------------------------------------===//
 +
 +#include "src/__support/common.h"
-+#include "src/__support/macros/config.h"
 +#include "src/__support/OSUtil/zaos/vdso.h"
++#include "src/__support/macros/config.h"
 +
 +namespace LIBC_NAMESPACE_DECL {
 +namespace internal {
@@ -2346,7 +3082,7 @@ index 000000000..7faaf2cc6
 +__attribute__((noreturn)) void
 +exit(int status) {
 +  for (;;) {
-+    os::process_exit(status);
++    process_exit(status);
 +  }
 +}
 +
@@ -2511,10 +3247,10 @@ index 000000000..3c52a973d
 +#endif // LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_IO_H
 diff --git a/libc/src/__support/OSUtil/zaos/ioring.cpp b/libc/src/__support/OSUtil/zaos/ioring.cpp
 new file mode 100644
-index 000000000..7a59cda8c
+index 000000000..0c3da581a
 --- /dev/null
 +++ b/libc/src/__support/OSUtil/zaos/ioring.cpp
-@@ -0,0 +1,950 @@
+@@ -0,0 +1,1092 @@
 +//===---------- x86/x86_64 zaos configuration ---------------------* C++ *-===//
 +//
 +// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
@@ -2524,14 +3260,14 @@ index 000000000..7a59cda8c
 +//===----------------------------------------------------------------------===//
 +
 +#include "src/__support/common.h"
-+#include "src/__support/macros/config.h"
 +#include "src/__support/OSUtil/zaos/ioring.h"
++#include "src/__support/macros/config.h"
 +
 +extern "C" int32_t __attribute__((weak)) __vdso_ioring_setup(void *buffer, size_t bufferlen, uint64_t flags);
 +extern "C" int32_t __attribute__((weak)) __vdso_ioring_enter(int32_t fd, uint32_t to_submit, uint32_t min_complete, uint64_t flags);
 +extern "C" int32_t __attribute__((weak)) __vdso_ioring_destroy(int32_t fd);
 +
-+namespace os {
++extern "C" {
 +
 +int32_t ioring_setup(void *buffer, size_t bufferlen, uint64_t flags)
 +{
@@ -2548,342 +3284,387 @@ index 000000000..7a59cda8c
 +  return __vdso_ioring_destroy(fd);
 +}
 +
-+auto ioring_get_sqe(ioring &ring) -> ioring_sqe *
++auto ioring_get_sqe(ioring *ring) -> ioring_sqe *
 +{
-+  auto tail = ring.header->sq_tail;
-+  auto index = tail & ring.header->sq_mask;
++  auto tail = ring->header->sq_tail;
++  auto index = tail & ring->header->sq_mask;
 +  auto next = tail + 1;
 +
-+  if (next - __atomic_load_n(&ring.header->sq_head, __ATOMIC_RELAXED) > ring.header->sq_mask + 1)
++  if (next - __atomic_load_n(&ring->header->sq_head, __ATOMIC_RELAXED) > ring->header->sq_mask + 1)
 +    return nullptr;
 +
-+  return reinterpret_cast<ioring_sqe *>(reinterpret_cast<uintptr_t>(ring.header) + static_cast<size_t>(ring.header->sq_offset + index * sizeof(ioring_sqe)));
++  return reinterpret_cast<ioring_sqe *>(reinterpret_cast<uintptr_t>(ring->header) + static_cast<size_t>(ring->header->sq_offset + index * sizeof(ioring_sqe)));
 +}
 +
-+auto ioring_advance_sqe(ioring &ring) -> void
++auto ioring_advance_sqe(ioring *ring) -> void
 +{
-+  auto tail = ring.header->sq_tail;
++  auto tail = ring->header->sq_tail;
 +  auto next = tail + 1;
 +
-+  __atomic_store_n(&ring.header->sq_tail, next, __ATOMIC_SEQ_CST);
++  __atomic_store_n(&ring->header->sq_tail, next, __ATOMIC_SEQ_CST);
 +}
 +
-+auto ioring_submit_sqe(ioring &ring) -> int32_t
++auto ioring_submit_sqe(ioring *ring) -> int32_t
 +{
-+  auto tail = ring.header->sq_tail;
++  auto tail = ring->header->sq_tail;
 +  auto next = tail + 1;
 +
-+  __atomic_store_n(&ring.header->sq_tail, next, __ATOMIC_SEQ_CST);
++  __atomic_store_n(&ring->header->sq_tail, next, __ATOMIC_SEQ_CST);
 +
-+  return __vdso_ioring_enter(ring.fd, 1, 0, 0);
++  return __vdso_ioring_enter(ring->fd, 1, 0, 0);
 +}
 +
-+auto ioring_get_cqe(ioring &ring) -> ioring_cqe const *
++auto ioring_get_cqe(ioring *ring) -> ioring_cqe const *
 +{
-+  auto head = ring.header->cq_head;
-+  auto index = head & ring.header->cq_mask;
++  auto head = ring->header->cq_head;
++  auto index = head & ring->header->cq_mask;
 +
-+  if (head == __atomic_load_n(&ring.header->cq_tail, __ATOMIC_RELAXED))
++  if (head == __atomic_load_n(&ring->header->cq_tail, __ATOMIC_RELAXED))
 +    return nullptr;
 +
 +  __atomic_thread_fence(__ATOMIC_ACQUIRE);
 +
-+  return reinterpret_cast<ioring_cqe const *>(reinterpret_cast<uintptr_t>(ring.header) + static_cast<size_t>(ring.header->cq_offset + index * sizeof(ioring_cqe)));
++  return reinterpret_cast<ioring_cqe const *>(reinterpret_cast<uintptr_t>(ring->header) + static_cast<size_t>(ring->header->cq_offset + index * sizeof(ioring_cqe)));
 +}
 +
-+auto ioring_wait_cqe(ioring &ring) -> int32_t
++auto ioring_wait_cqe(ioring *ring) -> int32_t
 +{
-+  auto head = ring.header->cq_head;
++  auto head = ring->header->cq_head;
 +
-+  if (head == __atomic_load_n(&ring.header->sq_tail, __ATOMIC_RELAXED))
++  if (head == __atomic_load_n(&ring->header->sq_tail, __ATOMIC_RELAXED))
 +  {
-+    if (auto rc = __vdso_ioring_enter(ring.fd, 0, 1, 0); rc < 0)
++    if (auto rc = __vdso_ioring_enter(ring->fd, 0, 1, 0); rc < 0)
 +      return rc;
 +  }
 +
 +  return 0;
 +}
 +
-+auto ioring_advance_cqe(ioring &ring) -> void
++auto ioring_advance_cqe(ioring *ring) -> void
 +{
-+  auto head = ring.header->cq_head;
++  auto head = ring->header->cq_head;
 +  auto next = head + 1;
 +
-+  __atomic_store_n(&ring.header->cq_head, next, __ATOMIC_RELAXED);
++  __atomic_store_n(&ring->header->cq_head, next, __ATOMIC_RELAXED);
 +}
 +
-+auto ioring_prep_sqe_open(ioring_sqe *sqe, int32_t dir, string path, uint64_t flags, uint32_t mode) -> void
++auto ioring_prep_sqe_open(ioring_sqe *sqe, int32_t dir, char const *path, size_t pathlen, uint64_t flags, uint32_t mode) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::open);
-+  sqe->args[0] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(path.len);
-+  sqe->args[1] = reinterpret_cast<uintptr_t>(path.data);
++  sqe->op = ioring_op_open;
++  sqe->args[0] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(pathlen);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(path);
 +  sqe->args[2] = static_cast<uintptr_t>(flags);
 +  sqe->args[3] = static_cast<uintptr_t>(mode);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_stat(ioring_sqe *sqe, int32_t fd, struct stat *statbuf, uint64_t flags) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::stat);
++  sqe->op = ioring_op_stat;
 +  sqe->args[0] = static_cast<uintptr_t>(fd);
 +  sqe->args[1] = reinterpret_cast<uintptr_t>(statbuf);
 +  sqe->args[2] = static_cast<uintptr_t>(flags);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
-+auto ioring_prep_sqe_read(ioring_sqe *sqe, int32_t fd, void *buffer, size_t buflen) -> void
++auto ioring_prep_sqe_read(ioring_sqe *sqe, int32_t fd, void *buffer, size_t length) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::read);
++  sqe->op = ioring_op_read;
 +  sqe->args[0] = static_cast<uintptr_t>(fd);
 +  sqe->args[1] = reinterpret_cast<uintptr_t>(buffer);
-+  sqe->args[2] = static_cast<uintptr_t>(buflen);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->args[2] = static_cast<uintptr_t>(length);
++  sqe->flags = ioring_flag_fin;
 +}
 +
-+auto ioring_prep_sqe_write(ioring_sqe *sqe, int32_t fd, void const *buffer, size_t buflen) -> void
++auto ioring_prep_sqe_readv(ioring_sqe *sqe, int32_t fd, iovec *iovs, size_t n) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::write);
++  sqe->op = ioring_op_readv;
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(iovs);
++  sqe->args[2] = static_cast<uintptr_t>(n);
++  sqe->flags = ioring_flag_fin;
++}
++
++auto ioring_prep_sqe_preadv(ioring_sqe *sqe, int32_t fd, iovec *iovs, size_t n, uint64_t position) -> void
++{
++  sqe->op = ioring_op_preadv;
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(iovs);
++  sqe->args[2] = static_cast<uintptr_t>(n);
++  sqe->args[3] = static_cast<uintptr_t>(position);
++  sqe->flags = ioring_flag_fin;
++}
++
++auto ioring_prep_sqe_write(ioring_sqe *sqe, int32_t fd, void const *buffer, size_t length) -> void
++{
++  sqe->op = ioring_op_write;
 +  sqe->args[0] = static_cast<uintptr_t>(fd);
 +  sqe->args[1] = reinterpret_cast<uintptr_t>(buffer);
-+  sqe->args[2] = static_cast<uintptr_t>(buflen);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->args[2] = static_cast<uintptr_t>(length);
++  sqe->flags = ioring_flag_fin;
++}
++
++auto ioring_prep_sqe_writev(ioring_sqe *sqe, int32_t fd, ciovec const *iovs, size_t n) -> void
++{
++  sqe->op = ioring_op_writev;
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(iovs);
++  sqe->args[2] = static_cast<uintptr_t>(n);
++  sqe->flags = ioring_flag_fin;
++}
++
++auto ioring_prep_sqe_pwritev(ioring_sqe *sqe, int32_t fd, ciovec const *iovs, size_t n, uint64_t position) -> void
++{
++  sqe->op = ioring_op_pwritev;
++  sqe->args[0] = static_cast<uintptr_t>(fd);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(iovs);
++  sqe->args[2] = static_cast<uintptr_t>(n);
++  sqe->args[3] = static_cast<uintptr_t>(position);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_ioctl(ioring_sqe *sqe, int32_t fd, uint32_t op, void *buffer, size_t buflen) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::ioctl);
++  sqe->op = ioring_op_ioctl;
 +  sqe->args[0] = static_cast<uintptr_t>(fd);
 +  sqe->args[1] = static_cast<uintptr_t>(op);
 +  sqe->args[2] = reinterpret_cast<uintptr_t>(buffer);
 +  sqe->args[3] = static_cast<uintptr_t>(buflen);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_close(ioring_sqe *sqe, int32_t fd) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::close);
++  sqe->op = ioring_op_close;
 +  sqe->args[0] = static_cast<uintptr_t>(fd);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
-+auto ioring_prep_sqe_select(ioring_sqe *sqe, pollevt *evts, size_t n, uint64_t timeout) -> void
++auto ioring_prep_sqe_select(ioring_sqe *sqe, pollevt *evts, size_t n, uint64_t abstime) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::select);
++  sqe->op = ioring_op_select;
 +  sqe->args[0] = reinterpret_cast<uintptr_t>(evts);
 +  sqe->args[1] = static_cast<uintptr_t>(n);
-+  sqe->args[2] = static_cast<uintptr_t>(timeout);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->args[2] = static_cast<uintptr_t>(abstime);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_dup(ioring_sqe *sqe, int32_t oldfd) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::dup);
++  sqe->op = ioring_op_dup;
 +  sqe->args[0] = static_cast<uintptr_t>(oldfd);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_dup2(ioring_sqe *sqe, int32_t oldfd, int32_t newfd) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::dup2);
++  sqe->op = ioring_op_dup2;
 +  sqe->args[0] = static_cast<uintptr_t>(oldfd);
 +  sqe->args[1] = static_cast<uintptr_t>(newfd);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
-+auto ioring_prep_sqe_mkdir(ioring_sqe *sqe, int32_t dir, string path, uint64_t flags, uint32_t mode) -> void
++auto ioring_prep_sqe_mkdir(ioring_sqe *sqe, int32_t dir, char const *path, size_t pathlen, uint64_t flags, uint32_t mode) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::mkdir);
-+  sqe->args[0] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(path.len);
-+  sqe->args[1] = reinterpret_cast<uintptr_t>(path.data);
++  sqe->op = ioring_op_mkdir;
++  sqe->args[0] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(pathlen);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(path);
 +  sqe->args[2] = static_cast<uintptr_t>(flags);
 +  sqe->args[3] = static_cast<uintptr_t>(mode);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
-+auto ioring_prep_sqe_rename(ioring_sqe *sqe, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> void
++auto ioring_prep_sqe_rename(ioring_sqe *sqe, int32_t olddir, char const *oldpath, size_t oldpathlen, int32_t newdir, char const *newpath, size_t newpathlen, uint64_t flags) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::rename);
-+  sqe->args[0] = static_cast<uintptr_t>(olddir) << 32 | static_cast<uintptr_t>(oldpath.len);
-+  sqe->args[1] = reinterpret_cast<uintptr_t>(oldpath.data);
-+  sqe->args[2] = static_cast<uintptr_t>(newdir) << 32 | static_cast<uintptr_t>(newpath.len);
-+  sqe->args[3] = reinterpret_cast<uintptr_t>(newpath.data);
++  sqe->op = ioring_op_rename;
++  sqe->args[0] = static_cast<uintptr_t>(olddir) << 32 | static_cast<uintptr_t>(oldpathlen);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(oldpath);
++  sqe->args[2] = static_cast<uintptr_t>(newdir) << 32 | static_cast<uintptr_t>(newpathlen);
++  sqe->args[3] = reinterpret_cast<uintptr_t>(newpath);
 +  sqe->args[4] = static_cast<uintptr_t>(flags);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
-+auto ioring_prep_sqe_link(ioring_sqe *sqe, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> void
++auto ioring_prep_sqe_link(ioring_sqe *sqe, int32_t olddir, char const *oldpath, size_t oldpathlen, int32_t newdir, char const *newpath, size_t newpathlen, uint64_t flags) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::link);
-+  sqe->args[0] = static_cast<uintptr_t>(olddir) << 32 | static_cast<uintptr_t>(oldpath.len);
-+  sqe->args[1] = reinterpret_cast<uintptr_t>(oldpath.data);
-+  sqe->args[2] = static_cast<uintptr_t>(newdir) << 32 | static_cast<uintptr_t>(newpath.len);
-+  sqe->args[3] = reinterpret_cast<uintptr_t>(newpath.data);
++  sqe->op = ioring_op_link;
++  sqe->args[0] = static_cast<uintptr_t>(olddir) << 32 | static_cast<uintptr_t>(oldpathlen);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(oldpath);
++  sqe->args[2] = static_cast<uintptr_t>(newdir) << 32 | static_cast<uintptr_t>(newpathlen);
++  sqe->args[3] = reinterpret_cast<uintptr_t>(newpath);
 +  sqe->args[4] = static_cast<uintptr_t>(flags);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
-+auto ioring_prep_sqe_symlink(ioring_sqe *sqe, int32_t dir, string path, string target, uint64_t flags) -> void
++auto ioring_prep_sqe_symlink(ioring_sqe *sqe, int32_t dir, char const *path, size_t pathlen, char const *target, size_t targetlen, uint64_t flags) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::symlink);
-+  sqe->args[0] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(path.len);
-+  sqe->args[1] = reinterpret_cast<uintptr_t>(path.data);
-+  sqe->args[2] = static_cast<uintptr_t>(target.len);
-+  sqe->args[3] = reinterpret_cast<uintptr_t>(target.data);
++  sqe->op = ioring_op_symlink;
++  sqe->args[0] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(pathlen);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(path);
++  sqe->args[2] = static_cast<uintptr_t>(targetlen);
++  sqe->args[3] = reinterpret_cast<uintptr_t>(target);
 +  sqe->args[4] = static_cast<uintptr_t>(flags);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_chstat(ioring_sqe *sqe, int32_t fd, struct stat const *statbuf, uint64_t flags) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::chstat);
++  sqe->op = ioring_op_chstat;
 +  sqe->args[0] = static_cast<uintptr_t>(fd);
 +  sqe->args[1] = reinterpret_cast<uintptr_t>(statbuf);
 +  sqe->args[2] = static_cast<uintptr_t>(flags);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
-+auto ioring_prep_sqe_unlink(ioring_sqe *sqe, int32_t dir, string path, uint64_t flags) -> void
++auto ioring_prep_sqe_unlink(ioring_sqe *sqe, int32_t dir, char const *path, size_t pathlen, uint64_t flags) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::unlink);
-+  sqe->args[0] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(path.len);
-+  sqe->args[1] = reinterpret_cast<uintptr_t>(path.data);
++  sqe->op = ioring_op_unlink;
++  sqe->args[0] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(pathlen);
++  sqe->args[1] = reinterpret_cast<uintptr_t>(path);
 +  sqe->args[2] = static_cast<uintptr_t>(flags);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_poll_create(ioring_sqe *sqe, uint64_t flags) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::poll_create);
++  sqe->op = ioring_op_poll_create;
 +  sqe->args[0] = static_cast<uintptr_t>(flags);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_poll_add(ioring_sqe *sqe, int32_t fd, int32_t id, uint16_t type, uint16_t mask, uintptr_t user_data, uint64_t flags) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::poll_add);
++  sqe->op = ioring_op_poll_add;
 +  sqe->args[0] = static_cast<uintptr_t>(fd);
 +  sqe->args[1] = static_cast<uintptr_t>(id);
 +  sqe->args[2] = static_cast<uintptr_t>(type);
 +  sqe->args[3] = static_cast<uintptr_t>(mask);
 +  sqe->args[4] = static_cast<uintptr_t>(user_data);
 +  sqe->args[5] = static_cast<uintptr_t>(flags);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_poll_remove(ioring_sqe *sqe, int32_t fd, int32_t id, uint16_t type) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::poll_remove);
++  sqe->op = ioring_op_poll_remove;
 +  sqe->args[0] = static_cast<uintptr_t>(fd);
 +  sqe->args[1] = static_cast<uintptr_t>(id);
 +  sqe->args[2] = static_cast<uintptr_t>(type);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
-+auto ioring_prep_sqe_poll_wait(ioring_sqe *sqe, int32_t fd, pollevt *evts, size_t n, uint64_t timeout) -> void
++auto ioring_prep_sqe_poll_wait(ioring_sqe *sqe, int32_t fd, pollevt *evts, size_t n, uint64_t abstime) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::poll_wait);
++  sqe->op = ioring_op_poll_wait;
 +  sqe->args[0] = static_cast<uintptr_t>(fd);
 +  sqe->args[1] = reinterpret_cast<uintptr_t>(evts);
 +  sqe->args[2] = static_cast<uintptr_t>(n);
-+  sqe->args[3] = static_cast<uintptr_t>(timeout);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->args[3] = static_cast<uintptr_t>(abstime);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_notify_create(ioring_sqe *sqe, uint64_t flags) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::notify_create);
++  sqe->op = ioring_op_notify_create;
 +  sqe->args[0] = static_cast<uintptr_t>(flags);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
-+auto ioring_prep_sqe_notify_add(ioring_sqe *sqe, int32_t fd, int32_t dir, string path, uint64_t mask, uintptr_t user_data, uint64_t flags) -> void
++auto ioring_prep_sqe_notify_add(ioring_sqe *sqe, int32_t fd, int32_t dir, char const *path, size_t pathlen, uint64_t mask, uintptr_t user_data, uint64_t flags) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::notify_add);
++  sqe->op = ioring_op_notify_add;
 +  sqe->args[0] = static_cast<uintptr_t>(fd);
-+  sqe->args[1] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(path.len);
-+  sqe->args[2] = reinterpret_cast<uintptr_t>(path.data);
++  sqe->args[1] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(pathlen);
++  sqe->args[2] = reinterpret_cast<uintptr_t>(path);
 +  sqe->args[3] = static_cast<uintptr_t>(mask);
 +  sqe->args[4] = static_cast<uintptr_t>(user_data);
 +  sqe->args[5] = static_cast<uintptr_t>(flags);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
-+auto ioring_prep_sqe_notify_remove(ioring_sqe *sqe, int32_t fd, int32_t dir, string path) -> void
++auto ioring_prep_sqe_notify_remove(ioring_sqe *sqe, int32_t fd, int32_t dir, char const *path, size_t pathlen) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::notify_remove);
++  sqe->op = ioring_op_notify_remove;
 +  sqe->args[0] = static_cast<uintptr_t>(fd);
-+  sqe->args[1] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(path.len);
-+  sqe->args[2] = reinterpret_cast<uintptr_t>(path.data);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->args[1] = static_cast<uintptr_t>(dir) << 32 | static_cast<uintptr_t>(pathlen);
++  sqe->args[2] = reinterpret_cast<uintptr_t>(path);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_event_create(ioring_sqe *sqe, uint64_t value, uint64_t maxvalue, uint64_t flags) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::event_create);
++  sqe->op = ioring_op_event_create;
 +  sqe->args[0] = static_cast<uintptr_t>(value);
 +  sqe->args[1] = static_cast<uintptr_t>(maxvalue);
 +  sqe->args[2] = static_cast<uintptr_t>(flags);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_buffer_create(ioring_sqe *sqe, int32_t *fds, size_t size, uint64_t flags) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::buffer_create);
++  sqe->op = ioring_op_buffer_create;
 +  sqe->args[0] = reinterpret_cast<uintptr_t>(fds);
 +  sqe->args[1] = static_cast<uintptr_t>(size);
 +  sqe->args[2] = static_cast<uintptr_t>(flags);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_channel_create(ioring_sqe *sqe, int32_t *fds, uint64_t flags) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::channel_create);
++  sqe->op = ioring_op_channel_create;
 +  sqe->args[0] = reinterpret_cast<uintptr_t>(fds);
 +  sqe->args[1] = static_cast<uintptr_t>(flags);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_channel_read(ioring_sqe *sqe, int32_t fd, int32_t *sid, struct msg *buffer, size_t *outbytes, size_t *outfds) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::channel_read);
++  sqe->op = ioring_op_channel_read;
 +  sqe->args[0] = static_cast<uintptr_t>(fd);
 +  sqe->args[1] = reinterpret_cast<uintptr_t>(sid);
 +  sqe->args[2] = reinterpret_cast<uintptr_t>(buffer);
 +  sqe->args[3] = reinterpret_cast<uintptr_t>(outbytes);
 +  sqe->args[4] = reinterpret_cast<uintptr_t>(outfds);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_channel_write(ioring_sqe *sqe, int32_t fd, int32_t sid, struct cmsg const *msg) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::channel_write);
++  sqe->op = ioring_op_channel_write;
 +  sqe->args[0] = static_cast<uintptr_t>(fd);
 +  sqe->args[1] = static_cast<uintptr_t>(sid);
 +  sqe->args[2] = reinterpret_cast<uintptr_t>(msg);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
 +auto ioring_prep_sqe_channel_call(ioring_sqe *sqe, int32_t fd, struct cmsg *msg, struct msg *buffer, size_t *outbytes, size_t *outfds) -> void
 +{
-+  sqe->op = static_cast<uint8_t>(ioring_ops::channel_call);
++  sqe->op = ioring_op_channel_call;
 +  sqe->args[0] = static_cast<uintptr_t>(fd);
 +  sqe->args[1] = reinterpret_cast<uintptr_t>(msg);
 +  sqe->args[2] = reinterpret_cast<uintptr_t>(buffer);
 +  sqe->args[3] = reinterpret_cast<uintptr_t>(outbytes);
 +  sqe->args[4] = reinterpret_cast<uintptr_t>(outfds);
-+  sqe->flags = static_cast<uint8_t>(ioring_flags::fin);
++  sqe->flags = ioring_flag_fin;
 +}
 +
-+auto open(ioring &ring, int32_t dir, string path, uint64_t flags, uint32_t mode) -> int32_t
++auto ioring_prep_sqe_sleep_until(ioring_sqe *sqe, uint64_t abstime) -> void
++{
++  sqe->op = ioring_op_channel_call;
++  sqe->args[0] = static_cast<uintptr_t>(abstime);
++  sqe->flags = ioring_flag_fin;
++}
++
++auto openat(ioring *ring, int32_t dir, char const *path, size_t pathlen, uint64_t flags, uint32_t mode) -> int32_t
 +{
 +  if (dir < 0)
 +    return EINVAL;
 +
 +  auto sqe = ioring_get_sqe(ring);
-+  ioring_prep_sqe_open(sqe, dir, path, flags, mode);
++  ioring_prep_sqe_open(sqe, dir, path, pathlen, flags, mode);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -2893,17 +3674,17 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto open(ioring &ring, string path, uint64_t flags, uint32_t mode) -> int32_t
++auto open(ioring *ring, char const *path, size_t pathlen, uint64_t flags, uint32_t mode) -> int32_t
 +{
 +  auto dir = STDCWD_FILENO;
 +
-+  if (path.len > 0 && *path.data == '/')
++  if (pathlen > 0 && *path == '/')
 +    dir = STDROOT_FILENO;
 +
-+  return open(ring, dir, path, flags, mode);
++  return openat(ring, dir, path, pathlen, flags, mode);
 +}
 +
-+auto stat(ioring &ring, int32_t fd, struct stat *statbuf, uint64_t flags) -> int32_t
++auto stat(ioring *ring, int32_t fd, struct stat *statbuf, uint64_t flags) -> int32_t
 +{
 +  if (fd < 0)
 +    return EINVAL;
@@ -2912,7 +3693,7 @@ index 000000000..7a59cda8c
 +  ioring_prep_sqe_stat(sqe, fd, statbuf, flags);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -2922,16 +3703,16 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto read(ioring &ring, int32_t fd, void *buffer, size_t buflen) -> int32_t
++auto read(ioring *ring, int32_t fd, void *buffer, size_t length) -> int32_t
 +{
 +  if (fd < 0)
 +    return EINVAL;
 +
 +  auto sqe = ioring_get_sqe(ring);
-+  ioring_prep_sqe_read(sqe, fd, buffer, buflen);
++  ioring_prep_sqe_read(sqe, fd, buffer, length);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -2941,16 +3722,16 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto write(ioring &ring, int32_t fd, void const *buffer, size_t buflen) -> int32_t
++auto readv(ioring *ring, int32_t fd, iovec *iovs, size_t n) -> int32_t
 +{
 +  if (fd < 0)
 +    return EINVAL;
 +
 +  auto sqe = ioring_get_sqe(ring);
-+  ioring_prep_sqe_write(sqe, fd, buffer, buflen);
++  ioring_prep_sqe_readv(sqe, fd, iovs, n);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -2960,7 +3741,83 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto ioctl(ioring &ring, int32_t fd, uint32_t op, void *buffer, size_t buflen) -> int32_t
++auto preadv(ioring *ring, int32_t fd, iovec *iovs, size_t n, uint64_t position) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_preadv(sqe, fd, iovs, n, position);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto write(ioring *ring, int32_t fd, void const *buffer, size_t length) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_write(sqe, fd, buffer, length);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto writev(ioring *ring, int32_t fd, ciovec const *iovs, size_t n) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_writev(sqe, fd, iovs, n);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto pwritev(ioring *ring, int32_t fd, ciovec const *iovs, size_t n, uint64_t position) -> int32_t
++{
++  if (fd < 0)
++    return EINVAL;
++
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_pwritev(sqe, fd, iovs, n, position);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto ioctl(ioring *ring, int32_t fd, uint32_t op, void *buffer, size_t buflen) -> int32_t
 +{
 +  if (fd < 0)
 +    return EINVAL;
@@ -2969,7 +3826,7 @@ index 000000000..7a59cda8c
 +  ioring_prep_sqe_ioctl(sqe, fd, op, buffer, buflen);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -2979,7 +3836,7 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto close(ioring &ring, int32_t fd) -> int32_t
++auto close(ioring *ring, int32_t fd) -> int32_t
 +{
 +  if (fd < 0)
 +    return EINVAL;
@@ -2988,7 +3845,7 @@ index 000000000..7a59cda8c
 +  ioring_prep_sqe_close(sqe, fd);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -2998,13 +3855,13 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto select(ioring &ring, pollevt *evts, size_t n, uint64_t timeout) -> int32_t
++auto select(ioring *ring, pollevt *evts, size_t n, uint64_t abstime) -> int32_t
 +{
 +  auto sqe = ioring_get_sqe(ring);
-+  ioring_prep_sqe_select(sqe, evts, n, timeout);
++  ioring_prep_sqe_select(sqe, evts, n, abstime);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3014,13 +3871,13 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto dup(ioring &ring, int32_t oldfd) -> int32_t
++auto dup(ioring *ring, int32_t oldfd) -> int32_t
 +{
 +  auto sqe = ioring_get_sqe(ring);
 +  ioring_prep_sqe_dup(sqe, oldfd);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3030,13 +3887,13 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto dup2(ioring &ring, int32_t oldfd, int32_t newfd) -> int32_t
++auto dup2(ioring *ring, int32_t oldfd, int32_t newfd) -> int32_t
 +{
 +  auto sqe = ioring_get_sqe(ring);
 +  ioring_prep_sqe_dup2(sqe, oldfd, newfd);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3046,16 +3903,16 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto mkdir(ioring &ring, int32_t dir, string path, uint64_t flags, uint32_t mode) -> int32_t
++auto mkdirat(ioring *ring, int32_t dir, char const *path, size_t pathlen, uint64_t flags, uint32_t mode) -> int32_t
 +{
 +  if (dir < 0)
 +    return EINVAL;
 +
 +  auto sqe = ioring_get_sqe(ring);
-+  ioring_prep_sqe_mkdir(sqe, dir, path, flags, mode);
++  ioring_prep_sqe_mkdir(sqe, dir, path, pathlen, flags, mode);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3065,26 +3922,26 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto mkdir(ioring &ring, string path, uint64_t flags, uint32_t mode) -> int32_t
++auto mkdir(ioring *ring, char const *path, size_t pathlen, uint64_t flags, uint32_t mode) -> int32_t
 +{
 +  auto dir = STDCWD_FILENO;
 +
-+  if (path.len > 0 && *path.data == '/')
++  if (pathlen > 0 && *path == '/')
 +    dir = STDROOT_FILENO;
 +
-+  return mkdir(ring, dir, path, flags, mode);
++  return mkdirat(ring, dir, path, pathlen, flags, mode);
 +}
 +
-+auto rename(ioring &ring, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> int32_t
++auto renameat(ioring *ring, int32_t olddir, char const *oldpath, size_t oldpathlen, int32_t newdir, char const *newpath, size_t newpathlen, uint64_t flags) -> int32_t
 +{
 +  if (olddir < 0 || newdir < 0)
 +    return EINVAL;
 +
 +  auto sqe = ioring_get_sqe(ring);
-+  ioring_prep_sqe_rename(sqe, olddir, oldpath, newdir, newpath, flags);
++  ioring_prep_sqe_rename(sqe, olddir, oldpath, oldpathlen, newdir, newpath, newpathlen, flags);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3094,31 +3951,31 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto rename(ioring &ring, string oldpath, string newpath, uint64_t flags) -> int32_t
++auto rename(ioring *ring, char const *oldpath, size_t oldpathlen, char const *newpath, size_t newpathlen, uint64_t flags) -> int32_t
 +{
 +  auto olddir = STDCWD_FILENO;
 +
-+  if (oldpath.len > 0 && *oldpath.data == '/')
++  if (oldpathlen > 0 && *oldpath == '/')
 +    olddir = STDROOT_FILENO;
 +
 +  auto newdir = STDCWD_FILENO;
 +
-+  if (newpath.len > 0 && *newpath.data == '/')
++  if (newpathlen > 0 && *newpath == '/')
 +    newdir = STDROOT_FILENO;
 +
-+  return rename(ring, olddir, oldpath, newdir, newpath, flags);
++  return renameat(ring, olddir, oldpath, oldpathlen, newdir, newpath, newpathlen, flags);
 +}
 +
-+auto link(ioring &ring, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> int32_t
++auto linkat(ioring *ring, int32_t olddir, char const *oldpath, size_t oldpathlen, int32_t newdir, char const *newpath, size_t newpathlen, uint64_t flags) -> int32_t
 +{
 +  if (olddir < 0 || newdir < 0)
 +    return EINVAL;
 +
 +  auto sqe = ioring_get_sqe(ring);
-+  ioring_prep_sqe_link(sqe, olddir, oldpath, newdir, newpath, flags);
++  ioring_prep_sqe_link(sqe, olddir, oldpath, oldpathlen, newdir, newpath, newpathlen, flags);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3128,31 +3985,31 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto link(ioring &ring, string oldpath, string newpath, uint64_t flags) -> int32_t
++auto link(ioring *ring, char const *oldpath, size_t oldpathlen, char const *newpath, size_t newpathlen, uint64_t flags) -> int32_t
 +{
 +  auto olddir = STDCWD_FILENO;
 +
-+  if (oldpath.len > 0 && *oldpath.data == '/')
++  if (oldpathlen > 0 && *oldpath == '/')
 +    olddir = STDROOT_FILENO;
 +
 +  auto newdir = STDCWD_FILENO;
 +
-+  if (newpath.len > 0 && *newpath.data == '/')
++  if (newpathlen > 0 && *newpath == '/')
 +    newdir = STDROOT_FILENO;
 +
-+  return link(ring, olddir, oldpath, newdir, newpath, flags);
++  return linkat(ring, olddir, oldpath, oldpathlen, newdir, newpath, newpathlen, flags);
 +}
 +
-+auto symlink(ioring &ring, int32_t dir, string path, string target, uint64_t flags) -> int32_t
++auto symlinkat(ioring *ring, int32_t dir, char const *path, size_t pathlen, char const *target, size_t targetlen, uint64_t flags) -> int32_t
 +{
 +  if (dir < 0)
 +    return EINVAL;
 +
 +  auto sqe = ioring_get_sqe(ring);
-+  ioring_prep_sqe_symlink(sqe, dir, path, target, flags);
++  ioring_prep_sqe_symlink(sqe, dir, path, pathlen, target, targetlen, flags);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3162,17 +4019,17 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto symlink(ioring &ring, string path, string target, uint64_t flags) -> int32_t
++auto symlink(ioring *ring, char const *path, size_t pathlen, char const *target, size_t targetlen, uint64_t flags) -> int32_t
 +{
 +  auto dir = STDCWD_FILENO;
 +
-+  if (path.len > 0 && *path.data == '/')
++  if (pathlen > 0 && *path == '/')
 +    dir = STDROOT_FILENO;
 +
-+  return symlink(ring, dir, path, target, flags);
++  return symlinkat(ring, dir, path, pathlen, target, targetlen, flags);
 +}
 +
-+auto chstat(ioring &ring, int32_t fd, struct stat const *statbuf, uint64_t flags) -> int32_t
++auto chstat(ioring *ring, int32_t fd, struct stat const *statbuf, uint64_t flags) -> int32_t
 +{
 +  if (fd < 0)
 +    return EINVAL;
@@ -3181,7 +4038,7 @@ index 000000000..7a59cda8c
 +  ioring_prep_sqe_chstat(sqe, fd, statbuf, flags);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3191,16 +4048,16 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto unlink(ioring &ring, int32_t dir, string path, uint64_t flags) -> int32_t
++auto unlinkat(ioring *ring, int32_t dir, char const *path, size_t pathlen, uint64_t flags) -> int32_t
 +{
 +  if (dir < 0)
 +    return EINVAL;
 +
 +  auto sqe = ioring_get_sqe(ring);
-+  ioring_prep_sqe_unlink(sqe, dir, path, flags);
++  ioring_prep_sqe_unlink(sqe, dir, path, pathlen, flags);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3210,23 +4067,23 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto unlink(ioring &ring, string path, uint64_t flags) -> int32_t
++auto unlink(ioring *ring, char const *path, size_t pathlen, uint64_t flags) -> int32_t
 +{
 +  auto dir = STDCWD_FILENO;
 +
-+  if (path.len > 0 && *path.data == '/')
++  if (pathlen > 0 && *path == '/')
 +    dir = STDROOT_FILENO;
 +
-+  return unlink(ring, dir, path, flags);
++  return unlinkat(ring, dir, path, pathlen, flags);
 +}
 +
-+auto poll_create(ioring &ring, uint64_t flags) -> int32_t
++auto poll_create(ioring *ring, uint64_t flags) -> int32_t
 +{
 +  auto sqe = ioring_get_sqe(ring);
 +  ioring_prep_sqe_poll_create(sqe, flags);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3236,7 +4093,7 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto poll_add(ioring &ring, int32_t fd, int32_t id, uint16_t type, uint16_t mask, uintptr_t user_data, uint64_t flags) -> int32_t
++auto poll_add(ioring *ring, int32_t fd, int32_t id, uint16_t type, uint16_t mask, uintptr_t user_data, uint64_t flags) -> int32_t
 +{
 +  if (fd < 0)
 +    return EINVAL;
@@ -3248,7 +4105,7 @@ index 000000000..7a59cda8c
 +  ioring_prep_sqe_poll_add(sqe, fd, id, type, mask, user_data, flags);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3258,7 +4115,7 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto poll_remove(ioring &ring, int32_t fd, int32_t id, uint16_t type) -> int32_t
++auto poll_remove(ioring *ring, int32_t fd, int32_t id, uint16_t type) -> int32_t
 +{
 +  if (fd < 0)
 +    return EINVAL;
@@ -3270,7 +4127,7 @@ index 000000000..7a59cda8c
 +  ioring_prep_sqe_poll_remove(sqe, fd, id, type);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3280,16 +4137,16 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto poll_wait(ioring &ring, int32_t fd, pollevt *evts, size_t n, uint64_t timeout) -> int32_t
++auto poll_wait(ioring *ring, int32_t fd, pollevt *evts, size_t n, uint64_t abstime) -> int32_t
 +{
 +  if (fd < 0)
 +    return EINVAL;
 +
 +  auto sqe = ioring_get_sqe(ring);
-+  ioring_prep_sqe_poll_wait(sqe, fd, evts, n, timeout);
++  ioring_prep_sqe_poll_wait(sqe, fd, evts, n, abstime);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3299,13 +4156,13 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto notify_create(ioring &ring, uint64_t flags) -> int32_t
++auto notify_create(ioring *ring, uint64_t flags) -> int32_t
 +{
 +  auto sqe = ioring_get_sqe(ring);
 +  ioring_prep_sqe_notify_create(sqe, flags);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3315,7 +4172,7 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto notify_add(ioring &ring, int32_t fd, int32_t dir, string path, uint64_t mask, uintptr_t user_data, uint64_t flags) -> int32_t
++auto notify_add(ioring *ring, int32_t fd, int32_t dir, char const *path, size_t pathlen, uint64_t mask, uintptr_t user_data, uint64_t flags) -> int32_t
 +{
 +  if (fd < 0)
 +    return EINVAL;
@@ -3324,10 +4181,10 @@ index 000000000..7a59cda8c
 +    return EINVAL;
 +
 +  auto sqe = ioring_get_sqe(ring);
-+  ioring_prep_sqe_notify_add(sqe, fd, dir, path, mask, user_data, flags);
++  ioring_prep_sqe_notify_add(sqe, fd, dir, path, pathlen, mask, user_data, flags);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3337,7 +4194,7 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto notify_remove(ioring &ring, int32_t fd, int32_t dir, string path) -> int32_t
++auto notify_remove(ioring *ring, int32_t fd, int32_t dir, char const *path, size_t pathlen) -> int32_t
 +{
 +  if (fd < 0)
 +    return EINVAL;
@@ -3346,10 +4203,10 @@ index 000000000..7a59cda8c
 +    return EINVAL;
 +
 +  auto sqe = ioring_get_sqe(ring);
-+  ioring_prep_sqe_notify_remove(sqe, fd, dir, path);
++  ioring_prep_sqe_notify_remove(sqe, fd, dir, path, pathlen);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3359,13 +4216,13 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto event_create(ioring &ring, uint64_t value, uint64_t maxvalue, uint64_t flags) -> int32_t
++auto event_create(ioring *ring, uint64_t value, uint64_t maxvalue, uint64_t flags) -> int32_t
 +{
 +  auto sqe = ioring_get_sqe(ring);
 +  ioring_prep_sqe_event_create(sqe, value, maxvalue, flags);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3375,13 +4232,13 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto buffer_create(ioring &ring, int32_t *fds, size_t size, uint64_t flags) -> int32_t
++auto buffer_create(ioring *ring, int32_t *fds, size_t size, uint64_t flags) -> int32_t
 +{
 +  auto sqe = ioring_get_sqe(ring);
 +  ioring_prep_sqe_buffer_create(sqe, fds, size, flags);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3391,13 +4248,13 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto channel_create(ioring &ring, int32_t *fds, uint64_t flags) -> int32_t
++auto channel_create(ioring *ring, int32_t *fds, uint64_t flags) -> int32_t
 +{
 +  auto sqe = ioring_get_sqe(ring);
 +  ioring_prep_sqe_channel_create(sqe, fds, flags);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3407,7 +4264,7 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto channel_read(ioring &ring, int32_t fd, int32_t *sid, struct msg *buffer, size_t *outbytes, size_t *outfds) -> int32_t
++auto channel_read(ioring *ring, int32_t fd, int32_t *sid, struct msg *buffer, size_t *outbytes, size_t *outfds) -> int32_t
 +{
 +  if (fd < 0)
 +    return EINVAL;
@@ -3416,7 +4273,7 @@ index 000000000..7a59cda8c
 +  ioring_prep_sqe_channel_read(sqe, fd, sid, buffer, outbytes, outfds);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3426,7 +4283,7 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto channel_write(ioring &ring, int32_t fd, int32_t sid, struct cmsg const *msg) -> int32_t
++auto channel_write(ioring *ring, int32_t fd, int32_t sid, struct cmsg const *msg) -> int32_t
 +{
 +  if (fd < 0)
 +    return EINVAL;
@@ -3435,7 +4292,7 @@ index 000000000..7a59cda8c
 +  ioring_prep_sqe_channel_write(sqe, fd, sid, msg);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3445,7 +4302,7 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+auto channel_call(ioring &ring, int32_t fd, struct cmsg *msg, struct msg *buffer, size_t *outbytes, size_t *outfds) -> int32_t
++auto channel_call(ioring *ring, int32_t fd, struct cmsg *msg, struct msg *buffer, size_t *outbytes, size_t *outfds) -> int32_t
 +{
 +  if (fd < 0)
 +    return EINVAL;
@@ -3454,7 +4311,7 @@ index 000000000..7a59cda8c
 +  ioring_prep_sqe_channel_call(sqe, fd, msg, buffer, outbytes, outfds);
 +  ioring_advance_sqe(ring);
 +
-+  if (auto rc = __vdso_ioring_enter(ring.fd, 1, 1, 0); rc < 0)
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
 +    return rc;
 +
 +  auto cqe = ioring_get_cqe(ring);
@@ -3464,433 +4321,63 @@ index 000000000..7a59cda8c
 +  return result;
 +}
 +
-+} // namespace os
++auto sleep_until(ioring *ring, uint64_t abstime) -> int32_t
++{
++  auto sqe = ioring_get_sqe(ring);
++  ioring_prep_sqe_sleep_until(sqe, abstime);
++  ioring_advance_sqe(ring);
++
++  if (auto rc = __vdso_ioring_enter(ring->fd, 1, 1, 0); rc < 0)
++    return rc;
++
++  auto cqe = ioring_get_cqe(ring);
++  auto result = cqe->result;
++  ioring_advance_cqe(ring);
++
++  return result;
++}
++
++auto thread_ring() -> ioring *
++{
++  return &LIBC_NAMESPACE::thread_ring;
++}
++
++}
 diff --git a/libc/src/__support/OSUtil/zaos/ioring.h b/libc/src/__support/OSUtil/zaos/ioring.h
 new file mode 100644
-index 000000000..46ce45d37
+index 000000000..055a282af
 --- /dev/null
 +++ b/libc/src/__support/OSUtil/zaos/ioring.h
-@@ -0,0 +1,414 @@
-+//===---------- x86/x86_64 zaos configuration ---------------------* C++ *-===//
+@@ -0,0 +1,23 @@
++//===-------------- Zaos implementation of ioring ---------------*- C++ -*-===//
 +//
 +// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 +// See https://llvm.org/LICENSE.txt for license information.
 +// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 +//
 +//===----------------------------------------------------------------------===//
-+#ifndef LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_X86_64_IORING_H
-+#define LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_X86_64_IORING_H
-+#include <stdint.h>
-+#include <stddef.h>
-+#include "hdr/errno_macros.h"
-+#include "src/__support/macros/attributes.h"
 +
-+namespace os {
++#ifndef LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_IORING_H
++#define LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_IORING_H
 +
-+using uid_t = uint32_t;
-+using gid_t = uint32_t;
-+using mode_t = uint32_t;
-+using off_t = uint64_t;
-+using time_t = int64_t;
-+using dev_t = uintptr_t;
-+using ino_t = uintptr_t;
++#include "src/__support/CPP/string_view.h"
++#include "src/__support/macros/config.h"
 +
-+constexpr uint64_t O_RDONLY = 0x1;
-+constexpr uint64_t O_WRONLY = 0x2;
-+constexpr uint64_t O_RDWR = 0x3;
++#include <zaos/ioring.h>
 +
-+constexpr uint64_t O_CREAT = 0100;
-+constexpr uint64_t O_EXCL = 0200;
-+constexpr uint64_t O_TRUNC = 01000;
-+constexpr uint64_t O_APPEND = 02000;
-+constexpr uint64_t O_SYMLINK = 0100000;
-+constexpr uint64_t O_DIRECTORY = 0200000;
-+constexpr uint64_t O_NOFOLLOW = 0400000;
-+constexpr uint64_t O_FILESYSTEM = 01000000;
++namespace LIBC_NAMESPACE_DECL {
 +
-+constexpr uint64_t S_IUMSK = 07777;  // user settable bits
++LIBC_INLINE_VAR LIBC_THREAD_LOCAL ioring thread_ring;
 +
-+constexpr uint64_t S_IRWXU = 0700;   // read, write, execute: owner
-+constexpr uint64_t S_IRUSR = 0400;   // read permission: owner
-+constexpr uint64_t S_IWUSR = 0200;   // write permission: owner
-+constexpr uint64_t S_IXUSR = 0100;   // execute permission: owner
-+constexpr uint64_t S_IRWXG = 0070;   // read, write, execute: group
-+constexpr uint64_t S_IRGRP = 0040;   // read permission: group
-+constexpr uint64_t S_IWGRP = 0020;   // write permission: group
-+constexpr uint64_t S_IXGRP = 0010;   // execute permission: group
-+constexpr uint64_t S_IRWXO = 0007;   // read, write, execute: other
-+constexpr uint64_t S_IROTH = 0004;   // read permission: other
-+constexpr uint64_t S_IWOTH = 0002;   // write permission: other
-+constexpr uint64_t S_IXOTH = 0001;   // execute permission: other
++} // namespace LIBC_NAMESPACE_DECL
 +
-+constexpr uint64_t S_ISUID = 04000;  // set user id on execution
-+constexpr uint64_t S_ISGID = 02000;  // set group id on execution */
-+constexpr uint64_t S_ISVTX = 01000;  // sticky bit
-+
-+constexpr uint64_t S_IFMT = 0xf000;   // type of file
-+constexpr uint64_t S_IFDATA = 0xb000; // socket dgram
-+constexpr uint64_t S_IFSOCK = 0xc000; // socket stream
-+constexpr uint64_t S_IFLNK = 0xa000;  // symbolic link
-+constexpr uint64_t S_IFREG = 0x8000;  // regular
-+constexpr uint64_t S_IFBLK = 0x6000;  // block device
-+constexpr uint64_t S_IFDIR = 0x4000;  // directory
-+constexpr uint64_t S_IFCHR = 0x2000;  // character device
-+constexpr uint64_t S_IFIFO = 0x1000;  // fifo
-+
-+constexpr uint64_t N_ACCESS = 0x1;
-+constexpr uint64_t N_ATTRIB = 0x2;
-+constexpr uint64_t N_CLOSE_WRITE = 0x4;
-+constexpr uint64_t N_CLOSE_NOWRITE = 0x8;
-+constexpr uint64_t N_MKDIR = 0x10;
-+constexpr uint64_t N_CREATE = 0x20;
-+constexpr uint64_t N_UNLINK = 0x40;
-+constexpr uint64_t N_MODIFY = 0x100;
-+constexpr uint64_t N_MOVED = 0x400;
-+constexpr uint64_t N_RENAME = 0x1000;
-+constexpr uint64_t N_OPEN = 0x2000;
-+constexpr uint64_t N_ALL = 0xffff;
-+
-+constexpr uint32_t STDIN_FILENO = 0;
-+constexpr uint32_t STDOUT_FILENO = 1;
-+constexpr uint32_t STDERR_FILENO = 2;
-+constexpr uint32_t STDROOT_FILENO = 4;
-+constexpr uint32_t STDCWD_FILENO = 5;
-+
-+enum class filetype
-+{
-+  unknown,
-+  block_device,
-+  character_device,
-+  directory,
-+  regular,
-+  socket_dgram,
-+  socket_stream,
-+  symlink,
-+};
-+
-+enum class stats
-+{
-+  uid = 0x01,
-+  gid = 0x02,
-+  mode = 0x04,
-+  size = 0x08,
-+  mtime = 0x10,
-+  ctime = 0x20,
-+  btime = 0x40,
-+  inode = 0x100,
-+  device = 0x200,
-+};
-+
-+struct stat
-+{
-+  uid_t uid;
-+  gid_t gid;
-+  mode_t mode;
-+
-+  off_t size;
-+
-+  time_t mtime;
-+  time_t ctime;
-+  time_t btime;
-+
-+  ino_t inode;
-+  dev_t device;
-+
-+  auto type() -> filetype
-+  {
-+    switch (this->mode & S_IFMT)
-+    {
-+      case S_IFREG:
-+        return filetype::regular;
-+
-+      case S_IFBLK:
-+        return filetype::block_device;
-+
-+      case S_IFDIR:
-+        return filetype::directory;
-+
-+      case S_IFCHR:
-+        return filetype::character_device;
-+
-+      case S_IFLNK:
-+        return filetype::symlink;
-+
-+      case S_IFDATA:
-+        return filetype::socket_dgram;
-+
-+      case S_IFSOCK:
-+        return filetype::socket_stream;
-+    }
-+
-+    return filetype::unknown;
-+  }
-+};
-+
-+struct dirent
-+{
-+  uint32_t rec_len;
-+  uint16_t file_type;
-+  uint16_t name_len;
-+  uint8_t file_name[0];
-+
-+  //auto name() -> std::string_view
-+  //{
-+  //  return std::string_view(&this->file_name, static_cast<size_t>(this->name_len));
-+  //}
-+
-+  auto type() -> filetype
-+  {
-+    return static_cast<filetype>(this->file_type);
-+  }
-+};
-+
-+constexpr uint16_t POLLIN = 0x001;
-+constexpr uint16_t POLLOUT = 0x004;
-+
-+constexpr uint16_t POLLFD = 0x1;
-+constexpr uint16_t POLLTHREAD = 0x2;
-+
-+struct pollevt
-+{
-+  int32_t id;
-+  uint16_t type;
-+  uint16_t mask;
-+  uintptr_t user_data;
-+
-+  pollevt(int32_t id, uint16_t type, uint16_t mask, uintptr_t user_data)
-+    : id(id), type(type), mask(mask), user_data(user_data)
-+  {
-+  }
-+};
-+
-+struct watchevt
-+{
-+  uint32_t len;
-+  uint32_t pad;
-+  uint64_t mask;
-+  uintptr_t user_data;
-+
-+  struct info
-+  {
-+    inline static constexpr uint16_t id = 1;
-+    inline static constexpr uint16_t dir = 2;
-+    inline static constexpr uint16_t name = 3;
-+
-+    uint16_t type;
-+    uint16_t len;
-+  };
-+
-+  struct id_info : public info
-+  {
-+    uintptr_t id;
-+  };
-+
-+  struct dir_info : public info
-+  {
-+    uintptr_t id;
-+  };
-+
-+  struct name_info : public info
-+  {
-+    uint8_t file_name[0];
-+
-+    //auto name() -> std::string_view
-+    //{
-+    //  return std::string_view(&this->file_name, static_cast<size_t>(this->len - sizeof<info>));
-+    //}
-+  };
-+};
-+
-+struct string
-+{
-+  char const *data;
-+  size_t len;
-+
-+  string(char const *data, size_t len)
-+    : data(data), len(len)
-+  {
-+  }
-+};
-+
-+struct msg
-+{
-+  uint8_t *bytes;
-+  size_t nbytes;
-+  int32_t *fds;
-+  size_t nfds;
-+};
-+
-+struct cmsg
-+{
-+  uint8_t const *bytes;
-+  size_t nbytes;
-+  int32_t const *fds;
-+  size_t nfds;
-+};
-+
-+enum class ioring_ops
-+{
-+  open = 0x01,
-+  stat = 0x02,
-+  read = 0x03,
-+  write = 0x04,
-+  ioctl = 0x05,
-+  close = 0x06,
-+  select = 0x07,
-+  dup = 0x08,
-+  dup2 = 0x09,
-+  mkdir = 0x0a,
-+  rename = 0x0b,
-+  link = 0x0c,
-+  symlink = 0x0d,
-+  chstat = 0x0e,
-+  unlink = 0x0f,
-+  poll_create = 0x10,
-+  poll_add = 0x11,
-+  poll_modify = 0x12,
-+  poll_remove = 0x13,
-+  poll_wait = 0x14,
-+  notify_create = 0x15,
-+  notify_add = 0x16,
-+  notify_modify = 0x17,
-+  notify_remove = 0x18,
-+  event_create = 0x19,
-+  buffer_create = 0x1a,
-+  channel_create = 0x1b,
-+  channel_read = 0x1c,
-+  channel_write = 0x1d,
-+  channel_call = 0x1e,
-+};
-+
-+enum class ioring_flags
-+{
-+  fin = 0x1,
-+};
-+
-+struct ioring_header
-+{
-+  uint32_t sq_head;
-+  uint32_t sq_tail;
-+  uint32_t sq_mask;
-+  uint32_t sq_offset;
-+
-+  uint32_t cq_head;
-+  uint32_t cq_tail;
-+  uint32_t cq_mask;
-+  uint32_t cq_offset;
-+
-+  uint8_t reserved[32];
-+};
-+
-+struct ioring_sqe
-+{
-+  uint8_t op;
-+  uint8_t flags;
-+  uint16_t reserved1;
-+  uint32_t reserved2;
-+  uintptr_t args[6];
-+  uintptr_t user_data;
-+};
-+
-+struct ioring_cqe
-+{
-+  uint32_t flags;
-+  int32_t result;
-+  uintptr_t user_data;
-+};
-+
-+struct ioring
-+{
-+  int32_t fd;
-+  ioring_header *header;
-+};
-+
-+int32_t ioring_setup(void *buffer, size_t bufferlen, uint64_t flags);
-+int32_t ioring_enter(int32_t fd, uint32_t to_submit, uint32_t min_complete, uint64_t flags);
-+int32_t ioring_destroy(int32_t fd);
-+
-+auto ioring_get_sqe(ioring &ring) -> ioring_sqe *;
-+auto ioring_advance_sqe(ioring &ring) -> void;
-+auto ioring_submit_sqe(ioring &ring) -> int32_t;
-+auto ioring_get_cqe(ioring &ring) -> ioring_cqe const *;
-+auto ioring_wait_cqe(ioring &ring) -> int32_t;
-+auto ioring_advance_cqe(ioring &ring) -> void;
-+
-+auto ioring_prep_sqe_open(ioring_sqe *sqe, int32_t dir, string path, uint64_t flags, uint32_t mode) -> void;
-+auto ioring_prep_sqe_stat(ioring_sqe *sqe, int32_t fd, struct stat *statbuf, uint64_t flags) -> void;
-+auto ioring_prep_sqe_read(ioring_sqe *sqe, int32_t fd, void *buffer, size_t buflen) -> void;
-+auto ioring_prep_sqe_write(ioring_sqe *sqe, int32_t fd, void const *buffer, size_t buflen) -> void;
-+auto ioring_prep_sqe_ioctl(ioring_sqe *sqe, int32_t fd, uint32_t op, void *buffer, size_t buflen) -> void;
-+auto ioring_prep_sqe_close(ioring_sqe *sqe, int32_t fd) -> void;
-+auto ioring_prep_sqe_select(ioring_sqe *sqe, pollevt *evts, size_t n, uint64_t timeout) -> void;
-+auto ioring_prep_sqe_dup(ioring_sqe *sqe, int32_t oldfd) -> void;
-+auto ioring_prep_sqe_dup2(ioring_sqe *sqe, int32_t oldfd, int32_t newfd) -> void;
-+auto ioring_prep_sqe_mkdir(ioring_sqe *sqe, int32_t dir, string path, uint64_t flags, uint32_t mode) -> void;
-+auto ioring_prep_sqe_rename(ioring_sqe *sqe, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> void;
-+auto ioring_prep_sqe_link(ioring_sqe *sqe, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> void;
-+auto ioring_prep_sqe_symlink(ioring_sqe *sqe, int32_t dir, string path, string target, uint64_t flags) -> void;
-+auto ioring_prep_sqe_chstat(ioring_sqe *sqe, int32_t fd, struct stat const *statbuf, uint64_t flags) -> void;
-+auto ioring_prep_sqe_unlink(ioring_sqe *sqe, int32_t dir, string path, uint64_t flags) -> void;
-+auto ioring_prep_sqe_poll_create(ioring_sqe *sqe, uint64_t flags) -> void;
-+auto ioring_prep_sqe_poll_add(ioring_sqe *sqe, int32_t fd, int32_t id, uint16_t type, uint16_t mask, uintptr_t user_data, uint64_t flags) -> void;
-+auto ioring_prep_sqe_poll_remove(ioring_sqe *sqe, int32_t fd, int32_t id, uint16_t type) -> void;
-+auto ioring_prep_sqe_poll_wait(ioring_sqe *sqe, int32_t fd, pollevt *evts, size_t n, uint64_t timeout) -> void;
-+auto ioring_prep_sqe_notify_create(ioring_sqe *sqe, uint64_t flags) -> void;
-+auto ioring_prep_sqe_notify_add(ioring_sqe *sqe, int32_t fd, int32_t dir, string path, uint64_t mask, uintptr_t user_data, uint64_t flags) -> void;
-+auto ioring_prep_sqe_notify_remove(ioring_sqe *sqe, int32_t fd, int32_t dir, string path) -> void;
-+auto ioring_prep_sqe_event_create(ioring_sqe *sqe, uint64_t value, uint64_t maxvalue, uint64_t flags) -> void;
-+auto ioring_prep_sqe_buffer_create(ioring_sqe *sqe, int32_t *fds, size_t size, uint64_t flags) -> void;
-+auto ioring_prep_sqe_channel_create(ioring_sqe *sqe, int32_t *fds, uint64_t flags) -> void;
-+auto ioring_prep_sqe_channel_read(ioring_sqe *sqe, int32_t fd, int32_t *sid, struct msg *buffer, size_t *outbytes, size_t *outfds) -> void;
-+auto ioring_prep_sqe_channel_write(ioring_sqe *sqe, int32_t fd, int32_t sid, struct cmsg const *msg) -> void;
-+auto ioring_prep_sqe_channel_call(ioring_sqe *sqe, int32_t fd, struct cmsg *msg, struct msg *buffer, size_t *outbytes, size_t *outfds) -> void;
-+
-+auto open(ioring &ring, int32_t dir, string path, uint64_t flags, uint32_t mode) -> int32_t;
-+auto open(ioring &ring, string path, uint64_t flags, uint32_t mode) -> int32_t;
-+auto stat(ioring &ring, int32_t fd, struct stat *statbuf, uint64_t flags) -> int32_t;
-+auto read(ioring &ring, int32_t fd, void *buffer, size_t buflen) -> int32_t;
-+auto write(ioring &ring, int32_t fd, void const *buffer, size_t buflen) -> int32_t;
-+auto ioctl(ioring &ring, int32_t fd, uint32_t op, void *buffer, size_t buflen) -> int32_t;
-+auto close(ioring &ring, int32_t fd) -> int32_t;
-+auto select(ioring &ring, pollevt *evts, size_t n, uint64_t timeout) -> int32_t;
-+auto dup(ioring &ring, int32_t oldfd) -> int32_t;
-+auto dup2(ioring &ring, int32_t oldfd, int32_t newfd) -> int32_t;
-+auto mkdir(ioring &ring, int32_t dir, string path, uint64_t flags, uint32_t mode) -> int32_t;
-+auto mkdir(ioring &ring, string path, uint64_t flags, uint32_t mode) -> int32_t;
-+auto rename(ioring &ring, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> int32_t;
-+auto rename(ioring &ring, string oldpath, string newpath, uint64_t flags) -> int32_t;
-+auto link(ioring &ring, int32_t olddir, string oldpath, int32_t newdir, string newpath, uint64_t flags) -> int32_t;
-+auto link(ioring &ring, string oldpath, string newpath, uint64_t flags) -> int32_t;
-+auto symlink(ioring &ring, int32_t dir, string path, string target, uint64_t flags) -> int32_t;
-+auto symlink(ioring &ring, string path, string target, uint64_t flags) -> int32_t;
-+auto chstat(ioring &ring, int32_t fd, struct stat const *statbuf, uint64_t flags) -> int32_t;
-+auto unlink(ioring &ring, int32_t dir, string path, uint64_t flags) -> int32_t;
-+auto unlink(ioring &ring, string path, uint64_t flags) -> int32_t;
-+auto poll_create(ioring &ring, uint64_t flags) -> int32_t;
-+auto poll_add(ioring &ring, int32_t fd, int32_t id, uint16_t type, uint16_t mask, uintptr_t user_data, uint64_t flags) -> int32_t;
-+auto poll_remove(ioring &ring, int32_t fd, int32_t id, uint16_t type) -> int32_t;
-+auto poll_wait(ioring &ring, int32_t fd, pollevt *evts, size_t n, uint64_t timeout) -> int32_t;
-+auto notify_create(ioring &ring, uint64_t flags) -> int32_t;
-+auto notify_add(ioring &ring, int32_t fd, int32_t dir, string path, uint64_t mask, uintptr_t user_data, uint64_t flags) -> int32_t;
-+auto notify_remove(ioring &ring, int32_t fd, int32_t dir, string path, uint64_t mask) -> int32_t;
-+auto event_create(ioring &ring, uint64_t value, uint64_t maxvalue, uint64_t flags) -> int32_t;
-+auto buffer_create(ioring &ring, int32_t *fds, size_t size, uint64_t flags) -> int32_t;
-+auto channel_create(ioring &ring, int32_t *fds, uint64_t flags) -> int32_t;
-+auto channel_read(ioring &ring, int32_t fd, int32_t *sid, struct msg *buffer, size_t *outbytes, size_t *outfds) -> int32_t;
-+auto channel_write(ioring &ring, int32_t fd, int32_t sid, struct cmsg const *msg) -> int32_t;
-+auto channel_call(ioring &ring, int32_t fd, struct cmsg *msg, struct msg *buffer, size_t *outbytes, size_t *outfds) -> int32_t;
-+
-+} // namespace os
-+
-+LIBC_INLINE_VAR LIBC_THREAD_LOCAL os::ioring thread_ring;
-+
-+#endif // LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_X86_64_IORING_H
++#endif // LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_IORING_H
 diff --git a/libc/src/__support/OSUtil/zaos/vdso.cpp b/libc/src/__support/OSUtil/zaos/vdso.cpp
 new file mode 100644
-index 000000000..5691022f6
+index 000000000..275b5f5ef
 --- /dev/null
 +++ b/libc/src/__support/OSUtil/zaos/vdso.cpp
-@@ -0,0 +1,139 @@
+@@ -0,0 +1,172 @@
 +//===---------- x86/x86_64 vdso configuration ---------------------* C++ *-===//
 +//
 +// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
@@ -3900,8 +4387,8 @@ index 000000000..5691022f6
 +//===----------------------------------------------------------------------===//
 +
 +#include "src/__support/common.h"
-+#include "src/__support/macros/config.h"
 +#include "src/__support/OSUtil/zaos/vdso.h"
++#include "src/__support/macros/config.h"
 +
 +extern "C" int32_t __attribute__((weak)) __vdso_get_pid();
 +extern "C" int32_t __attribute__((weak)) __vdso_get_tid();
@@ -3914,20 +4401,25 @@ index 000000000..5691022f6
 +extern "C" int32_t __attribute__((weak)) __vdso_clock_time(int32_t clockid, uint64_t *tp);
 +
 +extern "C" size_t __attribute__((weak)) __vdso_get_pagesize();
-+extern "C" int32_t __attribute__((weak)) __vdso_mmap(int32_t fd, os::mmvec const *mmvs, size_t n, void **addrbuf, uint64_t flags);
++extern "C" int32_t __attribute__((weak)) __vdso_mmap(int32_t fd, mmvec const *mmvs, size_t n, void **addrbuf, uint64_t flags);
 +extern "C" int32_t __attribute__((weak)) __vdso_munmap(void *addr, size_t length);
 +
-+extern "C" int32_t __attribute__((weak)) __vdso_process_create(os::arg const *argv, size_t argc, os::arg const *envp, size_t envc, os::attr const *attrs, size_t n, uint64_t flags);
++extern "C" int32_t __attribute__((weak)) __vdso_process_create(arg const *argv, size_t argc, arg const *envp, size_t envc, attr const *attrs, size_t n, uint64_t flags);
 +extern "C" int32_t __attribute__((weak)) __vdso_thread_create(void *stack, void (*start_routine)(), void *start_argument, int32_t priority, int32_t *tid, uint64_t flags);
 +extern "C" int32_t __attribute__((weak)) __vdso_wait(int32_t id, int32_t *rvalbuf, uint64_t flags);
++extern "C" int32_t __attribute__((weak)) __vdso_sleep(uint64_t timeout);
 +extern "C" int32_t __attribute__((weak)) __vdso_futex_wait(uint32_t *addr, uint32_t expected, uint64_t abstime);
 +extern "C" int32_t __attribute__((weak)) __vdso_futex_wake(uint32_t *addr, uint32_t count);
-+extern "C" int32_t __attribute__((weak)) __vdso_process_kill(int32_t pid);
++extern "C" int32_t __attribute__((weak)) __vdso_sched_get_param(int32_t id, sched_param *param);
++extern "C" int32_t __attribute__((weak)) __vdso_sched_set_param(int32_t id, sched_param const *param);
 +extern "C" int32_t __attribute__((weak)) __vdso_thread_munmap_exit(void *addr, size_t length);
 +extern "C" void __attribute__((weak)) __vdso_thread_exit(int32_t rval);
 +extern "C" void __attribute__((weak)) __vdso_process_exit(int32_t rval);
++extern "C" int32_t __attribute__((weak)) __vdso_process_kill(int32_t pid);
++extern "C" int32_t __attribute__((weak)) __vdso_kill(char const *uuid, size_t uuidlen, uint64_t flags);
 +
-+namespace os {
++extern "C"
++{
 +
 +int32_t get_pid()
 +{
@@ -3974,7 +4466,7 @@ index 000000000..5691022f6
 +  return __vdso_get_pagesize();
 +}
 +
-+int32_t mmap(int32_t fd, os::mmvec const *mmvs, size_t n, void **addrbuf, uint64_t flags)
++int32_t mmap(int32_t fd, mmvec const *mmvs, size_t n, void **addrbuf, uint64_t flags)
 +{
 +  return __vdso_mmap(fd, mmvs, n, addrbuf, flags);
 +}
@@ -3984,7 +4476,7 @@ index 000000000..5691022f6
 +  return __vdso_munmap(addr, length);
 +}
 +
-+int32_t process_create(os::arg const *argv, size_t argc, os::arg const *envp, size_t envc, os::attr const *attrs, size_t n, uint64_t flags)
++int32_t process_create(arg const *argv, size_t argc, arg const *envp, size_t envc, attr const *attrs, size_t n, uint64_t flags)
 +{
 +  return __vdso_process_create(argv, argc, envp, envc, attrs, n, flags);
 +}
@@ -4004,19 +4496,42 @@ index 000000000..5691022f6
 +  return __vdso_futex_wait(addr, expected, abstime);
 +}
 +
++int32_t sleep(uint64_t timeout)
++{
++  uint64_t tp;
++  if (auto rc = clock_time(CLOCK_MONOTONIC, &tp); rc < 0)
++    return rc;
++  
++  uint64_t abstime = uint64_t(-1);
++  if (timeout < uint64_t(-1) - tp)
++    abstime = tp + timeout;
++
++  return __vdso_sleep(abstime);
++}
++
 +int32_t futex_wake(uint32_t *addr, uint32_t count)
 +{
 +  return __vdso_futex_wake(addr, count);
 +}
 +
-+int32_t process_kill(int32_t pid)
++int32_t sched_get_param(int32_t id, sched_param *param)
 +{
-+  return __vdso_process_kill(pid);
++  return __vdso_sched_get_param(id, param);
++}
++
++int32_t sched_set_param(int32_t id, sched_param const *param)
++{
++  return __vdso_sched_set_param(id, param);
 +}
 +
 +int32_t thread_munmap_exit(void *addr, size_t length)
 +{
 +  return __vdso_thread_munmap_exit(addr, length);
++}
++
++int32_t process_kill(int32_t pid)
++{
++  return __vdso_process_kill(pid);
 +}
 +
 +void thread_exit(int32_t rval)
@@ -4029,120 +4544,35 @@ index 000000000..5691022f6
 +  return __vdso_process_exit(rval);
 +}
 +
-+} // namespace os
++int32_t kill(char const *uuid, size_t uuidlen, uint64_t flags)
++{
++  return __vdso_kill(uuid, uuidlen, flags);
++}
++
++}
 diff --git a/libc/src/__support/OSUtil/zaos/vdso.h b/libc/src/__support/OSUtil/zaos/vdso.h
 new file mode 100644
-index 000000000..ae3f54941
+index 000000000..973082ef3
 --- /dev/null
 +++ b/libc/src/__support/OSUtil/zaos/vdso.h
-@@ -0,0 +1,107 @@
-+//===---------- x86/x86_64 vdso configuration ---------------------* C++ *-===//
+@@ -0,0 +1,17 @@
++//===-------------- Zaos implementation of vdso -----------------*- C++ -*-===//
 +//
 +// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 +// See https://llvm.org/LICENSE.txt for license information.
 +// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 +//
 +//===----------------------------------------------------------------------===//
-+#ifndef LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_X86_64_VDSO_H
-+#define LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_X86_64_VDSO_H
-+#include <stdint.h>
-+#include <stddef.h>
-+#include "hdr/errno_macros.h"
 +
-+#define ETIMEDOUT 110
++#ifndef LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_VDSO_H
++#define LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_VDSO_H
 +
-+namespace os {
++#include "src/__support/CPP/string_view.h"
++#include "src/__support/macros/config.h"
 +
-+struct arg
-+{
-+  uint8_t *beg;
-+  uint8_t *end;
-+};
++#include <zaos/vdso.h>
 +
-+struct attr
-+{
-+  inline static constexpr int32_t stdin = 0;
-+  inline static constexpr int32_t stdout = 1;
-+  inline static constexpr int32_t stderr = 2;
-+  inline static constexpr int32_t stdroot = 4;
-+  inline static constexpr int32_t stdcwd = 5;
-+  //inline constexpr  fn dupfd(i32 fd) -> i32 { return fd; }
-+  inline static constexpr int32_t enddup = 255;
-+
-+  int32_t type;
-+  uintptr_t value;
-+};
-+
-+enum priority
-+{
-+  lowest = 1,
-+  low = 5,
-+  normal = 10,
-+  display = 15,
-+  high = 20,
-+  max = 50,
-+};
-+
-+constexpr uint64_t WNOHANG = 0x1;
-+constexpr uint64_t WNOWAIT = 0x2;
-+
-+enum clock
-+{
-+  realtime = 0,
-+  monotonic = 1,
-+};
-+
-+enum mmap
-+{
-+  shared = 0x1,
-+  privated = 0x2,
-+  anonymous = 0x20,
-+};
-+
-+enum prot
-+{
-+  none = 0,
-+  readonly = 1,
-+  readwrite = 2,
-+  executable = 4,
-+};
-+
-+struct mmvec
-+{
-+  uint64_t offset;
-+  size_t length;
-+  uintptr_t base;
-+  uint32_t flags;
-+  uint32_t prot;
-+};
-+
-+int32_t get_tid();
-+uint32_t get_uid();
-+uint32_t get_euid();
-+uint32_t get_gid();
-+uint32_t get_egid();
-+
-+int32_t clock_res(int32_t clockid, uint64_t *res);
-+int32_t clock_time(int32_t clockid, uint64_t *tp);
-+
-+size_t get_pagesize();
-+int32_t mmap(int32_t fd, os::mmvec const *mmvs, size_t n, void **addrbuf, uint64_t flags);
-+int32_t munmap(void *addr, size_t length);
-+
-+int32_t process_create(os::arg const *argv, size_t argc, os::arg const *envp, size_t envc, os::attr const *attrs, size_t n, uint64_t flags);
-+int32_t thread_create(void *stack, void (*start_routine)(), void *start_argument, int32_t priority, int32_t *tid, uint64_t flags);
-+int32_t wait(int32_t id, int32_t *rvalbuf, uint64_t flags);
-+int32_t futex_wait(uint32_t *addr, uint32_t expected, uint64_t abstime);
-+int32_t futex_wake(uint32_t *addr, uint32_t count);
-+int32_t process_kill(int32_t pid);
-+int32_t thread_munmap_exit(void *addr, size_t length);
-+void thread_exit(int32_t rval);
-+void process_exit(int32_t rval);
-+
-+} // namespace os
-+
-+
-+#endif // LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_X86_64_VDSO_H
++#endif // LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_VDSO_H
 diff --git a/libc/src/__support/OSUtil/zaos/x86_64/CMakeLists.txt b/libc/src/__support/OSUtil/zaos/x86_64/CMakeLists.txt
 new file mode 100644
 index 000000000..e69de29bb
@@ -4214,7 +4644,7 @@ index 000000000..51c11fa2e
 +)
 diff --git a/libc/src/__support/threads/zaos/mutex.h b/libc/src/__support/threads/zaos/mutex.h
 new file mode 100644
-index 000000000..a7e0ffd6c
+index 000000000..30986fb4e
 --- /dev/null
 +++ b/libc/src/__support/threads/zaos/mutex.h
 @@ -0,0 +1,100 @@
@@ -4233,8 +4663,8 @@ index 000000000..a7e0ffd6c
 +#include "src/__support/CPP/atomic.h"
 +#include "src/__support/CPP/optional.h"
 +#include "src/__support/libc_assert.h"
-+#include "src/__support/macros/config.h"
 +#include "src/__support/OSUtil/zaos/vdso.h"
++#include "src/__support/macros/config.h"
 +#include "src/__support/threads/mutex_common.h"
 +
 +namespace LIBC_NAMESPACE_DECL {
@@ -4290,7 +4720,7 @@ index 000000000..a7e0ffd6c
 +      if (futex.compare_exchange_strong(state, BUSY))
 +        break;
 +
-+      os::futex_wait(&futex.val, WAITING | BUSY, -1);
++      futex_wait(&futex.val, WAITING | BUSY, -1);
 +    }
 +    return MutexError::NONE;
 +  }
@@ -4302,7 +4732,7 @@ index 000000000..a7e0ffd6c
 +
 +    futex.store(WAITING);
 +
-+    os::futex_wake(&futex.val, 1);
++    futex_wake(&futex.val, 1);
 +    
 +    return MutexError::NONE;
 +  }
@@ -4319,8 +4749,8 @@ index 000000000..a7e0ffd6c
 +
 +#endif // LLVM_LIBC_SRC___SUPPORT_THREADS_ZAOS_MUTEX_H
 diff --git a/libc/src/__support/threads/zaos/thread.cpp b/libc/src/__support/threads/zaos/thread.cpp
-new file mode 100755
-index 000000000..33c4fb885
+new file mode 100644
+index 000000000..01f78a9b9
 --- /dev/null
 +++ b/libc/src/__support/threads/zaos/thread.cpp
 @@ -0,0 +1,316 @@
@@ -4344,8 +4774,8 @@ index 000000000..33c4fb885
 +#include "src/__support/macros/config.h"
 +#include "src/errno/libc_errno.h"                    // For error macros
 +
-+#include "hdr/fcntl_macros.h"
 +#include <stdint.h>
++#include "hdr/fcntl_macros.h"
 +
 +namespace LIBC_NAMESPACE_DECL {
 +
@@ -4368,14 +4798,14 @@ index 000000000..33c4fb885
 +LIBC_INLINE ErrorOr<void *> alloc_stack(size_t stacksize, size_t guardsize) {
 +  (void)guardsize;
 +
-+  os::mmvec mmvec = {};
++  mmvec mmvec = {};
 +  mmvec.length = stacksize;
-+  mmvec.flags = os::mmap::anonymous;
-+  mmvec.prot = os::prot::readwrite;
++  mmvec.flags = MMAP_ANONYMOUS;
++  mmvec.prot = PROT_READWRITE;
 +
 +  void *addr;
-+  if (int32_t rc = os::mmap(-1, &mmvec, 1, &addr, 0); rc < 0)
-+    os::process_exit(1);
++  if (int32_t rc = mmap(-1, &mmvec, 1, &addr, 0); rc < 0)
++    process_exit(1);
 +
 +  return addr;
 +}
@@ -4387,7 +4817,7 @@ index 000000000..33c4fb885
 +free_stack(void *stack, size_t stacksize, size_t guardsize) {
 +  (void)guardsize;
 +
-+  os::munmap(stack, stacksize);
++  munmap(stack, stacksize);
 +}
 +
 +struct Thread;
@@ -4438,7 +4868,7 @@ index 000000000..33c4fb885
 +        thread_ring.fd = static_cast<int32_t>(aux_entry->value);
 +        break;
 +      case 36: // RINGHDR
-+        thread_ring.header = reinterpret_cast<os::ioring_header *>(aux_entry->value);
++        thread_ring.header = reinterpret_cast<ioring_header*>(aux_entry->value);
 +        break;
 +      default:
 +        break;
@@ -4550,7 +4980,7 @@ index 000000000..33c4fb885
 +  start_args->runner = runner;
 +  start_args->arg = arg;
 +
-+  int32_t clone_result = os::thread_create(stack, start_thread, start_args, os::priority::normal, &attrib->tid, 0);
++  int32_t clone_result = thread_create(stack, start_thread, start_args, SCHED_NORMAL, &attrib->tid, 0);
 +
 +  if (clone_result == 0) {
 +    start_thread();
@@ -4591,7 +5021,7 @@ index 000000000..33c4fb885
 +
 +void Thread::wait() {
 +  int32_t rval;
-+  os::wait(attrib->tid, &rval, 0);
++  ::wait(attrib->tid, &rval, 0);
 +}
 +
 +bool Thread::operator==(const Thread &thread) const {
@@ -4630,11 +5060,11 @@ index 000000000..33c4fb885
 +    // Thread is detached so cleanup the resources.
 +    cleanup_thread_resources(attrib);
 +
-+    os::thread_exit(0);
++    ::thread_exit(0);
 +    __builtin_unreachable();
 +  }
 +
-+  os::thread_exit(0);
++  ::thread_exit(0);
 +
 +  __builtin_unreachable();
 +}
@@ -4661,7 +5091,7 @@ index 000000000..e37df39a6
 +)
 diff --git a/libc/src/__support/time/zaos/clock_gettime.cpp b/libc/src/__support/time/zaos/clock_gettime.cpp
 new file mode 100644
-index 000000000..bed64492d
+index 000000000..5c82520fc
 --- /dev/null
 +++ b/libc/src/__support/time/zaos/clock_gettime.cpp
 @@ -0,0 +1,38 @@
@@ -4685,7 +5115,7 @@ index 000000000..bed64492d
 +namespace internal {
 +ErrorOr<int> clock_gettime(clockid_t clockid, timespec *ts) {
 +  uint64_t tp = 0;
-+  int32_t ret = os::clock_time(clockid, &tp);
++  int32_t ret = clock_time(clockid, &tp);
 +
 +  static_assert(
 +      sizeof(time_t) == sizeof(int64_t),
@@ -4702,6 +5132,209 @@ index 000000000..bed64492d
 +}
 +
 +} // namespace internal
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/stdio/freadat.h b/libc/src/stdio/freadat.h
+new file mode 100644
+index 000000000..c542350cd
+--- /dev/null
++++ b/libc/src/stdio/freadat.h
+@@ -0,0 +1,23 @@
++//===-- Implementation header of freadat ------------------------*- C++ -*-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_LIBC_SRC_STDIO_FREADAT_H
++#define LLVM_LIBC_SRC_STDIO_FREADAT_H
++
++#include "hdr/types/FILE.h"
++#include "src/__support/macros/config.h"
++#include <stddef.h>
++
++namespace LIBC_NAMESPACE_DECL {
++
++size_t freadat(void *__restrict buffer, size_t size, size_t nmemb,
++             long offset, ::FILE *stream);
++
++} // namespace LIBC_NAMESPACE_DECL
++
++#endif // LLVM_LIBC_SRC_STDIO_FREADAT_H
+diff --git a/libc/src/stdio/fwriteat.h b/libc/src/stdio/fwriteat.h
+new file mode 100644
+index 000000000..4a86753e5
+--- /dev/null
++++ b/libc/src/stdio/fwriteat.h
+@@ -0,0 +1,23 @@
++//===-- Implementation header of fwriteat -----------------------*- C++ -*-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_LIBC_SRC_STDIO_FWRITEAT_H
++#define LLVM_LIBC_SRC_STDIO_FWRITEAT_H
++
++#include "hdr/types/FILE.h"
++#include "src/__support/macros/config.h"
++#include <stddef.h>
++
++namespace LIBC_NAMESPACE_DECL {
++
++size_t fwriteat(const void *__restrict ptr, size_t size, size_t nmemb,
++              long offset, ::FILE *__restrict stream);
++
++} // namespace LIBC_NAMESPACE_DECL
++
++#endif // LLVM_LIBC_SRC_STDIO_FWRITEAT_H
+diff --git a/libc/src/stdio/zaos/CMakeLists.txt b/libc/src/stdio/zaos/CMakeLists.txt
+new file mode 100644
+index 000000000..631ec0902
+--- /dev/null
++++ b/libc/src/stdio/zaos/CMakeLists.txt
+@@ -0,0 +1,35 @@
++add_entrypoint_object(
++  remove
++  SRCS
++    remove.cpp
++  HDRS
++    ../remove.h
++  DEPENDS
++    libc.hdr.fcntl_macros
++    libc.include.unistd
++    libc.src.__support.OSUtil.osutil
++    libc.src.errno.errno
++)
++
++add_entrypoint_object(
++  rename
++  SRCS
++    rename.cpp
++  HDRS
++    ../rename.h
++  DEPENDS
++    libc.src.__support.OSUtil.osutil
++    libc.src.errno.errno
++    libc.hdr.fcntl_macros
++)
++
++add_entrypoint_object(
++  fdopen
++  SRCS
++    fdopen.cpp
++  HDRS
++    ../fdopen.h
++  DEPENDS
++    libc.src.__support.File.file
++    libc.src.__support.File.platform_file
++)
+diff --git a/libc/src/stdio/zaos/fdopen.cpp b/libc/src/stdio/zaos/fdopen.cpp
+new file mode 100644
+index 000000000..7d72fdc88
+--- /dev/null
++++ b/libc/src/stdio/zaos/fdopen.cpp
+@@ -0,0 +1,26 @@
++//===-- Implementation of fdopen --------------------------------*- C++ -*-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/stdio/fdopen.h"
++
++#include "src/__support/File/linux/file.h"
++#include "src/__support/macros/config.h"
++#include "src/errno/libc_errno.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++LLVM_LIBC_FUNCTION(::FILE *, fdopen, (int fd, const char *mode)) {
++  auto result = LIBC_NAMESPACE::create_file_from_fd(fd, mode);
++  if (!result.has_value()) {
++    libc_errno = result.error();
++    return nullptr;
++  }
++  return reinterpret_cast<::FILE *>(result.value());
++}
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/stdio/zaos/remove.cpp b/libc/src/stdio/zaos/remove.cpp
+new file mode 100644
+index 000000000..f7707c516
+--- /dev/null
++++ b/libc/src/stdio/zaos/remove.cpp
+@@ -0,0 +1,31 @@
++//===-- Linux implementation of remove ------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/stdio/remove.h"
++
++#include "src/__support/OSUtil/zaos/ioring.h"
++#include "src/__support/common.h"
++
++#include "hdr/fcntl_macros.h" // For AT_* macros.
++#include "src/__support/macros/config.h"
++#include "src/string/strlen.h"
++#include "src/errno/libc_errno.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++LLVM_LIBC_FUNCTION(int, remove, (const char *path)) {
++  int ret = unlink(&thread_ring, path, strlen(path), 0);
++  if (ret < 0)
++  {
++    libc_errno = -ret;
++    return -1;
++  }
++  return 0;
++}
++
++} // namespace LIBC_NAMESPACE_DECL
+diff --git a/libc/src/stdio/zaos/rename.cpp b/libc/src/stdio/zaos/rename.cpp
+new file mode 100644
+index 000000000..2334f7390
+--- /dev/null
++++ b/libc/src/stdio/zaos/rename.cpp
+@@ -0,0 +1,29 @@
++//===-- Linux implementation of rename ------------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "src/stdio/rename.h"
++#include "hdr/fcntl_macros.h"
++#include "src/__support/OSUtil/zaos/ioring.h"
++#include "src/__support/common.h"
++#include "src/__support/macros/config.h"
++#include "src/string/strlen.h"
++#include "src/errno/libc_errno.h"
++
++namespace LIBC_NAMESPACE_DECL {
++
++LLVM_LIBC_FUNCTION(int, rename, (const char *oldpath, const char *newpath)) {
++  int ret = rename(&thread_ring, oldpath, strlen(oldpath), newpath, strlen(newpath), 0);
++  if (ret < 0)
++  {
++    libc_errno = -ret;
++    return -1;
++  }
++  return 0;
++}
++
 +} // namespace LIBC_NAMESPACE_DECL
 diff --git a/libc/src/stdlib/CMakeLists.txt b/libc/src/stdlib/CMakeLists.txt
 index 73a9fbf1e..877657164 100644
@@ -4924,10 +5557,10 @@ index 000000000..0b76e0b57
 +} // namespace LIBC_NAMESPACE_DECL
 diff --git a/libc/src/stdlib/zaos/heap.cpp b/libc/src/stdlib/zaos/heap.cpp
 new file mode 100644
-index 000000000..f163e974b
+index 000000000..ce34e4cf3
 --- /dev/null
 +++ b/libc/src/stdlib/zaos/heap.cpp
-@@ -0,0 +1,152 @@
+@@ -0,0 +1,154 @@
 +//===-- Implementation for heap -------------------------------------------===//
 +//
 +// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
@@ -4937,10 +5570,10 @@ index 000000000..f163e974b
 +//===----------------------------------------------------------------------===//
 +
 +#include "src/stdlib/zaos/heap.h"
++#include "src/__support/OSUtil/zaos/vdso.h"
 +#include "src/__support/common.h"
 +#include "src/__support/CPP/mutex.h"
 +#include "src/__support/CPP/algorithm.h"
-+#include "src/__support/OSUtil/zaos/vdso.h"
 +#include "src/__support/macros/config.h"
 +#include "src/string/memory_utils/inline_memcpy.h"
 +#include "src/string/memory_utils/inline_memset.h"
@@ -4955,8 +5588,6 @@ index 000000000..f163e974b
 +Heap *heap = &heap_symbols;
 +
 +void *Heap::allocate(size_t alignment, size_t size) {
-+  cpp::lock_guard lock(mutex);
-+
 +  if (size == 0)
 +    return nullptr;
 +
@@ -4964,12 +5595,10 @@ index 000000000..f163e974b
 +  if (alignment && (alignment & (alignment - 1)) != 0)
 +    return nullptr;
 +
-+  // The size parameter must be an integral multiple of alignment.
-+  if (size % alignment != 0)
-+    return nullptr;
-+
 +  // The minimum alignment supported by Block is max_align_t.
 +  alignment = cpp::max(alignment, alignof(max_align_t));
++
++  cpp::lock_guard lock(mutex);
 +
 +  if (!is_initialized)
 +  {
@@ -4984,13 +5613,13 @@ index 000000000..f163e974b
 +  Block *block = free_store.remove_best_fit(request_size);
 +  if (!block)
 +  {
-+    os::mmvec mmvec = {};
-+    mmvec.length = cpp::max(request_size, MAX_BLOCK_SIZE);
-+    mmvec.flags = os::mmap::anonymous;
-+    mmvec.prot = os::prot::readwrite;
++    mmvec mmvec = {};
++    mmvec.length = cpp::max(align_up(request_size + sizeof(Block), alignof(max_align_t)), MAX_BLOCK_SIZE);
++    mmvec.flags = MMAP_ANONYMOUS;
++    mmvec.prot = PROT_READWRITE;
 +
 +    void *addr;
-+    if (int32_t rc = os::mmap(-1, &mmvec, 1, &addr, 0); rc < 0)
++    if (int32_t rc = mmap(-1, &mmvec, 1, &addr, 0); rc < 0)
 +      return nullptr;
 +
 +    block = *Block::init({static_cast<cpp::byte*>(addr), mmvec.length});
@@ -4998,10 +5627,13 @@ index 000000000..f163e974b
 +
 +  auto block_info = Block::allocate(block, alignment, size);
 +
-+  if (block_info.next)
-+    free_store.insert(block_info.next);
-+  if (block_info.prev)
-+    free_store.insert(block_info.prev);
++  if (block->outer_size() < MAX_BLOCK_SIZE)
++  {
++    if (block_info.next)
++      free_store.insert(block_info.next);
++    if (block_info.prev)
++      free_store.insert(block_info.prev);
++  }
 +
 +  block_info.block->mark_used();
 +
@@ -5043,6 +5675,9 @@ index 000000000..f163e974b
 +}
 +
 +void Heap::free(void *ptr) {
++  if (!ptr)
++    return;
++
 +  cpp::lock_guard lock(mutex);
 +
 +  cpp::byte *bytes = static_cast<cpp::byte *>(ptr);
@@ -5074,7 +5709,7 @@ index 000000000..f163e974b
 +  }
 +  else
 +  {
-+    os::munmap(block->region().data(), block->region().size());
++    munmap(block->region().data(), block->region().size());
 +  }
 +}
 +
@@ -5393,7 +6028,7 @@ index 000000000..e8ddf482f
 +} // namespace LIBC_NAMESPACE_DECL
 diff --git a/libc/src/time/zaos/nanosleep.cpp b/libc/src/time/zaos/nanosleep.cpp
 new file mode 100644
-index 000000000..9584bcd53
+index 000000000..0f31839ba
 --- /dev/null
 +++ b/libc/src/time/zaos/nanosleep.cpp
 @@ -0,0 +1,48 @@
@@ -5407,8 +6042,8 @@ index 000000000..9584bcd53
 +
 +#include "src/time/nanosleep.h"
 +#include "hdr/time_macros.h"
-+#include "src/__support/common.h"
 +#include "src/__support/OSUtil/zaos/vdso.h"
++#include "src/__support/common.h"
 +#include "src/__support/macros/config.h"
 +#include "src/errno/libc_errno.h"
 +
@@ -5421,14 +6056,14 @@ index 000000000..9584bcd53
 +  uint64_t nsecs = req->tv_nsec + req->tv_sec * 1000000000;
 +
 +  uint64_t start = 0;
-+  os::clock_time(os::clock::monotonic, &start);
++  clock_time(CLOCK_MONOTONIC, &start);
 +
 +  uint64_t now = 0;
-+  os::clock_time(os::clock::monotonic, &now);
++  clock_time(CLOCK_MONOTONIC, &now);
 +  
 +  while (now - start < nsecs)
 +  {
-+    os::clock_time(os::clock::monotonic, &now);
++    clock_time(CLOCK_MONOTONIC, &now);
 +  }
 +
 +  uint64_t elapsed = (now - start);
@@ -5665,10 +6300,10 @@ new file mode 100644
 index 000000000..e69de29bb
 diff --git a/libc/startup/zaos/do_start.cpp b/libc/startup/zaos/do_start.cpp
 new file mode 100644
-index 000000000..357d50d5f
+index 000000000..edb0428d9
 --- /dev/null
 +++ b/libc/startup/zaos/do_start.cpp
-@@ -0,0 +1,204 @@
+@@ -0,0 +1,206 @@
 +//===-- Implementation file of do_start -----------------------------------===//
 +//
 +// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
@@ -5678,14 +6313,16 @@ index 000000000..357d50d5f
 +//===----------------------------------------------------------------------===//
 +#include "startup/zaos/do_start.h"
 +#include "config/zaos/app.h"
-+#include "src/__support/OSUtil/zaos/vdso.h"
-+#include "src/__support/OSUtil/zaos/ioring.h"
 +#include "src/__support/macros/config.h"
 +#include "src/__support/threads/thread.h"
++#include "src/__support/OSUtil/zaos/ioring.h"
 +#include "src/stdlib/atexit.h"
 +#include "src/stdlib/exit.h"
 +#include "src/unistd/environ.h"
++
 +#include <stdint.h>
++#include <zaos/vdso.h>
++#include <zaos/ioring.h>
 +
 +struct Elf64_Phdr
 +{
@@ -5774,9 +6411,9 @@ index 000000000..357d50d5f
 +void teardown_main_tls() { cleanup_tls(tls.addr, tls.size); }
 +
 +[[noreturn]] void do_start() {
-+  auto tid = os::get_tid();
++  auto tid = get_tid();
 +  if (tid <= 0)
-+    os::process_exit(1);
++    process_exit(1);
 +  main_thread_attrib.tid = static_cast<int>(tid);
 +
 +  uintptr_t *env_ptr = app.args->argv + 2 * app.args->argc + 2;
@@ -5788,7 +6425,7 @@ index 000000000..357d50d5f
 +  // Initialize the POSIX global declared in unistd.h
 +  environ = reinterpret_cast<char **>(env_ptr);
 +
-+  app.page_size = os::get_pagesize();
++  app.page_size = get_pagesize();
 +
 +  uintptr_t program_hdr_table = 0;
 +  uintptr_t program_hdr_entry = 0;
@@ -5836,7 +6473,7 @@ index 000000000..357d50d5f
 +  // capture the context.
 +  init_tls(tls);
 +  if (tls.size != 0 && !set_thread_ptr(tls.tp))
-+    os::process_exit(1);
++    process_exit(1);
 +
 +  for (auto *aux_entry = app.auxv_ptr; aux_entry->id != 0; ++aux_entry) {
 +    switch (aux_entry->id) {
@@ -5844,7 +6481,7 @@ index 000000000..357d50d5f
 +      thread_ring.fd = static_cast<int32_t>(aux_entry->value);
 +      break;
 +    case 36: // RINGHDR
-+      thread_ring.header = reinterpret_cast<os::ioring_header *>(aux_entry->value);
++      thread_ring.header = reinterpret_cast<ioring_header*>(aux_entry->value);
 +      break;
 +    default:
 +      break;
@@ -5969,10 +6606,10 @@ index 000000000..c4d5c1ed1
 +}
 diff --git a/libc/startup/zaos/x86_64/tls.cpp b/libc/startup/zaos/x86_64/tls.cpp
 new file mode 100644
-index 000000000..a5197b1c8
+index 000000000..52e40f004
 --- /dev/null
 +++ b/libc/startup/zaos/x86_64/tls.cpp
-@@ -0,0 +1,71 @@
+@@ -0,0 +1,73 @@
 +//===-- Implementation of tls for x86_64 ----------------------------------===//
 +//
 +// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
@@ -5981,10 +6618,12 @@ index 000000000..a5197b1c8
 +//
 +//===----------------------------------------------------------------------===//
 +
-+#include "src/__support/OSUtil/zaos/vdso.h"
 +#include "src/__support/macros/config.h"
 +#include "src/string/memory_utils/inline_memcpy.h"
 +#include "startup/zaos/do_start.h"
++
++#include <zaos/vdso.h>
++#include <zaos/ioring.h>
 +
 +namespace LIBC_NAMESPACE_DECL {
 +
@@ -6010,14 +6649,14 @@ index 000000000..a5197b1c8
 +  // We cannot call the mmap function here as the functions set errno on
 +  // failure. Since errno is implemented via a thread local variable, we cannot
 +  // use errno before TLS is setup.
-+  os::mmvec mmvec = {};
++  mmvec mmvec = {};
 +  mmvec.length = tls_size_with_addr;
-+  mmvec.flags = os::mmap::anonymous;
-+  mmvec.prot = os::prot::readwrite;
++  mmvec.flags = MMAP_ANONYMOUS;
++  mmvec.prot = PROT_READWRITE;
 +
 +  void *tls_addr;
-+  if (int32_t rc = os::mmap(-1, &mmvec, 1, &tls_addr, 0); rc < 0)
-+    os::process_exit(1);
++  if (int32_t rc = mmap(-1, &mmvec, 1, &tls_addr, 0); rc < 0)
++    process_exit(1);
 +
 +  uintptr_t end_ptr = reinterpret_cast<uintptr_t>(tls_addr) + tls_size;
 +  *reinterpret_cast<uintptr_t *>(end_ptr) = end_ptr;
@@ -6035,7 +6674,7 @@ index 000000000..a5197b1c8
 +void cleanup_tls(uintptr_t addr, uintptr_t size) {
 +  if (size == 0)
 +    return;
-+  os::munmap((void*)addr, size);
++  munmap((void*)addr, size);
 +}
 +
 +// Sets the thread pointer to |val|. Returns true on success, false on failure.

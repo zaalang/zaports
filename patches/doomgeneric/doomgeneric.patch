@@ -1,0 +1,300 @@
+From e071de2592e466f530cd5e84ff5ad8f10a3c84af Mon Sep 17 00:00:00 2001
+From: Peter Niekamp <pniekamp@gmail.com>
+Date: Sun, 3 Aug 2025 19:26:09 +1000
+Subject: [PATCH] 1
+
+---
+ doomgeneric/Makefile.zaos      | 54 +++++++++++++++++++
+ doomgeneric/doomgeneric_zaos.c | 94 ++++++++++++++++++++++++++++++++++
+ doomgeneric/g_game.c           |  5 +-
+ doomgeneric/i_system.c         |  4 +-
+ doomgeneric/i_video.c          |  2 -
+ doomgeneric/i_video.h          |  1 +
+ doomgeneric/m_misc.c           |  6 +--
+ doomgeneric/w_file.c           |  1 +
+ doomgeneric/z_zone.h           |  1 +
+ 9 files changed, 160 insertions(+), 8 deletions(-)
+ create mode 100644 doomgeneric/Makefile.zaos
+ create mode 100644 doomgeneric/doomgeneric_zaos.c
+
+diff --git a/doomgeneric/Makefile.zaos b/doomgeneric/Makefile.zaos
+new file mode 100644
+index 0000000..1033148
+--- /dev/null
++++ b/doomgeneric/Makefile.zaos
+@@ -0,0 +1,54 @@
++################################################################
++#
++# $Id:$
++#
++# $Log:$
++#
++
++ifeq ($(V),1)
++        VB=''
++else
++        VB=@
++endif
++
++
++CC=clang
++CFLAGS+=-ggdb3 -Os
++LDFLAGS+=-Wl,--gc-sections
++CFLAGS+=-ggdb3 -Wall -DNORMALUNIX -DLINUX -DSNDSERV -D_DEFAULT_SOURCE # -DUSEASM
++LIBS+=-lm -lc
++
++# subdirectory for objects
++OBJDIR=build
++OUTPUT=doomgeneric
++
++SRC_DOOM = i_main.o dummy.o am_map.o doomdef.o doomstat.o dstrings.o d_event.o d_items.o d_iwad.o d_loop.o d_main.o d_mode.o d_net.o f_finale.o f_wipe.o g_game.o hu_lib.o hu_stuff.o info.o i_cdmus.o i_endoom.o i_joystick.o i_scale.o i_sound.o i_system.o i_timer.o memio.o m_argv.o m_bbox.o m_cheat.o m_config.o m_controls.o m_fixed.o m_menu.o m_misc.o m_random.o p_ceilng.o p_doors.o p_enemy.o p_floor.o p_inter.o p_lights.o p_map.o p_maputl.o p_mobj.o p_plats.o p_pspr.o p_saveg.o p_setup.o p_sight.o p_spec.o p_switch.o p_telept.o p_tick.o p_user.o r_bsp.o r_data.o r_draw.o r_main.o r_plane.o r_segs.o r_sky.o r_things.o sha1.o sounds.o statdump.o st_lib.o st_stuff.o s_sound.o tables.o v_video.o wi_stuff.o w_checksum.o w_file.o w_main.o w_wad.o z_zone.o w_file_stdc.o i_input.o i_video.o doomgeneric.o doomgeneric_zaos.o
++OBJS += $(addprefix $(OBJDIR)/, $(SRC_DOOM))
++
++all:	 $(OUTPUT)
++
++clean:
++	rm -rf $(OBJDIR)
++	rm -f $(OUTPUT)
++	rm -f $(OUTPUT).gdb
++	rm -f $(OUTPUT).map
++
++$(OUTPUT):	$(OBJS)
++	@echo [Linking $@]
++	$(VB)$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) \
++	-o $(OUTPUT) $(LIBS) -Wl,-Map,$(OUTPUT).map
++	@echo [Size]
++	-$(CROSS_COMPILE)size $(OUTPUT)
++
++$(OBJS): | $(OBJDIR)
++
++$(OBJDIR):
++	mkdir -p $(OBJDIR)
++
++$(OBJDIR)/%.o:	%.c
++	@echo [Compiling $<]
++	$(VB)$(CC) $(CFLAGS) -c $< -o $@
++
++print:
++	@echo OBJS: $(OBJS)
++
+diff --git a/doomgeneric/doomgeneric_zaos.c b/doomgeneric/doomgeneric_zaos.c
+new file mode 100644
+index 0000000..5e04ed0
+--- /dev/null
++++ b/doomgeneric/doomgeneric_zaos.c
+@@ -0,0 +1,94 @@
++#include "doomgeneric.h"
++
++#include <stdio.h>
++#include <string.h>
++#include <zaos/vdso.h>
++#include <zaos/ioring.h>
++
++#define FBIO_SCREENINFO 0X80034600
++
++struct screeninfo {
++  uint64_t caps;
++  size_t width;
++  size_t height;
++  size_t depth;
++  size_t pitch;
++};
++
++static char *fb = NULL;
++static size_t fb_width = 0;
++static size_t fb_height = 0;
++static size_t fb_pitch = 0;
++static size_t fb_xoffset = 0;
++static size_t fb_yoffset = 0;
++
++void DG_Init(){
++
++  int fd = open(thread_ring(), "/dev/fb0", 8, O_RDWR, 0);
++
++  if (fd < 0) {
++     printf("Error opening framebuffer\n");
++     exit(1);
++  };
++
++  struct screeninfo si;
++
++  if (ioctl(thread_ring(), fd, FBIO_SCREENINFO, &si, sizeof(si)) < 0) {
++     printf("Error reading framebuffer\n");
++     exit(1);
++  };
++
++  mmvec mmvec;
++  mmvec.offset = 0;
++  mmvec.length = si.pitch*si.height;
++  mmvec.flags = MMAP_SHARED;
++  mmvec.prot = PROT_READWRITE;
++
++  void *addr = NULL;
++  if (mmap(fd, &mmvec, 1, &addr, 0) < 0) {
++      printf("Error mapping framebuffer\n");
++      exit(1);
++  };
++
++  fb = addr;
++  fb_width = si.width;
++  fb_height = si.height;
++  fb_pitch = si.pitch;
++  fb_xoffset = (fb_width - DOOMGENERIC_RESX) / 2;
++  fb_yoffset = (fb_height - DOOMGENERIC_RESY) / 2;
++
++  close(thread_ring(), fd);
++}
++
++void DG_DrawFrame()
++{
++  for (size_t y = 0; y < DOOMGENERIC_RESY; ++y) {
++    void *src = DG_ScreenBuffer + (DOOMGENERIC_RESX * y);
++    void *dst = fb + (fb_pitch * (fb_yoffset + y)) + (fb_xoffset * 4);
++
++    memcpy(dst, src, DOOMGENERIC_RESX * 4);
++  }
++
++//  handleKeyInput();
++}
++
++void DG_SleepMs(uint32_t ms)
++{
++  sleep((uint64_t)ms * 1000000);
++}
++
++uint32_t DG_GetTicksMs()
++{
++  uint64_t tp;
++  clock_time(CLOCK_MONOTONIC, &tp);
++  return tp / 1000000;
++}
++
++int DG_GetKey(int* pressed, unsigned char* doomKey)
++{
++  return 0;
++}
++
++void DG_SetWindowTitle(const char * title)
++{
++}
+diff --git a/doomgeneric/g_game.c b/doomgeneric/g_game.c
+index 9954d78..602cefb 100644
+--- a/doomgeneric/g_game.c
++++ b/doomgeneric/g_game.c
+@@ -20,6 +20,7 @@
+ #include <string.h>
+ #include <stdlib.h>
+ #include <math.h>
++#include <zaos/ioring.h>
+ 
+ #include "doomdef.h" 
+ #include "doomkeys.h"
+@@ -1672,8 +1673,8 @@ void G_DoSaveGame (void)
+     // Now rename the temporary savegame file to the actual savegame
+     // file, overwriting the old savegame if there was one there.
+ 
+-    remove(savegame_file);
+-    rename(temp_savegame_file, savegame_file);
++    unlink(thread_ring(), savegame_file, strlen(savegame_file), 0);
++    rename(thread_ring(), temp_savegame_file, strlen(temp_savegame_file), savegame_file, strlen(savegame_file), 0);
+     
+     gameaction = ga_nothing;
+     M_StringCopy(savedescription, "", sizeof(savedescription));
+diff --git a/doomgeneric/i_system.c b/doomgeneric/i_system.c
+index 5d00091..aefacbe 100644
+--- a/doomgeneric/i_system.c
++++ b/doomgeneric/i_system.c
+@@ -264,7 +264,7 @@ void I_Quit (void)
+ #endif
+ }
+ 
+-#if !defined(_WIN32) && !defined(__MACOSX__)
++#if !defined(_WIN32) && !defined(__MACOSX__) && !defined(__zaos__)
+ #define ZENITY_BINARY "/usr/bin/zenity"
+ 
+ // returns non-zero if zenity is available
+@@ -448,6 +448,8 @@ void I_Error (char *error, ...)
+                                         message,
+                                         NULL);
+     }
++#elif defined(__zaos__)
++
+ #else
+     {
+         ZenityErrorBox(msgbuf);
+diff --git a/doomgeneric/i_video.c b/doomgeneric/i_video.c
+index bf63035..7722759 100644
+--- a/doomgeneric/i_video.c
++++ b/doomgeneric/i_video.c
+@@ -45,8 +45,6 @@ rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
+ 
+ #include <stdarg.h>
+ 
+-#include <sys/types.h>
+-
+ //#define CMAP256
+ 
+ struct FB_BitField
+diff --git a/doomgeneric/i_video.h b/doomgeneric/i_video.h
+index 3c7db19..3a07fbc 100644
+--- a/doomgeneric/i_video.h
++++ b/doomgeneric/i_video.h
+@@ -110,6 +110,7 @@ void I_FinishUpdate (void);
+ void I_ReadScreen (byte* scr);
+ 
+ void I_BeginRead (void);
++void I_EndRead (void);
+ 
+ void I_SetWindowTitle(char *title);
+ 
+diff --git a/doomgeneric/m_misc.c b/doomgeneric/m_misc.c
+index 53b86db..c5ebbef 100644
+--- a/doomgeneric/m_misc.c
++++ b/doomgeneric/m_misc.c
+@@ -32,8 +32,8 @@
+ #include <direct.h>
+ #endif
+ #else
+-#include <sys/stat.h>
+-#include <sys/types.h>
++#include <zaos/vdso.h>
++#include <zaos/ioring.h>
+ #endif
+ 
+ #include "doomtype.h"
+@@ -57,7 +57,7 @@ void M_MakeDirectory(char *path)
+ #ifdef _WIN32
+     mkdir(path);
+ #else
+-    mkdir(path, 0755);
++    mkdir(thread_ring(), path, strlen(path), 0, 0755);
+ #endif
+ }
+ 
+diff --git a/doomgeneric/w_file.c b/doomgeneric/w_file.c
+index cce3737..a47412d 100644
+--- a/doomgeneric/w_file.c
++++ b/doomgeneric/w_file.c
+@@ -17,6 +17,7 @@
+ //
+ 
+ #include <stdio.h>
++#include <string.h>
+ 
+ #include "config.h"
+ 
+diff --git a/doomgeneric/z_zone.h b/doomgeneric/z_zone.h
+index 526f30d..37fd03b 100644
+--- a/doomgeneric/z_zone.h
++++ b/doomgeneric/z_zone.h
+@@ -25,6 +25,7 @@
+ #define __Z_ZONE__
+ 
+ #include <stdio.h>
++#include <string.h>
+ 
+ //
+ // ZONE MEMORY
+-- 
+2.49.0
+
