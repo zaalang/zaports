@@ -1,6 +1,6 @@
-From c630eb73ecfe8fc96286e09288d4a75b7e930cc2 Mon Sep 17 00:00:00 2001
+From 9beb292b963d8d612577ffed290b5b8d44cdfc00 Mon Sep 17 00:00:00 2001
 From: Peter Niekamp <pniekamp@gmail.com>
-Date: Sun, 3 Aug 2025 19:22:07 +1000
+Date: Sat, 3 Jan 2026 00:12:59 +1100
 Subject: [PATCH] 1
 
 ---
@@ -70,7 +70,7 @@ Subject: [PATCH] 1
  libc/src/time/zaos/clock.cpp                  |   47 +
  libc/src/time/zaos/clock_gettime.cpp          |   30 +
  libc/src/time/zaos/gettimeofday.cpp           |   42 +
- libc/src/time/zaos/nanosleep.cpp              |   48 +
+ libc/src/time/zaos/nanosleep.cpp              |   27 +
  libc/src/time/zaos/timespec_get.cpp           |   45 +
  libc/startup/linux/do_start.cpp               |    5 -
  libc/startup/zaos/CMakeLists.txt              |  139 ++
@@ -84,7 +84,7 @@ Subject: [PATCH] 1
  lld/ELF/Writer.cpp                            |    2 +-
  llvm/include/llvm/TargetParser/Triple.h       |    1 +
  llvm/lib/TargetParser/Triple.cpp              |    2 +
- 80 files changed, 5966 insertions(+), 17 deletions(-)
+ 80 files changed, 5945 insertions(+), 17 deletions(-)
  create mode 100644 clang/lib/Driver/ToolChains/ZaOS.cpp
  create mode 100644 clang/lib/Driver/ToolChains/ZaOS.h
  create mode 100644 libc/config/zaos/app.h
@@ -2421,7 +2421,7 @@ index 000000000..088e5f4ac
 +functions: []
 diff --git a/libc/include/zaos/vdso.h.def b/libc/include/zaos/vdso.h.def
 new file mode 100644
-index 000000000..8cb727237
+index 000000000..dc2c96ce0
 --- /dev/null
 +++ b/libc/include/zaos/vdso.h.def
 @@ -0,0 +1,106 @@
@@ -2505,8 +2505,8 @@ index 000000000..8cb727237
 +uint32_t get_gid();
 +uint32_t get_egid();
 +
-+int32_t clock_res(int32_t clockid, uint64_t *res);
-+int32_t clock_time(int32_t clockid, uint64_t *tp);
++int32_t clock_getres(int32_t clockid, uint64_t *res);
++int32_t clock_gettime(int32_t clockid, uint64_t *tp);
 +
 +size_t get_pagesize();
 +int32_t mmap(int32_t fd, mmvec const *mmvs, size_t n, void **addrbuf, uint64_t flags);
@@ -4374,7 +4374,7 @@ index 000000000..055a282af
 +#endif // LLVM_LIBC_SRC___SUPPORT_OSUTIL_ZAOS_IORING_H
 diff --git a/libc/src/__support/OSUtil/zaos/vdso.cpp b/libc/src/__support/OSUtil/zaos/vdso.cpp
 new file mode 100644
-index 000000000..275b5f5ef
+index 000000000..88a754896
 --- /dev/null
 +++ b/libc/src/__support/OSUtil/zaos/vdso.cpp
 @@ -0,0 +1,172 @@
@@ -4397,8 +4397,8 @@ index 000000000..275b5f5ef
 +extern "C" uint32_t __attribute__((weak)) __vdso_get_gid();
 +extern "C" uint32_t __attribute__((weak)) __vdso_get_egid();
 +
-+extern "C" int32_t __attribute__((weak)) __vdso_clock_res(int32_t clockid, uint64_t *res);
-+extern "C" int32_t __attribute__((weak)) __vdso_clock_time(int32_t clockid, uint64_t *tp);
++extern "C" int32_t __attribute__((weak)) __vdso_clock_getres(int32_t clockid, uint64_t *res);
++extern "C" int32_t __attribute__((weak)) __vdso_clock_gettime(int32_t clockid, uint64_t *tp);
 +
 +extern "C" size_t __attribute__((weak)) __vdso_get_pagesize();
 +extern "C" int32_t __attribute__((weak)) __vdso_mmap(int32_t fd, mmvec const *mmvs, size_t n, void **addrbuf, uint64_t flags);
@@ -4451,14 +4451,14 @@ index 000000000..275b5f5ef
 +  return __vdso_get_egid();
 +}
 +
-+int32_t clock_res(int32_t clockid, uint64_t *res)
++int32_t clock_getres(int32_t clockid, uint64_t *res)
 +{
-+  return __vdso_clock_res(clockid, res);
++  return __vdso_clock_getres(clockid, res);
 +}
 +
-+int32_t clock_time(int32_t clockid, uint64_t *tp)
++int32_t clock_gettime(int32_t clockid, uint64_t *tp)
 +{
-+  return __vdso_clock_time(clockid, tp);
++  return __vdso_clock_gettime(clockid, tp);
 +}
 +
 +size_t get_pagesize()
@@ -4499,7 +4499,7 @@ index 000000000..275b5f5ef
 +int32_t sleep(uint64_t timeout)
 +{
 +  uint64_t tp;
-+  if (auto rc = clock_time(CLOCK_MONOTONIC, &tp); rc < 0)
++  if (auto rc = clock_gettime(CLOCK_MONOTONIC, &tp); rc < 0)
 +    return rc;
 +  
 +  uint64_t abstime = uint64_t(-1);
@@ -5091,7 +5091,7 @@ index 000000000..e37df39a6
 +)
 diff --git a/libc/src/__support/time/zaos/clock_gettime.cpp b/libc/src/__support/time/zaos/clock_gettime.cpp
 new file mode 100644
-index 000000000..5c82520fc
+index 000000000..0bbd6cc77
 --- /dev/null
 +++ b/libc/src/__support/time/zaos/clock_gettime.cpp
 @@ -0,0 +1,38 @@
@@ -5115,7 +5115,7 @@ index 000000000..5c82520fc
 +namespace internal {
 +ErrorOr<int> clock_gettime(clockid_t clockid, timespec *ts) {
 +  uint64_t tp = 0;
-+  int32_t ret = clock_time(clockid, &tp);
++  int32_t ret = ::clock_gettime(clockid, &tp);
 +
 +  static_assert(
 +      sizeof(time_t) == sizeof(int64_t),
@@ -6028,10 +6028,10 @@ index 000000000..e8ddf482f
 +} // namespace LIBC_NAMESPACE_DECL
 diff --git a/libc/src/time/zaos/nanosleep.cpp b/libc/src/time/zaos/nanosleep.cpp
 new file mode 100644
-index 000000000..0f31839ba
+index 000000000..631317bd6
 --- /dev/null
 +++ b/libc/src/time/zaos/nanosleep.cpp
-@@ -0,0 +1,48 @@
+@@ -0,0 +1,27 @@
 +//===-- ZaOS implementation of nanosleep function -------------------------===//
 +//
 +// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
@@ -6053,29 +6053,8 @@ index 000000000..0f31839ba
 +
 +LLVM_LIBC_FUNCTION(int, nanosleep,
 +                   (const struct timespec *req, struct timespec *rem)) {
-+  uint64_t nsecs = req->tv_nsec + req->tv_sec * 1000000000;
-+
-+  uint64_t start = 0;
-+  clock_time(CLOCK_MONOTONIC, &start);
-+
-+  uint64_t now = 0;
-+  clock_time(CLOCK_MONOTONIC, &now);
-+  
-+  while (now - start < nsecs)
-+  {
-+    clock_time(CLOCK_MONOTONIC, &now);
-+  }
-+
-+  uint64_t elapsed = (now - start);
-+
-+  if (elapsed < nsecs) {
-+    if (rem) {
-+      rem->tv_sec = (nsecs - elapsed) / 1000000000;
-+      rem->tv_nsec = (nsecs - elapsed) % 1000000000;
-+    }
-+    return -1;
-+  }
-+    
++  (void)rem;
++  ::sleep(req->tv_nsec + req->tv_sec * 1000000000);
 +  return 0;
 +}
 +
@@ -6729,5 +6708,5 @@ index e9e6f130f..83f85321e 100644
  }
  
 -- 
-2.49.0
+2.52.0
 

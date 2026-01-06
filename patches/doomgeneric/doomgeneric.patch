@@ -1,6 +1,6 @@
-From e071de2592e466f530cd5e84ff5ad8f10a3c84af Mon Sep 17 00:00:00 2001
+From 00af6b01c0819f87189df8aaaa0d97135c4ccc63 Mon Sep 17 00:00:00 2001
 From: Peter Niekamp <pniekamp@gmail.com>
-Date: Sun, 3 Aug 2025 19:26:09 +1000
+Date: Sat, 3 Jan 2026 00:28:24 +1100
 Subject: [PATCH] 1
 
 ---
@@ -79,7 +79,7 @@ index 0000000..1033148
 +
 diff --git a/doomgeneric/doomgeneric_zaos.c b/doomgeneric/doomgeneric_zaos.c
 new file mode 100644
-index 0000000..5e04ed0
+index 0000000..adfab25
 --- /dev/null
 +++ b/doomgeneric/doomgeneric_zaos.c
 @@ -0,0 +1,94 @@
@@ -165,7 +165,7 @@ index 0000000..5e04ed0
 +uint32_t DG_GetTicksMs()
 +{
 +  uint64_t tp;
-+  clock_time(CLOCK_MONOTONIC, &tp);
++  clock_gettime(CLOCK_MONOTONIC, &tp);
 +  return tp / 1000000;
 +}
 +
@@ -296,5 +296,5 @@ index 526f30d..37fd03b 100644
  //
  // ZONE MEMORY
 -- 
-2.49.0
+2.52.0
 
